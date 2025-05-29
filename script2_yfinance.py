@@ -1,10 +1,16 @@
 import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
+import os
 
-start_date = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
-end_date = datetime.now().strftime('%Y-%m-%d')
-tickers = ['BROG','SGN','ITOS']
+# 📅 Data
+date_str = datetime.now().strftime("%Y-%m-%d")
+
+# 📥 Carica ticker dal CSV creato dallo script 1
+ticker_file = f"output/tickers_{date_str}.csv"
+df_tickers = pd.read_csv(ticker_file)
+tickers = df_tickers['Ticker'].tolist()
+
 
 intervals = {
     "1m": "1m",
@@ -137,6 +143,10 @@ for ticker in tickers:
 
         final_rows.append(data)
 
+# 📤 Output finale
+output_file = f"output/dati_azioni_completo_{date_str}.xlsx"
+
+# Il resto del codice resta invariato, cambia solo la riga di export finale:
 df_final = pd.DataFrame(final_rows)
-df_final.to_excel("dati_azioni_completo.xlsx", index=False)
-print("✅ File generato: dati_azioni_completo.xlsx")
+df_final.to_excel(output_file, index=False)
+print(f"✅ File generato: {output_file}")
