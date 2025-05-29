@@ -33,7 +33,7 @@ for ticker in tickers:
     try:
         info = stock.info
         float_shares = info.get("floatShares")
-        if float_shares is not None and float_shares > 50000000:
+        if float_shares is not None and float_shares > 50_000_000:
             print(f"❌ Float troppo alto ({float_shares}), skippo...")
             continue
 
@@ -88,3 +88,19 @@ for ticker in tickers:
             hist_1m = hist_1m.tz_localize(None)
             vwap_value = (hist_1m["Close"] * hist_1m["Volume"]).sum() / hist_1m["Volume"].sum()
             vwap_pct = round(((vwap_value - open_price) / open_price) * 100)
+        else:
+            vwap_pct = None
+
+        data["VWAP"] = vwap_value
+        data["VWAP %"] = vwap_pct
+
+        final_rows.append(data)
+
+# ✅ Salva i risultati in CSV
+if final_rows:
+    df_result = pd.DataFrame(final_rows)
+    output_path = f"output/yahoo_data_{date_str}.csv"
+    df_result.to_csv(output_path, index=False)
+    print(f"✅ File salvato in {output_path}")
+else:
+    print("⚠️ Nessun dato da salvare.")
