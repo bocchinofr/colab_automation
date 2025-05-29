@@ -11,7 +11,7 @@ end_date = today.strftime("%Y-%m-%d")
 date_str = yesterday.strftime("%Y-%m-%d")  # Data usata per nome file
 
 # 📥 Carica ticker dal CSV creato dallo script 1
-ticker_file = f"output/tickers_{date_str}.csv"
+ticker_file = f"output/tickers_{end_date}.csv"
 df_tickers = pd.read_csv(ticker_file)
 tickers = df_tickers['Ticker'].tolist()
 
