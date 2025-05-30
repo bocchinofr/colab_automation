@@ -40,10 +40,12 @@ for ticker in tickers:
         fundamentals = {
             "Ticker": ticker,
             "Market Cap": info.get("marketCap"),
+            "Shares Outstanding": info.get("sharesOutstanding"),
             "Float Shares": float_shares,
             "Insider Ownership": info.get("heldPercentInsiders"),
             "Institutional Ownership": info.get("heldPercentInstitutions")
         }
+
     except Exception as e:
         print(f"⚠️ Errore nei fondamentali: {e}")
         continue
