@@ -62,7 +62,26 @@ for ticker in tickers:
             interval="1d"
         )
         prev_close = prev_day["Close"].iloc[-1] if not prev_day.empty else None
-        open_price = row["Open"]
+
+        # Dati 1m per calcolo Open reale
+        hist_1m = stock.history(
+            start=day.strftime('%Y-%m-%d'),
+            end=(day + timedelta(days=1)).strftime('%Y-%m-%d'),
+            interval="1m"
+        )
+
+        if hist_1m.empty:
+            print(f"⚠️ Nessun dato 1m per {ticker}, skippo...")
+            continue
+
+        hist_1m = hist_1m.tz_localize(None)
+        market_open_time = datetime.combine(day, datetime.strptime("09:30", "%H:%M").time())
+
+        try:
+            open_price = hist_1m.loc[market_open_time]["Open"]
+        except:
+            print(f"⚠️ Nessun dato alle 09:30 per {ticker}, skippo...")
+            continue
 
         data = fundamentals.copy()
         data.update({
@@ -72,7 +91,8 @@ for ticker in tickers:
             "High": row["High"],
             "Low": row["Low"],
             "Close": row["Close"],
-            "Volume": row["Volume"]
+            "Volume": row["Volume"],
+            "Open (Daily)": row["Open"]  # Per confronto se serve
         })
 
         # Gap%
@@ -86,33 +106,18 @@ for ticker in tickers:
             print("❌ Gap < 25%, skippo...")
             continue
 
-        # Intraday 1m
-        hist_1m = stock.history(
-            start=day.strftime('%Y-%m-%d'),
-            end=(day + timedelta(days=1)).strftime('%Y-%m-%d'),
-            interval="1m"
-        )
+        # VWAP
+        vwap = (hist_1m["Close"] * hist_1m["Volume"]).sum() / hist_1m["Volume"].sum()
+        data["VWAP"] = round(vwap, 2)
+        data["VWAP %"] = round(((vwap - open_price) / open_price) * 100, 2)
 
-        if not hist_1m.empty:
-            hist_1m = hist_1m.tz_localize(None)
-
-            # VWAP
-            vwap = (hist_1m["Close"] * hist_1m["Volume"]).sum() / hist_1m["Volume"].sum()
-            data["VWAP"] = round(vwap, 2)
-            data["VWAP %"] = round(((vwap - open_price) / open_price) * 100, 2)
-
-            # High pre-market
-            premarket = hist_1m[hist_1m.index.time < datetime.strptime("09:30", "%H:%M").time()]
-            if not premarket.empty:
-                high_pm = premarket["High"].max()
-                data["High Pre-Market"] = round(high_pm, 2)
-                data["Open vs Pre-Market %"] = round(((open_price - high_pm) / high_pm) * 100, 2)
-            else:
-                data["High Pre-Market"] = None
-                data["Open vs Pre-Market %"] = None
+        # High pre-market
+        premarket = hist_1m[hist_1m.index.time < datetime.strptime("09:30", "%H:%M").time()]
+        if not premarket.empty:
+            high_pm = premarket["High"].max()
+            data["High Pre-Market"] = round(high_pm, 2)
+            data["Open vs Pre-Market %"] = round(((open_price - high_pm) / high_pm) * 100, 2)
         else:
-            data["VWAP"] = None
-            data["VWAP %"] = None
             data["High Pre-Market"] = None
             data["Open vs Pre-Market %"] = None
 
@@ -130,8 +135,8 @@ for ticker in tickers:
                     low = intraday["Low"].min()
                     vol = intraday["Volume"].sum()
 
-                    data[f"High_{label}"] = round((high / open_price - 1) * 100, 2)
-                    data[f"Low_{label}"] = round((low / open_price - 1) * 100, 2)
+                    data[f"High_{label}"] = round(high, 2)
+                    data[f"Low_{label}"] = round(low, 2)
                     data[f"Volume_{label}"] = int(vol)
 
                     if data["High Pre-Market"] is not None:
