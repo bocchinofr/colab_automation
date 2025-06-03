@@ -14,6 +14,11 @@ ticker_file = f"output/tickers_{end_date}.csv"
 df_tickers = pd.read_csv(ticker_file)
 tickers = df_tickers['Ticker'].tolist()
 
+if len(intraday_market) < 30:
+    print(f"❌ Troppi pochi dati intraday per {ticker}, skippo aggregazione...")
+    continue
+
+
 # Timeframes da aggregare da dati 1m
 resample_map = {
     "1m": "1T",      # 1 minute
@@ -70,6 +75,8 @@ for ticker in tickers:
             end=(day + timedelta(days=1)).strftime('%Y-%m-%d'),
             interval="1m"
         )
+        print(f"Dati intraday per {ticker}: {len(hist_1m)} righe")
+        hist_1m.to_csv(f"debug/hist_1m_{ticker}.csv")
 
         if hist_1m.empty:
             print(f"⚠️ Nessun dato 1m per {ticker}, skippo...")
@@ -130,7 +137,7 @@ for ticker in tickers:
             data["Open vs Pre-Market %"] = None
 
         # Aggregazione intraday da 1m
-        intraday_market = hist_1m[(hist_1m.index >= market_open) & (hist_1m.index <= market_close)]
+        intraday_market = hist_1m.between_time("09:30", "16:00")
 
         for label, resample_rule in resample_map.items():
             try:
