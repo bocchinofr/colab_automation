@@ -71,7 +71,7 @@ for ticker in tickers:
             interval="1m"
         )
         print(f"Dati intraday per {ticker}: {len(hist_1m)} righe")
-        hist_1m.to_csv(f"debug/hist_1m_{ticker}.csv")
+        #hist_1m.to_csv(f"debug/hist_1m_{ticker}.csv")
 
         if hist_1m.empty:
             print(f"⚠️ Nessun dato 1m per {ticker}, skippo...")
