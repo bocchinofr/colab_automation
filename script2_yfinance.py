@@ -1,6 +1,7 @@
 import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
+from pandas.tseries.frequencies import to_offset
 
 # 📅 Calcola le date
 today = datetime.now()
@@ -75,15 +76,12 @@ for ticker in tickers:
             print(f"⚠️ Nessun dato 1m per {ticker}, skippo...")
             continue
 
-        # ✅ Correggi la gestione del fuso orario
+        # ✅ Gestione fuso orario
         if hist_1m.index.tz is None:
             hist_1m.index = hist_1m.index.tz_localize("UTC").tz_convert("America/New_York")
         else:
             hist_1m.index = hist_1m.index.tz_convert("America/New_York")
         hist_1m = hist_1m.sort_index()
-
-        print(hist_1m.between_time("09:30", "16:00").head())
-        print(hist_1m.between_time("09:30", "16:00").tail())
 
         market_open_time = pd.Timestamp(datetime.combine(day, datetime.strptime("09:30", "%H:%M").time()), tz="America/New_York")
 
@@ -131,7 +129,7 @@ for ticker in tickers:
             data["High Pre-Market"] = None
             data["Open vs Pre-Market %"] = None
 
-        # Aggregazione intraday da 1m
+        # Intraday (solo 09:30–16:00)
         intraday_market = hist_1m.between_time("09:30", "16:00")
         print(f"🎯 Intraday rows (09:30–16:00): {len(intraday_market)}")
 
@@ -139,31 +137,34 @@ for ticker in tickers:
             print(f"❌ Troppi pochi dati intraday per {ticker}, skippo aggregazione...")
             continue
 
+        market_open = pd.Timestamp(datetime.combine(day, datetime.strptime("09:30", "%H:%M").time()), tz="America/New_York")
+
         for label, resample_rule in resample_map.items():
             try:
-                agg = (
-                    intraday_market
-                    .resample(resample_rule, origin='start', offset="0min")
-                    .agg({
-                        "High": "max",
-                        "Low": "min",
-                        "Volume": "sum"
-                    })
-                    .dropna()
-                )
-                if label == "1m":
-                    print(f"🔍 Primo minuto aggregato 1m per {ticker}:")
-                    print(agg.head(3))
+                offset = to_offset(resample_rule)
+                block_end = market_open + offset
 
+                df_cut = intraday_market[(intraday_market.index >= market_open) & (intraday_market.index < block_end)]
 
-                high = agg["High"].max()
-                low = agg["Low"].min()
-                vol = agg["Volume"].sum()
+                if df_cut.empty:
+                    print(f"⚠️ Nessun dato per {label} in blocco iniziale.")
+                    continue
+
+                agg = df_cut.resample(resample_rule).agg({
+                    "High": "max",
+                    "Low": "min",
+                    "Volume": "sum"
+                }).dropna()
+
+                first_row = agg.iloc[0]
+                high = first_row["High"]
+                low = first_row["Low"]
+                vol = first_row["Volume"]
 
                 data[f"High_{label}"] = round(high, 2)
                 data[f"Low_{label}"] = round(low, 2)
                 data[f"Volume_{label}"] = int(vol)
-                
+
                 print(f"📊 {ticker} - {label} | High: {high:.2f}, Low: {low:.2f}, Volume: {vol:,}")
 
                 if data["High Pre-Market"] is not None:
