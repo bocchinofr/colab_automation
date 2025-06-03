@@ -27,7 +27,7 @@ resample_map = {
 final_rows = []
 
 for ticker in tickers:
-    print(f"📈 Analizzo: {ticker}")
+    print(f"\n📈 Analizzo: {ticker}")
     stock = yf.Ticker(ticker)
 
     # Dati fondamentali
@@ -70,13 +70,6 @@ for ticker in tickers:
             end=(day + timedelta(days=1)).strftime('%Y-%m-%d'),
             interval="1m"
         )
-        print(hist_1m.head(5))
-        print(hist_1m.tail(5))
-        print(f"Timezone: {hist_1m.index.tz}")
-        print(f"Min timestamp: {hist_1m.index.min()}")
-        print(f"Max timestamp: {hist_1m.index.max()}")
-
-        print(f"Dati intraday per {ticker}: {len(hist_1m)} righe")
 
         if hist_1m.empty:
             print(f"⚠️ Nessun dato 1m per {ticker}, skippo...")
@@ -84,13 +77,15 @@ for ticker in tickers:
 
         # ✅ Correggi la gestione del fuso orario
         if hist_1m.index.tz is None:
-            hist_1m.index = hist_1m.index.tz_localize("UTC").tz_convert("US/Eastern")
+            hist_1m.index = hist_1m.index.tz_localize("UTC").tz_convert("America/New_York")
         else:
-            hist_1m.index = hist_1m.index.tz_convert("US/Eastern")
+            hist_1m.index = hist_1m.index.tz_convert("America/New_York")
         hist_1m = hist_1m.sort_index()
 
-        market_open_time = pd.Timestamp(datetime.combine(day, datetime.strptime("09:30", "%H:%M").time()), tz="US/Eastern")
-        market_close = pd.Timestamp(datetime.combine(day, datetime.strptime("16:00", "%H:%M").time()), tz="US/Eastern")
+        print(hist_1m.between_time("09:30", "16:00").head())
+        print(hist_1m.between_time("09:30", "16:00").tail())
+
+        market_open_time = pd.Timestamp(datetime.combine(day, datetime.strptime("09:30", "%H:%M").time()), tz="America/New_York")
 
         try:
             open_price = hist_1m.loc[market_open_time]["Open"]
@@ -139,7 +134,6 @@ for ticker in tickers:
         # Aggregazione intraday da 1m
         intraday_market = hist_1m.between_time("09:30", "16:00")
         print(f"🎯 Intraday rows (09:30–16:00): {len(intraday_market)}")
-        print(intraday_market.head(5))
 
         if len(intraday_market) < 30:
             print(f"❌ Troppi pochi dati intraday per {ticker}, skippo aggregazione...")
@@ -149,7 +143,7 @@ for ticker in tickers:
             try:
                 agg = (
                     intraday_market
-                    .resample(resample_rule, origin='start')
+                    .resample(resample_rule, origin='start', offset="0min")
                     .agg({
                         "High": "max",
                         "Low": "min",
