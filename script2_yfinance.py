@@ -127,22 +127,27 @@ for ticker in tickers:
         intraday_1m["Datetime"] = intraday_1m.index
         intraday_1m.set_index("Datetime", inplace=True)
 
+        # Filtro orario di mercato prima del resample
+        market_open = datetime.combine(day, datetime.strptime("09:30", "%H:%M").time())
+        market_close = datetime.combine(day, datetime.strptime("16:00", "%H:%M").time())
+        intraday_market = hist_1m[(hist_1m.index >= market_open) & (hist_1m.index <= market_close)]
+        
         for label, resample_rule in resample_map.items():
             try:
-                agg = intraday_1m.resample(resample_rule).agg({
+                agg = intraday_market.resample(resample_rule).agg({
                     "High": "max",
                     "Low": "min",
                     "Volume": "sum"
                 }).dropna()
-
+        
                 high = agg["High"].max()
                 low = agg["Low"].min()
                 vol = agg["Volume"].sum()
-
+        
                 data[f"High_{label}"] = round(high, 2)
                 data[f"Low_{label}"] = round(low, 2)
                 data[f"Volume_{label}"] = int(vol)
-
+        
                 if data["High Pre-Market"] is not None:
                     data[f"Break_PMH_{label}"] = "si" if high > data["High Pre-Market"] else "no"
                 else:
@@ -153,6 +158,7 @@ for ticker in tickers:
                 data[f"Low_{label}"] = None
                 data[f"Volume_{label}"] = None
                 data[f"Break_PMH_{label}"] = "n/a"
+
 
         # Filtro finale: Volume 1m
         if data.get("Volume_1m", 0) < 700_000:
