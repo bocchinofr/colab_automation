@@ -151,6 +151,10 @@ for ticker in tickers:
                     })
                     .dropna()
                 )
+                if label == "1m":
+                    print(f"🔍 Primo minuto aggregato 1m per {ticker}:")
+                    print(agg.head(3))
+
 
                 high = agg["High"].max()
                 low = agg["Low"].min()
@@ -159,6 +163,8 @@ for ticker in tickers:
                 data[f"High_{label}"] = round(high, 2)
                 data[f"Low_{label}"] = round(low, 2)
                 data[f"Volume_{label}"] = int(vol)
+                
+                print(f"📊 {ticker} - {label} | High: {high:.2f}, Low: {low:.2f}, Volume: {vol:,}")
 
                 if data["High Pre-Market"] is not None:
                     data[f"Break_PMH_{label}"] = "si" if high > data["High Pre-Market"] else "no"
