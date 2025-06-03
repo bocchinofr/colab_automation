@@ -16,12 +16,12 @@ tickers = df_tickers['Ticker'].tolist()
 
 # Timeframes da aggregare da dati 1m
 resample_map = {
-    "1m": "1min",      # 1 minute
-    "5m": "5min",      # 5 minutes
-    "30m": "30min",    # 30 minutes
-    "1h": "60min",      # 1 hour
-    "90m": "90min",    # 90 minutes
-    "4h": "240min"       # 4 hours
+    "1m": "1min",
+    "5m": "5min",
+    "30m": "30min",
+    "1h": "1h",
+    "90m": "90min",
+    "4h": "4h"
 }
 
 final_rows = []
@@ -71,7 +71,6 @@ for ticker in tickers:
             interval="1m"
         )
         print(f"Dati intraday per {ticker}: {len(hist_1m)} righe")
-        #hist_1m.to_csv(f"debug/hist_1m_{ticker}.csv")
 
         if hist_1m.empty:
             print(f"⚠️ Nessun dato 1m per {ticker}, skippo...")
@@ -82,6 +81,7 @@ for ticker in tickers:
             hist_1m.index = hist_1m.index.tz_localize("UTC").tz_convert("US/Eastern")
         else:
             hist_1m.index = hist_1m.index.tz_convert("US/Eastern")
+        hist_1m = hist_1m.sort_index()
 
         market_open_time = pd.Timestamp(datetime.combine(day, datetime.strptime("09:30", "%H:%M").time()), tz="US/Eastern")
         market_close = pd.Timestamp(datetime.combine(day, datetime.strptime("16:00", "%H:%M").time()), tz="US/Eastern")
@@ -133,18 +133,22 @@ for ticker in tickers:
         # Aggregazione intraday da 1m
         intraday_market = hist_1m.between_time("09:30", "16:00")
 
-        # ✅ Spostato qui il controllo
         if len(intraday_market) < 30:
             print(f"❌ Troppi pochi dati intraday per {ticker}, skippo aggregazione...")
             continue
 
         for label, resample_rule in resample_map.items():
             try:
-                agg = intraday_market.resample(resample_rule).agg({
-                    "High": "max",
-                    "Low": "min",
-                    "Volume": "sum"
-                }).dropna()
+                agg = (
+                    intraday_market
+                    .resample(resample_rule, origin='start')
+                    .agg({
+                        "High": "max",
+                        "Low": "min",
+                        "Volume": "sum"
+                    })
+                    .dropna()
+                )
 
                 high = agg["High"].max()
                 low = agg["Low"].min()
@@ -158,6 +162,7 @@ for ticker in tickers:
                     data[f"Break_PMH_{label}"] = "si" if high > data["High Pre-Market"] else "no"
                 else:
                     data[f"Break_PMH_{label}"] = "n/a"
+
             except Exception as e:
                 print(f"⚠️ Errore aggregazione {ticker} - {label}: {e}")
                 data[f"High_{label}"] = None
