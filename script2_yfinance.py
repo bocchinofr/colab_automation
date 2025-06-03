@@ -75,8 +75,11 @@ for ticker in tickers:
             print(f"⚠️ Nessun dato 1m per {ticker}, skippo...")
             continue
 
-        # ✅ Correzione timezone: da UTC a US/Eastern
-        hist_1m.index = hist_1m.index.tz_localize("UTC").tz_convert("US/Eastern")
+        # ✅ Correggi la gestione del fuso orario
+        if hist_1m.index.tz is None:
+            hist_1m.index = hist_1m.index.tz_localize("UTC").tz_convert("US/Eastern")
+        else:
+            hist_1m.index = hist_1m.index.tz_convert("US/Eastern")
 
         market_open_time = pd.Timestamp(datetime.combine(day, datetime.strptime("09:30", "%H:%M").time()), tz="US/Eastern")
         market_open = pd.Timestamp(datetime.combine(day, datetime.strptime("09:30", "%H:%M").time()), tz="US/Eastern")
