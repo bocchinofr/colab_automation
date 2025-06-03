@@ -14,13 +14,14 @@ ticker_file = f"output/tickers_{end_date}.csv"
 df_tickers = pd.read_csv(ticker_file)
 tickers = df_tickers['Ticker'].tolist()
 
-intervals = {
-    "1m": "1m",
-    "5m": "5m",
-    "30m": "30m",
-    "1h": "60m",
-    "90m": "90m",
-    "4h": "4h"
+# Timeframes da aggregare da dati 1m
+resample_map = {
+    "1m": "1min",
+    "5m": "5min",
+    "30m": "30min",
+    "1h": "60min",
+    "90m": "90min",
+    "4h": "240min"
 }
 
 final_rows = []
@@ -92,7 +93,7 @@ for ticker in tickers:
             "Low": row["Low"],
             "Close": row["Close"],
             "Volume": row["Volume"],
-            "Open (Daily)": row["Open"]  # Per confronto se serve
+            "Open (Daily)": row["Open"]
         })
 
         # Gap%
@@ -121,35 +122,33 @@ for ticker in tickers:
             data["High Pre-Market"] = None
             data["Open vs Pre-Market %"] = None
 
-        # Intervalli intraday
-        for label, interval in intervals.items():
+        # Aggregazione intraday da 1m
+        intraday_1m = hist_1m.copy()
+        intraday_1m["Datetime"] = intraday_1m.index
+        intraday_1m.set_index("Datetime", inplace=True)
+
+        for label, resample_rule in resample_map.items():
             try:
-                intraday = stock.history(
-                    start=day.strftime('%Y-%m-%d'),
-                    end=(day + timedelta(days=1)).strftime('%Y-%m-%d'),
-                    interval=interval
-                )
-                if not intraday.empty:
-                    intraday = intraday.tz_localize(None)
-                    high = intraday["High"].max()
-                    low = intraday["Low"].min()
-                    vol = intraday["Volume"].sum()
+                agg = intraday_1m.resample(resample_rule).agg({
+                    "High": "max",
+                    "Low": "min",
+                    "Volume": "sum"
+                }).dropna()
 
-                    data[f"High_{label}"] = round(high, 2)
-                    data[f"Low_{label}"] = round(low, 2)
-                    data[f"Volume_{label}"] = int(vol)
+                high = agg["High"].max()
+                low = agg["Low"].min()
+                vol = agg["Volume"].sum()
 
-                    if data["High Pre-Market"] is not None:
-                        data[f"Break_PMH_{label}"] = "si" if high > data["High Pre-Market"] else "no"
-                    else:
-                        data[f"Break_PMH_{label}"] = "n/a"
+                data[f"High_{label}"] = round(high, 2)
+                data[f"Low_{label}"] = round(low, 2)
+                data[f"Volume_{label}"] = int(vol)
+
+                if data["High Pre-Market"] is not None:
+                    data[f"Break_PMH_{label}"] = "si" if high > data["High Pre-Market"] else "no"
                 else:
-                    data[f"High_{label}"] = None
-                    data[f"Low_{label}"] = None
-                    data[f"Volume_{label}"] = None
                     data[f"Break_PMH_{label}"] = "n/a"
             except Exception as e:
-                print(f"⚠️ Errore {ticker} - {interval}: {e}")
+                print(f"⚠️ Errore aggregazione {ticker} - {label}: {e}")
                 data[f"High_{label}"] = None
                 data[f"Low_{label}"] = None
                 data[f"Volume_{label}"] = None
