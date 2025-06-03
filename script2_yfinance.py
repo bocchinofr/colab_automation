@@ -130,7 +130,8 @@ for ticker in tickers:
         # Filtro orario di mercato prima del resample
         market_open = datetime.combine(day, datetime.strptime("09:30", "%H:%M").time())
         market_close = datetime.combine(day, datetime.strptime("16:00", "%H:%M").time())
-        intraday_market = hist_1m[(hist_1m.index >= market_open) & (hist_1m.index <= market_close)]
+        intraday_market = intraday_1m[(intraday_1m.index >= market_open) & (intraday_1m.index <= market_close)]
+
         
         for label, resample_rule in resample_map.items():
             try:
