@@ -16,13 +16,14 @@ tickers = df_tickers['Ticker'].tolist()
 
 # Timeframes da aggregare da dati 1m
 resample_map = {
-    "1m": "1min",
-    "5m": "5min",
-    "30m": "30min",
-    "1h": "60min",
-    "90m": "90min",
-    "4h": "240min"
+    "1m": "1T",      # 1 minute
+    "5m": "5T",      # 5 minutes
+    "30m": "30T",    # 30 minutes
+    "1h": "1H",      # 1 hour
+    "90m": "90T",    # 90 minutes
+    "4h": "4H"       # 4 hours
 }
+
 
 final_rows = []
 
