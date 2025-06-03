@@ -24,7 +24,6 @@ resample_map = {
     "4h": "4H"       # 4 hours
 }
 
-
 final_rows = []
 
 for ticker in tickers:
@@ -76,8 +75,12 @@ for ticker in tickers:
             print(f"⚠️ Nessun dato 1m per {ticker}, skippo...")
             continue
 
-        hist_1m = hist_1m.tz_localize(None)
-        market_open_time = datetime.combine(day, datetime.strptime("09:30", "%H:%M").time())
+        # ✅ Correzione timezone: da UTC a US/Eastern
+        hist_1m.index = hist_1m.index.tz_localize("UTC").tz_convert("US/Eastern")
+
+        market_open_time = pd.Timestamp(datetime.combine(day, datetime.strptime("09:30", "%H:%M").time()), tz="US/Eastern")
+        market_open = pd.Timestamp(datetime.combine(day, datetime.strptime("09:30", "%H:%M").time()), tz="US/Eastern")
+        market_close = pd.Timestamp(datetime.combine(day, datetime.strptime("16:00", "%H:%M").time()), tz="US/Eastern")
 
         try:
             open_price = hist_1m.loc[market_open_time]["Open"]
@@ -124,16 +127,8 @@ for ticker in tickers:
             data["Open vs Pre-Market %"] = None
 
         # Aggregazione intraday da 1m
-        intraday_1m = hist_1m.copy()
-        intraday_1m["Datetime"] = intraday_1m.index
-        intraday_1m.set_index("Datetime", inplace=True)
+        intraday_market = hist_1m[(hist_1m.index >= market_open) & (hist_1m.index <= market_close)]
 
-        # Filtro orario di mercato prima del resample
-        market_open = datetime.combine(day, datetime.strptime("09:30", "%H:%M").time())
-        market_close = datetime.combine(day, datetime.strptime("16:00", "%H:%M").time())
-        intraday_market = intraday_1m[(intraday_1m.index >= market_open) & (intraday_1m.index <= market_close)]
-
-        
         for label, resample_rule in resample_map.items():
             try:
                 agg = intraday_market.resample(resample_rule).agg({
@@ -141,15 +136,15 @@ for ticker in tickers:
                     "Low": "min",
                     "Volume": "sum"
                 }).dropna()
-        
+
                 high = agg["High"].max()
                 low = agg["Low"].min()
                 vol = agg["Volume"].sum()
-        
+
                 data[f"High_{label}"] = round(high, 2)
                 data[f"Low_{label}"] = round(low, 2)
                 data[f"Volume_{label}"] = int(vol)
-        
+
                 if data["High Pre-Market"] is not None:
                     data[f"Break_PMH_{label}"] = "si" if high > data["High Pre-Market"] else "no"
                 else:
@@ -160,7 +155,6 @@ for ticker in tickers:
                 data[f"Low_{label}"] = None
                 data[f"Volume_{label}"] = None
                 data[f"Break_PMH_{label}"] = "n/a"
-
 
         # Filtro finale: Volume 1m
         if data.get("Volume_1m", 0) < 700_000:
