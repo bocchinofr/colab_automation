@@ -70,6 +70,12 @@ for ticker in tickers:
             end=(day + timedelta(days=1)).strftime('%Y-%m-%d'),
             interval="1m"
         )
+        print(hist_1m.head(5))
+        print(hist_1m.tail(5))
+        print(f"Timezone: {hist_1m.index.tz}")
+        print(f"Min timestamp: {hist_1m.index.min()}")
+        print(f"Max timestamp: {hist_1m.index.max()}")
+
         print(f"Dati intraday per {ticker}: {len(hist_1m)} righe")
 
         if hist_1m.empty:
@@ -132,6 +138,8 @@ for ticker in tickers:
 
         # Aggregazione intraday da 1m
         intraday_market = hist_1m.between_time("09:30", "16:00")
+        print(f"🎯 Intraday rows (09:30–16:00): {len(intraday_market)}")
+        print(intraday_market.head(5))
 
         if len(intraday_market) < 30:
             print(f"❌ Troppi pochi dati intraday per {ticker}, skippo aggregazione...")
