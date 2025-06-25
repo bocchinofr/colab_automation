@@ -12,8 +12,8 @@ date_str = yesterday.strftime("%Y-%m-%d")
 
 # 📥 Legge i ticker generati dal primo script
 ticker_file = f"output/tickers_{end_date}.csv"
-df_tickers = pd.read_csv(ticker_file)
-tickers = df_tickers['Ticker'].tolist()
+df_tickers = pd.read_csv(ticker_file, keep_default_na=False)
+tickers = df_tickers['Ticker'].dropna().unique().tolist()
 
 # Timeframes da aggregare da dati 1m
 resample_map = {
