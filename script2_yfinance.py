@@ -15,13 +15,10 @@ ticker_file = f"output/tickers_{end_date}.csv"
 df_tickers = pd.read_csv(ticker_file, keep_default_na=False)
 tickers = df_tickers['Ticker'].dropna().unique().tolist()
 
-# Timeframes da aggregare da dati 1m
+# Timeframes per resample "classico"
 resample_map = {
     "1m": "1min",
     "5m": "5min",
-    "30m": "30min",
-    "1h": "1h",
-    "90m": "90min",
     "4h": "4h"
 }
 
@@ -137,24 +134,43 @@ for ticker in tickers:
             print(f"❌ Troppi pochi dati intraday per {ticker}, skippo aggregazione...")
             continue
 
-        market_open = pd.Timestamp(datetime.combine(day, datetime.strptime("09:30", "%H:%M").time()), tz="America/New_York")
+        market_open = market_open_time
 
+        # 🔹 Cumulativi: 30m, 60m, 90m
+        for label, minutes in [("30m", 30), ("1h", 60), ("90m", 90)]:
+            block_end = market_open + pd.Timedelta(minutes=minutes)
+            df_cut = intraday_market[(intraday_market.index >= market_open) & (intraday_market.index < block_end)]
+
+            if df_cut.empty:
+                data[f"High_{label}"] = None
+                data[f"Low_{label}"] = None
+                data[f"Volume_{label}"] = None
+                data[f"Break_PMH_{label}"] = "n/a"
+                continue
+
+            high = df_cut["High"].max()
+            low = df_cut["Low"].min()
+            vol = df_cut["Volume"].sum()
+
+            data[f"High_{label}"] = round(high, 2)
+            data[f"Low_{label}"] = round(low, 2)
+            data[f"Volume_{label}"] = int(vol)
+            data[f"Break_PMH_{label}"] = (
+                "si" if data.get("High Pre-Market") and high > data["High Pre-Market"] else "no"
+            )
+            print(f"📊 {ticker} - {label} | High: {high:.2f}, Low: {low:.2f}, Volume: {vol:,}")
+
+        # 🔹 Resample "classico" per 1m, 5m, 4h
         for label, resample_rule in resample_map.items():
             try:
-                offset = to_offset(resample_rule)
-                block_end = market_open + offset
-
-                df_cut = intraday_market[(intraday_market.index >= market_open) & (intraday_market.index < block_end)]
-
-                if df_cut.empty:
-                    print(f"⚠️ Nessun dato per {label} in blocco iniziale.")
-                    continue
-
-                agg = df_cut.resample(resample_rule).agg({
+                agg = intraday_market.resample(resample_rule, origin=market_open, label="right", closed="right").agg({
                     "High": "max",
                     "Low": "min",
                     "Volume": "sum"
                 }).dropna()
+
+                if agg.empty:
+                    continue
 
                 first_row = agg.iloc[0]
                 high = first_row["High"]
@@ -165,12 +181,12 @@ for ticker in tickers:
                 data[f"Low_{label}"] = round(low, 2)
                 data[f"Volume_{label}"] = int(vol)
 
-                print(f"📊 {ticker} - {label} | High: {high:.2f}, Low: {low:.2f}, Volume: {vol:,}")
-
                 if data["High Pre-Market"] is not None:
                     data[f"Break_PMH_{label}"] = "si" if high > data["High Pre-Market"] else "no"
                 else:
                     data[f"Break_PMH_{label}"] = "n/a"
+
+                print(f"📊 {ticker} - {label} | High: {high:.2f}, Low: {low:.2f}, Volume: {vol:,}")
 
             except Exception as e:
                 print(f"⚠️ Errore aggregazione {ticker} - {label}: {e}")
