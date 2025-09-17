@@ -89,18 +89,18 @@ for ticker in tickers:
         data = fundamentals.copy()
         data.update({
             "Date": day,
-            "Open": open_price,
-            "Prev Close": prev_close,
-            "High": row["High"],
-            "Low": row["Low"],
-            "Close": row["Close"],
-            "Volume": row["Volume"],
-            "Open (Daily)": row["Open"]
+            "Open": round(open_price, 2),
+            "Prev Close": round(prev_close, 2) if prev_close else None,
+            "High": round(row["High"], 2),
+            "Low": round(row["Low"], 2),
+            "Close": round(row["Close"], 2),
+            "Volume": int(row["Volume"]),
+            "Open (Daily)": round(row["Open"], 2)
         })
 
         # Gap%
         if prev_close and open_price:
-            gap_pct = round(((open_price - prev_close) / prev_close) * 100)
+            gap_pct = round(((open_price - prev_close) / prev_close) * 100, 2)
         else:
             gap_pct = None
         data["Gap %"] = gap_pct
