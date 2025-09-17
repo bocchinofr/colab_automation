@@ -194,9 +194,13 @@ for ticker in tickers:
                 data[f"Break_PMH_{label}"] = "n/a"
 
         # Filtro finale: Volume 1m
-        if data.get("Volume_1m", 0) < 700_000:
-            print("❌ Volume 1m < 700k, skippo...")
+        # --- modificato ---
+        vol_1m = data.get("Volume_1m")
+        # Skip only if Volume_1m is present, non-zero and below threshold
+        if vol_1m is not None and vol_1m != 0 and vol_1m < 700_000:
+            print("❌ Volume 1m presente e < 700k, skippo...")
             continue
+        # If vol_1m is None or 0, we do NOT skip (as requested)
 
         final_rows.append(data)
 
