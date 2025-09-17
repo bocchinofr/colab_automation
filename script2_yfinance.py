@@ -1,7 +1,6 @@
 import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
-from pandas.tseries.frequencies import to_offset
 
 # 📅 Calcola le date
 today = datetime.now()
@@ -18,8 +17,7 @@ tickers = df_tickers['Ticker'].dropna().unique().tolist()
 # Timeframes per resample "classico"
 resample_map = {
     "1m": "1min",
-    "5m": "5min",
-    "4h": "4h"
+    "5m": "5min"
 }
 
 final_rows = []
@@ -136,8 +134,8 @@ for ticker in tickers:
 
         market_open = market_open_time
 
-        # 🔹 Cumulativi: 30m, 60m, 90m
-        for label, minutes in [("30m", 30), ("1h", 60), ("90m", 90)]:
+        # 🔹 Cumulativi: 30m, 60m, 90m, 4h
+        for label, minutes in [("30m", 30), ("1h", 60), ("90m", 90), ("4h", 240)]:
             block_end = market_open + pd.Timedelta(minutes=minutes)
             df_cut = intraday_market[(intraday_market.index >= market_open) & (intraday_market.index < block_end)]
 
@@ -160,7 +158,7 @@ for ticker in tickers:
             )
             print(f"📊 {ticker} - {label} | High: {high:.2f}, Low: {low:.2f}, Volume: {vol:,}")
 
-        # 🔹 Resample "classico" per 1m, 5m, 4h
+        # 🔹 Resample "classico" per 1m, 5m
         for label, resample_rule in resample_map.items():
             try:
                 agg = intraday_market.resample(resample_rule, origin=market_open, label="right", closed="right").agg({
