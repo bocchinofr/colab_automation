@@ -2,7 +2,6 @@ import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
 
-
 # 📅 Calcola le date (stesso blocco di script2)
 today = datetime.now()
 yesterday = today - timedelta(days=1)
