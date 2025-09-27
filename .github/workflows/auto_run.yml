@@ -29,7 +29,10 @@ jobs:
 
       - name: Run script 2 (Yahoo Finance)
         run: python script2_yfinance.py
-
+        
+      - name: Run script 3 (Intraday 1m)
+        run: python script3_intraday.py
+      
       - name: Push output files
         run: |
           git config --global user.name "bocchinofr"
