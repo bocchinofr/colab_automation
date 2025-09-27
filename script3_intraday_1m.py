@@ -1,86 +1,70 @@
-# script3_intraday_1m.py
-
 import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
-import pytz
-import os
 
-# --- Imposta il fuso orario USA ---
-ny_tz = pytz.timezone("America/New_York")
+# 📅 Calcola le date (stesso blocco di script2)
+today = datetime.now()
+yesterday = today - timedelta(days=1)
+start_date = yesterday.strftime("%Y-%m-%d")
+end_date = today.strftime("%Y-%m-%d")
+date_str = yesterday.strftime("%Y-%m-%d")
 
-# --- Percorsi file ---
-input_file = "output/ticker_finviz.csv"  # file generato da script1
-today_str = datetime.now(ny_tz).strftime("%Y-%m-%d")
-output_file = f"output/dati_intraday_1m_{today_str}.xlsx"
+# 📥 Legge i ticker generati dal primo script (stesso di script2)
+ticker_file = f"output/tickers_{end_date}.csv"
+df_tickers = pd.read_csv(ticker_file, keep_default_na=False)
+tickers = df_tickers['Ticker'].dropna().unique().tolist()
 
-# --- Calcolo intervallo temporale ---
-oggi = datetime.now(ny_tz).date()
-ieri = oggi - timedelta(days=1)
+print(f"📊 Ticker trovati: {tickers}")
 
-start = datetime.combine(ieri, datetime.min.time()).replace(hour=16, tzinfo=ny_tz)
-end = datetime.combine(oggi, datetime.min.time()).replace(hour=16, tzinfo=ny_tz)
-
-print(f"Intervallo: {start} → {end}")
-
-# --- Carico i ticker ---
-if not os.path.exists(input_file):
-    raise FileNotFoundError(f"File non trovato: {input_file}")
-
-df_ticker = pd.read_csv(input_file)
-tickers = df_ticker['Ticker'].dropna().unique().tolist()
-
-print(f"Trovati {len(tickers)} ticker")
-
-# --- Raccolta dati ---
-all_data = []
+final_data = {}
 
 for ticker in tickers:
-    try:
-        print(f"Scarico dati per {ticker}...")
-        df = yf.download(
-            ticker,
-            start=start,
-            end=end,
-            interval="1m",
-            prepost=True,
-            progress=False
-        )
+    print(f"\n⏳ Scarico dati 1m per {ticker}...")
 
-        if df.empty:
-            print(f"⚠️ Nessun dato per {ticker}")
-            continue
+    stock = yf.Ticker(ticker)
 
-        # Converto timezone in New York
-        df.index = df.index.tz_convert("America/New_York")
+    # intervallo: dalle 16:00 di ieri (post-market T-1) alle 16:00 di oggi
+    start_dt = pd.Timestamp(
+        datetime.combine(yesterday.date(), datetime.strptime("16:00", "%H:%M").time()),
+        tz="America/New_York"
+    )
+    end_dt = pd.Timestamp(
+        datetime.combine(today.date(), datetime.strptime("16:00", "%H:%M").time()),
+        tz="America/New_York"
+    )
 
-        # Filtro solo tra le 16:00 di ieri e le 16:00 di oggi
-        df = df.loc[(df.index >= start) & (df.index <= end)]
+    hist_1m = stock.history(
+        start=start_dt.tz_convert("UTC"),
+        end=(end_dt + timedelta(minutes=1)).tz_convert("UTC"),
+        interval="1m"
+    )
 
-        # Aggiungo ticker
-        df["Ticker"] = ticker
+    if hist_1m.empty:
+        print(f"⚠️ Nessun dato trovato per {ticker}, skippo...")
+        continue
 
-        all_data.append(df)
+    # ✅ Gestione fuso orario
+    if hist_1m.index.tz is None:
+        hist_1m.index = hist_1m.index.tz_localize("UTC").tz_convert("America/New_York")
+    else:
+        hist_1m.index = hist_1m.index.tz_convert("America/New_York")
 
-    except Exception as e:
-        print(f"Errore con {ticker}: {e}")
+    hist_1m = hist_1m.sort_index()
+    hist_1m = hist_1m[(hist_1m.index >= start_dt) & (hist_1m.index <= end_dt)]
 
-# --- Unisco i dati ---
-if all_data:
-    final_df = pd.concat(all_data)
-    final_df.reset_index(inplace=True)
-    final_df.rename(columns={"index": "Datetime"}, inplace=True)
+    if hist_1m.empty:
+        print(f"⚠️ Nessun dato utile nell’intervallo per {ticker}")
+        continue
 
-    # Riordino colonne
-    final_df = final_df[["Datetime", "Ticker", "Open", "High", "Low", "Close", "Volume"]]
+    # Salvo nel dict
+    final_data[ticker] = hist_1m[["Open", "High", "Low", "Close", "Volume"]].copy()
 
-    # Arrotondo a 2 decimali
-    for col in ["Open", "High", "Low", "Close"]:
-        final_df[col] = final_df[col].round(2)
-
-    # Salvo su Excel
-    os.makedirs("output", exist_ok=True)
-    final_df.to_excel(output_file, index=False)
-    print(f"✅ Dati salvati in {output_file}")
+# 📤 Salva file Excel con un foglio per ticker
+if final_data:
+    output_path = f"output/dati_intraday1m_{date_str}.xlsx"
+    with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
+        for ticker, df in final_data.items():
+            df.to_excel(writer, sheet_name=ticker, index=True)
+    print(f"✅ File salvato: {output_path}")
 else:
-    print("⚠️ Nessun dato disponibile per nessun ticker")
+    print("⚠️ Nessun dato estratto, file non creato.")
