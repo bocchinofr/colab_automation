@@ -1,4 +1,3 @@
-# script1_finviz.py
 from finvizfinance.screener.overview import Overview
 from finvizfinance.quote import Quote
 import pandas as pd
@@ -20,7 +19,7 @@ filters_dict = {
     "Price": "Over $1"
 }
 
-# 📥 Estrazione da Finviz screener
+# 📥 Estrazione da Finviz
 overview = Overview()
 overview.set_filter(filters_dict=filters_dict)
 df_screen = overview.screener_view()
@@ -30,7 +29,8 @@ extra_data = []
 if df_screen is not None and not df_screen.empty:
     for ticker in df_screen["Ticker"]:
         try:
-            q = Quote(ticker)  # ✅ ticker passato al costruttore
+            q = Quote()
+            q.setTicker(ticker)
             data = q.ticker_fundament()
 
             shs_float = data.get("Shs Float", None)
