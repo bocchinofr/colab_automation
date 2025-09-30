@@ -46,3 +46,15 @@ if df_screen is not None and not df_screen.empty:
             extra_data.append({
                 "Ticker": ticker,
                 "Shs Float": None,
+                "Shs Outstand": None
+            })
+
+    # 🔗 Merge screener + extra dati
+    df_extra = pd.DataFrame(extra_data)
+    df_final = df_screen.merge(df_extra, on="Ticker", how="left")
+
+    # 💾 Salva CSV
+    df_final.to_csv(output_file, index=False)
+    print(f"✅ Salvato con fondamentali: {output_file}")
+else:
+    print("⚠️ Nessun ticker trovato.")
