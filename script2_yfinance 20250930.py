@@ -14,9 +14,6 @@ ticker_file = f"output/tickers_{end_date}.csv"
 df_tickers = pd.read_csv(ticker_file, keep_default_na=False)
 tickers = df_tickers['Ticker'].dropna().unique().tolist()
 
-# Mappa dei ticker -> valori Finviz
-finviz_map = df_tickers.set_index('Ticker').to_dict('index')
-
 # Timeframes per resample "classico"
 resample_map = {
     "1m": "1min",
@@ -32,54 +29,23 @@ for ticker in tickers:
     # Dati fondamentali
     try:
         info = stock.info
-        yf_float = info.get("floatShares")
-        yf_outstanding = info.get("sharesOutstanding")
-
-        # Recupero dati Finviz (se presenti)
-        finviz_float = finviz_map.get(ticker, {}).get("Shs Float")
-        finviz_out = finviz_map.get(ticker, {}).get("Shs Outstanding")
-
-        # Converte valori Finviz in numerici (gestendo eventuali formati $m / $b / K)
-        def parse_finviz_shares(x):
-            if x is None or x == '':
-                return None
-            x = str(x).replace(',', '').replace('$', '').strip()
-            if x.endswith('M'):
-                return float(x[:-1]) * 1e6
-            elif x.endswith('B'):
-                return float(x[:-1]) * 1e9
-            elif x.endswith('K'):
-                return float(x[:-1]) * 1e3
-            else:
-                try:
-                    return float(x)
-                except:
-                    return None
-
-        finviz_float = parse_finviz_shares(finviz_float)
-        finviz_out = parse_finviz_shares(finviz_out)
-
-        # Scegli il valore minimo disponibile (Yahoo o Finviz)
-        float_shares = min([v for v in [yf_float, finviz_float] if v is not None], default=None)
-        shares_out = min([v for v in [yf_outstanding, finviz_out] if v is not None], default=None)
+        float_shares = info.get("floatShares")
+        if float_shares is not None and float_shares > 50_000_000:
+            print(f"❌ Float troppo alto ({float_shares}), skippo...")
+            continue
 
         fundamentals = {
             "Ticker": ticker,
             "Market Cap": info.get("marketCap"),
-            "Shares Outstanding": shares_out,
+            "Shares Outstanding": info.get("sharesOutstanding"),
             "Float Shares": float_shares,
             "Insider Ownership": info.get("heldPercentInsiders"),
             "Institutional Ownership": info.get("heldPercentInstitutions")
         }
 
-        if float_shares is not None and float_shares > 50_000_000:
-            print(f"❌ Float troppo alto ({float_shares}), skippo...")
-            continue
-
     except Exception as e:
         print(f"⚠️ Errore nei fondamentali: {e}")
         continue
-
 
     # Dati daily
     daily = stock.history(start=start_date, end=end_date, interval="1d").reset_index()

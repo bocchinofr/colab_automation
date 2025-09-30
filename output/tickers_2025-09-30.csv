@@ -1,14 +1,14 @@
-Ticker,Company,Sector,Industry,Country,Market Cap,P/E,Price,Change,Volume,Shs Float,Shs Outstand
-AVTX,Avalo Therapeutics Inc,Healthcare,Biotechnology,USA,171240000.0,,13.02,0.20559999999999998,3057673.0,,
-DVLT,Datavault AI Inc,Technology,Software - Infrastructure,USA,197620000.0,,1.15,0.055,151095056.0,,
-DWTX,Dogwood Therapeutics Inc,Healthcare,Biotechnology,USA,15120000.0,,7.91,0.433,43109640.0,,
-GDEV,GDEV Inc,Communication Services,Electronic Gaming & Multimedia,Cyprus,511990000.0,13.17,28.24,0.0862,28783.0,,
-IBG,Innovation Beverage Group Ltd,Consumer Defensive,Beverages - Wineries & Distilleries,Australia,7320000.0,,3.15,0.318,4942364.0,,
-JFB,JFB Construction Holdings,Real Estate,Real Estate - Development,USA,120650000.0,,12.7,0.8540000000000001,25641328.0,,
-MSS,Maison Solutions Inc,Consumer Defensive,Grocery Stores,USA,19540000.0,,1.12,0.1728,93452424.0,,
-POAI,Predictive Oncology Inc,Healthcare,Health Information Services,USA,13720000.0,,18.0,0.5482,3566607.0,,
-PRLD,Prelude Therapeutics Inc,Healthcare,Biotechnology,USA,77530000.0,,1.37,-0.0867,1488428.0,,
-RDHL,Redhill Biopharma Ltd. ADR,Healthcare,Drug Manufacturers - Specialty & Generic,Israel,7790000.0,,2.34,0.2717,55783968.0,,
-SCOR,Comscore Inc,Communication Services,Internet Content & Information,USA,44880000.0,,8.95,0.46240000000000003,2819971.0,,
-STKH,Steakholder Foods Ltd ADR,Consumer Defensive,Packaged Foods,Israel,3420000.0,,6.33,0.4603,16861752.0,,
-ZURA,Zura Bio Ltd,Healthcare,Biotechnology,USA,194400000.0,,2.99,0.2407,25449218.0,,
+Ticker,Company,Sector,Industry,Country,Market Cap,P/E,Price,Change,Volume,Shs Float,Shares Outstanding
+AVTX,Avalo Therapeutics Inc,Healthcare,Biotechnology,USA,171240000.0,,13.02,0.20559999999999998,3057673.0,10.59M,10.84M
+DVLT,Datavault AI Inc,Technology,Software - Infrastructure,USA,197620000.0,,1.15,0.055,151095056.0,55.51M,86.66M
+DWTX,Dogwood Therapeutics Inc,Healthcare,Biotechnology,USA,15120000.0,,7.91,0.433,43109640.0,1.66M,1.91M
+GDEV,GDEV Inc,Communication Services,Electronic Gaming & Multimedia,Cyprus,511990000.0,13.17,28.24,0.0862,28783.0,2.78M,18.13M
+IBG,Innovation Beverage Group Ltd,Consumer Defensive,Beverages - Wineries & Distilleries,Australia,7320000.0,,3.15,0.318,4942364.0,1.39M,8.16M
+JFB,JFB Construction Holdings,Real Estate,Real Estate - Development,USA,120650000.0,,12.7,0.8540000000000001,25641328.0,3.01M,5.50M
+MSS,Maison Solutions Inc,Consumer Defensive,Grocery Stores,USA,19540000.0,,1.12,0.1728,93452424.0,2.93M,17.45M
+POAI,Predictive Oncology Inc,Healthcare,Health Information Services,USA,13720000.0,,18.0,0.5482,3566607.0,0.75M,0.76M
+PRLD,Prelude Therapeutics Inc,Healthcare,Biotechnology,USA,77530000.0,,1.37,-0.0867,1488428.0,24.42M,43.74M
+RDHL,Redhill Biopharma Ltd. ADR,Healthcare,Drug Manufacturers - Specialty & Generic,Israel,7790000.0,,2.34,0.2717,55783968.0,3.31M,3.33M
+SCOR,Comscore Inc,Communication Services,Internet Content & Information,USA,44880000.0,,8.95,0.46240000000000003,2819971.0,3.04M,5.01M
+STKH,Steakholder Foods Ltd ADR,Consumer Defensive,Packaged Foods,Israel,3420000.0,,6.33,0.4603,16861752.0,-,0.04M
+ZURA,Zura Bio Ltd,Healthcare,Biotechnology,USA,194400000.0,,2.99,0.2407,25449218.0,40.98M,62.06M
