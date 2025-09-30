@@ -20,7 +20,7 @@ filters_dict = {
     "Price": "Over $1"
 }
 
-# 📥 Estrazione da Finviz
+# 📥 Estrazione da Finviz screener
 overview = Overview()
 overview.set_filter(filters_dict=filters_dict)
 df_screen = overview.screener_view()
@@ -30,8 +30,7 @@ extra_data = []
 if df_screen is not None and not df_screen.empty:
     for ticker in df_screen["Ticker"]:
         try:
-            q = Quote()
-            q.setTicker(ticker)
+            q = Quote(ticker)  # ✅ ticker passato al costruttore
             data = q.ticker_fundament()
 
             shs_float = data.get("Shs Float", None)
@@ -47,15 +46,3 @@ if df_screen is not None and not df_screen.empty:
             extra_data.append({
                 "Ticker": ticker,
                 "Shs Float": None,
-                "Shs Outstand": None
-            })
-
-    # 🔗 Merge screener + extra dati
-    df_extra = pd.DataFrame(extra_data)
-    df_final = df_screen.merge(df_extra, on="Ticker", how="left")
-
-    # 💾 Salva CSV
-    df_final.to_csv(output_file, index=False)
-    print(f"✅ Salvato con fondamentali: {output_file}")
-else:
-    print("⚠️ Nessun ticker trovato.")
