@@ -1,48 +1,61 @@
-# script1_finviz.py (versione aggiornata)
-
+# script1_finviz.py
 from finvizfinance.screener.overview import Overview
 from finvizfinance.quote import Quote
 import pandas as pd
 from datetime import datetime
 import os
-import time
 
+# 📂 Cartella output
 output_dir = "output"
 os.makedirs(output_dir, exist_ok=True)
 
+# 📅 Nome file con data
 date_str = datetime.now().strftime("%Y-%m-%d")
 output_file = os.path.join(output_dir, f"tickers_{date_str}.csv")
 
+# 🔍 Filtri per screener
 filters_dict = {
     "Market Cap.": "-Small (under $2bln)",
     "Gap": "Up 20%",
     "Price": "Over $1"
 }
 
+# 📥 Estrazione da Finviz
 overview = Overview()
 overview.set_filter(filters_dict=filters_dict)
 df_screen = overview.screener_view()
 
+# ✅ Aggiunta fondamentali (Shs Float, Shs Outstand)
+extra_data = []
 if df_screen is not None and not df_screen.empty:
-    # Aggiungi colonne per i fondamentali
-    df_screen["Shs Float"] = None
-    df_screen["Shs Outstand"] = None
-
-    for i, ticker in enumerate(df_screen["Ticker"]):
+    for ticker in df_screen["Ticker"]:
         try:
-            q = Quote(ticker)
-            fundamentals = q.ticker_fundament(raw=True, output_format="dict")
-            # fundamentals è un dict con molte chiavi, tra cui "Shs Float" e "Shs Outstand" se disponibili
-            shs_float = fundamentals.get("Shs Float")
-            shs_out = fundamentals.get("Shs Outstand")
-            df_screen.at[i, "Shs Float"] = shs_float
-            df_screen.at[i, "Shs Outstand"] = shs_out
-            print(f"{ticker} → Float: {shs_float}, Outstand: {shs_out}")
-            time.sleep(1)  # optional delay per non stressare finviz
-        except Exception as e:
-            print(f"Errore con {ticker}: {e}")
+            q = Quote()
+            q.setTicker(ticker)
+            data = q.ticker_fundament()
 
-    df_screen.to_csv(output_file, index=False)
+            shs_float = data.get("Shs Float", None)
+            shs_outstand = data.get("Shs Outstand", None)
+
+            extra_data.append({
+                "Ticker": ticker,
+                "Shs Float": shs_float,
+                "Shs Outstand": shs_outstand
+            })
+        except Exception as e:
+            print(f"⚠️ Errore con {ticker}: {e}")
+            extra_data.append({
+                "Ticker": ticker,
+                "Shs Float": None,
+                "Shs Outstand": None
+            })
+
+    # 🔗 Merge screener + extra dati
+    df_extra = pd.DataFrame(extra_data)
+    df_final = df_screen.merge(df_extra, on="Ticker", how="left")
+
+    # 💾 Salva CSV
+    df_final.to_csv(output_file, index=False)
     print(f"✅ Salvato con fondamentali: {output_file}")
 else:
     print("⚠️ Nessun ticker trovato.")
