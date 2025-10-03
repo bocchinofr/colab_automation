@@ -40,14 +40,14 @@ ET = pytz.timezone("US/Eastern")
 # Oggi (in UTC)
 oggi = datetime.now(ET).date()
 
-# Ieri (1 ottobre)
+# Ieri
 ieri = oggi - timedelta(days=1)
 
-# Giorno prima di ieri (30 settembre)
+# Giorno prima di ieri
 giorno_prima = oggi - timedelta(days=2)
 
-start_dt = ET.localize(datetime.combine(ieri, datetime.min.time()) + timedelta(hours=4))   # dalle 04:00 di ieri
-end_dt   = ET.localize(datetime.combine(ieri, datetime.min.time()) + timedelta(hours=20))  # fino alle 20:00 di ieri
+start_dt = ET.localize(datetime.combine(giorno_prima, datetime.min.time()) + timedelta(hours=16))   # dalle 16:00 di ieri
+end_dt   = ET.localize(datetime.combine(ieri, datetime.min.time()) + timedelta(hours=15, minutes=59))  # fino alle 15:59 di ieri
 
 
 print("📅 Estrazione dati tra", start_dt, "e", end_dt)
