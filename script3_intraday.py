@@ -7,16 +7,26 @@ import pytz
 import os
 
 # 🔑 Chiave Alpha Vantage
-ALPHA_VANTAGE_KEY = "PR8DXOISAUX28X8N"
+ALPHA_VANTAGE_KEY = "4T18CQ9W52B3P8OF"
 
-# 📥 Legge i ticker generati dallo script 1
-ticker_file = "output/tickers_2025-10-01.csv"  # aggiorna con il file corretto
+# 📥 Cerca automaticamente il file tickers più recente in cartella
+ticker_file = None
+ticker_files = [f for f in os.listdir("output") if f.startswith("tickers_") and f.endswith(".csv")]
+if ticker_files:
+    ticker_files.sort(reverse=True)  # ordina per data decrescente
+    ticker_file = os.path.join("output", ticker_files[0])  # prende il più recente
+    print(f"📂 Uso file tickers: {ticker_file}")
+else:
+    raise FileNotFoundError("⚠️ Nessun file 'tickers_*.csv' trovato in output/")
+
+# 📥 Legge i ticker
 df_tickers = pd.read_csv(ticker_file, keep_default_na=False)
 tickers = df_tickers['Ticker'].dropna().unique().tolist()
 print(f"📊 Ticker trovati: {tickers}")
 
+
 # 📂 Cartella output
-output_folder = "output"
+output_folder = "output/aggregati"
 os.makedirs(output_folder, exist_ok=True)
 
 # ⏳ Istanza Alpha Vantage
@@ -24,13 +34,25 @@ ts = TimeSeries(key=ALPHA_VANTAGE_KEY, output_format='pandas', indexing_type='da
 
 final_data = []
 
-# ⏱️ Definisci intervallo: dalle 20:00 del giorno precedente alle 20:00 di ieri
-ny_tz = pytz.timezone("America/New_York")
-today = datetime.now(ny_tz).date()
-yesterday = today - timedelta(days=1)
-start_dt = ny_tz.localize(datetime.combine(yesterday, datetime.min.time().replace(hour=20)))  # 20:00 del giorno precedente
-end_dt = ny_tz.localize(datetime.combine(today, datetime.min.time().replace(hour=20)))       # 20:00 di ieri
-print(f"📅 Estrazione dati tra {start_dt} e {end_dt}")
+# Timezone di riferimento (mercato USA, Eastern Time)
+ET = pytz.timezone("US/Eastern")
+
+# Oggi (in UTC)
+oggi = datetime.now(ET).date()
+
+# Ieri (1 ottobre)
+ieri = oggi - timedelta(days=1)
+
+# Giorno prima di ieri (30 settembre)
+giorno_prima = oggi - timedelta(days=2)
+
+start_dt = ET.localize(datetime.combine(ieri, datetime.min.time()) + timedelta(hours=4))   # dalle 04:00 di ieri
+end_dt   = ET.localize(datetime.combine(ieri, datetime.min.time()) + timedelta(hours=20))  # fino alle 20:00 di ieri
+
+
+print("📅 Estrazione dati tra", start_dt, "e", end_dt)
+
+
 
 # 📥 Scarico dati
 for i, ticker in enumerate(tickers, 1):
@@ -38,10 +60,18 @@ for i, ticker in enumerate(tickers, 1):
     try:
         # Recupera dati intraday full
         data, meta = ts.get_intraday(symbol=ticker, interval='1min', outputsize='full')
-        data.index = pd.to_datetime(data.index)
+        print(f"📈 Raw dati {ticker}: {len(data)} righe totali")
 
-        # Converti a timezone NY
-        data = data.tz_localize('UTC').tz_convert('America/New_York')
+        if not data.empty:
+            print(data.head(5))  # Mostra le prime 5 righe grezze
+        else:
+            print(f"⚠️ Nessun dato grezzo da Alpha Vantage per {ticker}")
+
+        # Se ci sono dati, continua elaborazione
+        if not data.empty:
+            data.index = pd.to_datetime(data.index)
+            data = data.tz_localize('UTC').tz_convert('America/New_York')
+
 
         # Filtra per intervallo tra start_dt e end_dt
         data = data[(data.index >= start_dt) & (data.index <= end_dt)]
@@ -77,7 +107,7 @@ for i, ticker in enumerate(tickers, 1):
 if final_data:
     df_all = pd.concat(final_data).reset_index()
     df_all = df_all.rename(columns={'index': 'Date'})
-    output_path = os.path.join(output_folder, f"intraday1m_all_{today.strftime('%Y-%m-%d')}.csv")
+    output_path = os.path.join(output_folder, f"intraday1m_all_{oggi.strftime('%Y-%m-%d')}.csv")
     df_all.to_csv(output_path, index=False, float_format="%.4f")
     print(f"\n✅ Tutti i dati salvati in unico CSV: {output_path}")
 else:
