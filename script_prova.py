@@ -1,37 +1,61 @@
 import requests
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 
-# 🔑 API Key Alphavantage
+# 🔑 API Key Alpha Vantage
 API_KEY = "4T18CQ9W52B3P8OF"
 
-# 🎯 Ticker da scaricare
-ticker = input("ANGX").upper()
+# 📅 Calcola date dinamiche
+today = datetime.now()
+start_date = (today - timedelta(days=2)).replace(hour=16, minute=0, second=0, microsecond=0)
+end_date = (today - timedelta(days=1)).replace(hour=19, minute=50, second=0, microsecond=0)
 
-# 📥 Chiamata API Alpha Vantage (intraday 1m, mercato USA)
-url = "https://www.alphavantage.co/query"
-params = {
-    "function": "TIME_SERIES_INTRADAY",
-    "symbol": ticker,
-    "interval": "1min",   # puoi cambiare: 1min, 5min, 15min, 30min, 60min
-    "apikey": API_KEY,
-    "datatype": "json",
-    "outputsize": "full"  # "compact" = ultime 100 barre, "full" = fino a 30 giorni
-}
+print(f"📆 Intervallo temporale: da {start_date} a {end_date}")
 
-print(f"\n⏳ Scarico dati intraday 1m per {ticker} da Alpha Vantage...")
-response = requests.get(url, params=params)
+# 📂 Percorso file ticker (nome dinamico con data)
+date_str = datetime.now().strftime("%Y-%m-%d")
+file_tickers = f"output/intraday/tickers_{date_str}.csv"
 
-if response.status_code != 200:
-    print("❌ Errore nella richiesta API")
+# 📄 Carica lista ticker
+if file_tickers.endswith(".csv"):
+    df_tickers = pd.read_csv(file_tickers)
+elif file_tickers.endswith((".xlsx", ".xls")):
+    df_tickers = pd.read_excel(file_tickers, engine="openpyxl")
 else:
-    data = response.json()
+    raise ValueError("❌ Formato file non supportato. Usa CSV o Excel.")
 
-    if "Time Series (1min)" not in data:
-        print("⚠️ Nessun dato trovato o limite API raggiunto.")
-    else:
-        # 📊 Converte in DataFrame
+tickers = df_tickers["Ticker"].dropna().unique().tolist()
+
+print(f"📊 Trovati {len(tickers)} ticker nel file {file_tickers}")
+
+# 📂 Crea cartella output
+os.makedirs("output", exist_ok=True)
+
+# 📘 DataFrame finale cumulativo
+all_data = pd.DataFrame()
+
+for ticker in tickers:
+    print(f"\n⏳ Scarico dati intraday 1m per {ticker} da Alpha Vantage...")
+    url = "https://www.alphavantage.co/query"
+    params = {
+        "function": "TIME_SERIES_INTRADAY",
+        "symbol": ticker,
+        "interval": "1min",
+        "apikey": API_KEY,
+        "datatype": "json",
+        "outputsize": "full"
+    }
+
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        data = response.json()
+
+        if "Time Series (1min)" not in data:
+            print(f"⚠️ Nessun dato trovato o limite API raggiunto per {ticker}.")
+            continue
+
         df = pd.DataFrame.from_dict(data["Time Series (1min)"], orient="index")
         df = df.rename(columns={
             "1. open": "Open",
@@ -40,18 +64,29 @@ else:
             "4. close": "Close",
             "5. volume": "Volume"
         })
-
-        # ✅ Converti indici a datetime + ordina
         df.index = pd.to_datetime(df.index)
         df = df.sort_index()
 
-        # 📂 Crea cartella se non esiste
-        os.makedirs("output", exist_ok=True)
+        # ⏱️ Filtra per intervallo temporale desiderato
+        df = df[(df.index >= start_date) & (df.index <= end_date)]
 
-        # 💾 Salva su file Excel
-        date_str = datetime.now().strftime("%Y-%m-%d")
-        output_path = f"output/dati_intraday1m_{ticker}_{date_str}.xlsx"
-        df.to_excel(output_path, index=True)
+        if df.empty:
+            print(f"⚠️ Nessun dato disponibile per {ticker} nell'intervallo selezionato.")
+            continue
 
-        print(f"✅ File salvato: {output_path}")
-        print(df.head())
+        # ➕ Aggiungi colonna Ticker
+        df["Ticker"] = ticker
+
+        # 📊 Accumula nel DataFrame finale
+        all_data = pd.concat([all_data, df])
+
+    except Exception as e:
+        print(f"❌ Errore con {ticker}: {e}")
+
+# 💾 Salva unico file Excel
+if not all_data.empty:
+    output_path = f"output/dati_intraday1m_{date_str}.xlsx"
+    all_data.to_excel(output_path, index=True)
+    print(f"\n✅ File unico salvato: {output_path}")
+else:
+    print("\n⚠️ Nessun dato scaricato per nessun ticker.")
