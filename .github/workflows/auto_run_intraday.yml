@@ -1,8 +1,8 @@
-name: Run Colab Scripts Daily
+name: Run Intraday & Aggregation Scripts Daily
 
 on:
   schedule:
-    - cron: '0 5 * * *'  # Ogni giorno alle 05:00 UTC (07:00 italiane)
+    - cron: '0 6 * * *'  # Ogni giorno alle 08:00 italiane (06:00 UTC)
   workflow_dispatch:
 
 jobs:
@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GH_PAT }}  # <-- usa il tuo personal token qui
+          token: ${{ secrets.GH_PAT }}  # Riutilizza lo stesso secret
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -24,15 +24,12 @@ jobs:
         run: |
           pip install finvizfinance yfinance openpyxl pandas
 
-      - name: Run script 1 (Finviz)
-        run: python script1_finviz.py
+      - name: Run script 3 (Intraday 1m)
+        run: python script3_1m.py
 
-      - name: Run script 2 (Yahoo Finance)
-        run: python script2_yfinance.py
-        
-      #- name: Run script 3 (Intraday 1m)
-      #  run: python script3_intraday.py
-      
+      - name: Run script 4 (Aggrega)
+        run: python script4_aggrega.py
+
       - name: Push output files
         run: |
           git config --global user.name "bocchinofr"
