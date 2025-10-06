@@ -2,7 +2,7 @@ name: Run Colab Scripts Daily
 
 on:
   schedule:
-    - cron: '0 6 * * *'  # Ogni giorno alle 06:00 UTC (08:00 italiane)
+    - cron: '0 5 * * *'  # Ogni giorno alle 05:00 UTC (07:00 italiane)
   workflow_dispatch:
 
 jobs:
