@@ -1,120 +1,190 @@
-import os
 import pandas as pd
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
+import os
 
-# --- Configurazioni ---
-input_folder = "output"
-output_folder = "output/aggregati"
+# === Percorsi ===
+today = datetime.now()
+date_str = today.strftime("%Y-%m-%d")
+input_path = f"output/intraday/dati_intraday1m_{date_str}.xlsx"
+output_dir = "output/intraday"
+output_path = os.path.join(output_dir, f"riepilogo_intraday_{date_str}.xlsx")
 
-if not os.path.exists(output_folder):
-    os.makedirs(output_folder)
+os.makedirs(output_dir, exist_ok=True)
+print(f"📄 Leggo file: {input_path}")
 
-# --- Trova l'ultimo file intraday generato ---
-files = [f for f in os.listdir(input_folder) if f.startswith("intraday1m_all_") and f.endswith(".csv")]
-if not files:
-    raise FileNotFoundError("Nessun file intraday trovato in 'output/'")
+# === Carica dati ===
+try:
+    df = pd.read_excel(input_path)
+except FileNotFoundError:
+    raise FileNotFoundError(f"❌ File non trovato: {input_path}")
 
-files.sort()
-input_file = os.path.join(input_folder, files[-1])
-print(f"📂 Elaboro file: {input_file}")
+# Normalizza colonne e datetime
+if "Unnamed: 0" in df.columns:
+    df = df.rename(columns={"Unnamed: 0": "Datetime"})
+df["Datetime"] = pd.to_datetime(df["Datetime"], errors="coerce")
+df = df.dropna(subset=["Datetime"]).copy()
+df["Date"] = df["Datetime"].dt.date
+df["Time"] = df["Datetime"].dt.time
+df = df.rename(columns={c: c.strip().capitalize() for c in df.columns})
 
-# --- Leggi CSV ---
-df = pd.read_csv(input_file, parse_dates=['date'])
-df.columns = [c.strip() for c in df.columns]
-df['time_only'] = df['date'].dt.time
+if "Ticker" not in df.columns:
+    raise ValueError("Colonna 'Ticker' mancante nel file.")
 
-# --- Funzione generica per aggregare intervalli ---
-def aggregate_interval(df, start_time, end_time, interval_label, include_open_close=True, include_time=False):
-    df_int = df[(df['time_only'] >= start_time) & (df['time_only'] <= end_time)].copy()
-    df_int['Date'] = df_int['date'].dt.date  # <-- assicura di avere la colonna Date
-    df_int = df_int.sort_values(['Ticker', 'date'])
-    
-    if df_int.empty:
-        return pd.DataFrame()
-    
-    agg_dict = {
-        'High': 'max',
-        'Low': 'min',
-        'Volume': 'sum'
-    }
-    if include_open_close:
-        agg_dict.update({'Open': 'first', 'Close': 'last'})
-    
-    # Raggruppa per ticker e data
-    agg_df = df_int.groupby(['Ticker','Date']).agg(agg_dict).reset_index()
-    
-    # calcolo orario del max/min se richiesto
-    if include_time:
-        high_time_list, low_time_list = [], []
-        for (ticker,date_), group in df_int.groupby(['Ticker','Date']):
-            idx_high = group['High'].idxmax()
-            idx_low = group['Low'].idxmin()
-            high_time_list.append((ticker, date_, group.loc[idx_high, 'date'].time()))
-            low_time_list.append((ticker, date_, group.loc[idx_low, 'date'].time()))
-        if include_open_close and interval_label.startswith("PM"):
-            agg_df['HighPMTime'] = pd.DataFrame(high_time_list, columns=['Ticker','Date','HighPMTime'])['HighPMTime']
+# forza tipi numerici per sicurezza
+for col in ["Open","High","Low","Close","Volume"]:
+    if col in df.columns:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+
+tickers = df["Ticker"].dropna().unique()
+print(f"📈 Trovati {len(tickers)} ticker.")
+
+# helper: prendi il primo bucket (index 0) rispetto a rh_start_dt
+def first_bucket_stats(rh_df, rh_start_dt, m):
+    """
+    rh_df: DataFrame con Datetime colonne, ordinato
+    rh_start_dt: datetime del market open (es. 2025-10-02 09:30:00)
+    m: minuti del bucket (int)
+    ritorna (high, low, volume) del primo bucket; None se non presenti
+    """
+    if rh_df.empty:
+        return None, None, 0
+
+    # calcola numero di bucket (delta) per ogni riga
+    delta_seconds = (rh_df["Datetime"] - rh_start_dt).dt.total_seconds()
+    # bucket index (0 = primo bucket 09:30 .. <09:30+m)
+    bucket = (delta_seconds // (m * 60)).astype("Int64")  # può risultare negativo se riga < open (non dovrebbe)
+    rh_df = rh_df.assign(_bucket=bucket)
+    # prendi solo bucket 0 (fallback al primo bucket esistente se 0 non esiste)
+    grouped = rh_df.groupby("_bucket").agg({"High":"max","Low":"min","Volume":"sum"})
+    if grouped.empty:
+        return None, None, 0
+
+    if 0 in grouped.index:
+        g = grouped.loc[0]
+    else:
+        # fallback: prendi il primo bucket disponibile (ad esempio se non ci sono righe esattamente >=9:30)
+        g = grouped.iloc[0]
+
+    high = g["High"] if pd.notnull(g["High"]) else None
+    low = g["Low"] if pd.notnull(g["Low"]) else None
+    vol = int(g["Volume"]) if pd.notnull(g["Volume"]) else 0
+    return high, low, vol
+
+# === Elaborazione per ogni ticker ===
+final_data = []
+intervals = [1, 5, 30, 60, 90, 240]
+
+for ticker in tickers:
+    dft = df[df["Ticker"] == ticker].copy()
+    if dft.empty:
+        continue
+
+    # tieni solo la data più recente per il ticker
+    max_date = dft["Date"].max()
+    # day_df è solo le righe del giorno target (per rh)
+    day_df = dft[dft["Date"] == max_date].copy()
+
+    # definisci finestre temporali precise (datetime)
+    rh_start_dt = datetime.combine(max_date, time(9,30))
+    rh_end_dt   = datetime.combine(max_date, time(15,59))
+    pm_start_dt = datetime.combine(max_date - timedelta(days=1), time(16,0))
+    pm_end_dt   = datetime.combine(max_date, time(9,29))
+
+    # pm_df: prendiamo SOLO le righe comprese tra pm_start_dt e pm_end_dt
+    pm_df = dft[(dft["Datetime"] >= pm_start_dt) & (dft["Datetime"] <= pm_end_dt)].sort_values("Datetime").copy()
+    # escludi le barre 04:00 e 04:01 se presenti
+    pm_df = pm_df[~pm_df["Datetime"].dt.strftime("%H:%M").isin(["04:00", "04:01"])]
+
+    # rh_df: righe nel regular hours del giorno target
+    rh_df = day_df[(day_df["Datetime"] >= rh_start_dt) & (day_df["Datetime"] <= rh_end_dt)].sort_values("Datetime").copy()
+
+    # se non ci sono dati né in rh né in pm saltalo
+    if rh_df.empty and pm_df.empty:
+        continue
+
+    row = {"Ticker": ticker, "Date": max_date}
+
+    # --- Regular hours ---
+    if not rh_df.empty:
+        # Open: preferisci la barra delle 09:30 altrimenti la prima disponibile
+        if any(rh_df["Datetime"] == rh_start_dt):
+            open_v = rh_df.loc[rh_df["Datetime"] == rh_start_dt, "Open"].iloc[0]
         else:
-            agg_df['highREGTime'] = pd.DataFrame(high_time_list, columns=['Ticker','Date','highREGTime'])['highREGTime']
-            agg_df['lowREGTime'] = pd.DataFrame(low_time_list, columns=['Ticker','Date','lowREGTime'])['lowREGTime']
-    
-    agg_df.rename(columns={
-        'Open': f'open{interval_label}' if include_open_close else None,
-        'Close': f'close{interval_label}' if include_open_close else None,
-        'High': f'high{interval_label}',
-        'Low': f'low{interval_label}',
-        'Volume': f'volume{interval_label}'
-    }, inplace=True)
-    
-    agg_df = agg_df[[c for c in agg_df.columns if c is not None]]
-    
-    return agg_df
+            open_v = rh_df["Open"].iloc[0]
+        high_v = rh_df["High"].max() if not rh_df["High"].isna().all() else None
+        low_v  = rh_df["Low"].min()  if not rh_df["Low"].isna().all() else None
+        close_v = rh_df.loc[rh_df["Datetime"] == rh_end_dt, "Close"].iloc[-1] if any(rh_df["Datetime"] == rh_end_dt) else rh_df["Close"].iloc[-1]
+        vol_v = int(rh_df["Volume"].sum()) if "Volume" in rh_df.columns else 0
 
-# --- Intervalli da aggregare ---
-intervals = [
-    # Pre-market
-    (time(4,0), time(9,29), "PM", True, True),
-    # Pre-market 15m
-    (time(4,0), time(4,15), "PM15m", False, False),
-    # Regolare vari intervalli
-    (time(9,30), time(9,31), "1m", False, False),
-    (time(9,30), time(9,35), "5m", False, False),
-    (time(9,30), time(10,0), "30m", False, False),
-    (time(9,30), time(10,30), "1h", False, False),
-    (time(9,30), time(11,0), "1_30h", False, False),
-    (time(9,30), time(13,30), "4h", False, False),
-    # Sessione regolare completa
-    (time(9,30), time(15,59), "REG", True, True)
+        row["Open"] = round(open_v, 2) if pd.notnull(open_v) else None
+        row["High"] = round(high_v, 2) if pd.notnull(high_v) else None
+        row["Low"]  = round(low_v, 2)  if pd.notnull(low_v)  else None
+        row["Close"]= round(close_v, 2) if pd.notnull(close_v) else None
+        row["Volume"] = vol_v
+    else:
+        row.update({"Open": None, "High": None, "Low": None, "Close": None, "Volume": 0})
+
+    # --- Pre-market ---
+    if not pm_df.empty:
+        # OpenPM: preferisci la barra esatta alle 16:00 del giorno precedente altrimenti la prima riga nella finestra
+        if any(pm_df["Datetime"] == pm_start_dt):
+            openpm = pm_df.loc[pm_df["Datetime"] == pm_start_dt, "Open"].iloc[0]
+        else:
+            openpm = pm_df["Open"].iloc[0]
+        highpm = pm_df["High"].max() if not pm_df["High"].isna().all() else None
+        lowpm  = pm_df["Low"].min()  if not pm_df["Low"].isna().all() else None
+        closepm = pm_df.loc[pm_df["Datetime"] == pm_end_dt, "Close"].iloc[-1] if any(pm_df["Datetime"] == pm_end_dt) else pm_df["Close"].iloc[-1]
+        volpm = int(pm_df["Volume"].sum()) if "Volume" in pm_df.columns else 0
+
+        row["OpenPM"] = round(openpm, 2) if pd.notnull(openpm) else None
+        row["HighPM"] = round(highpm, 2) if pd.notnull(highpm) else None
+        row["LowPM"]  = round(lowpm, 2)  if pd.notnull(lowpm)  else None
+        row["ClosePM"]= round(closepm, 2) if pd.notnull(closepm) else None
+        row["VolumePM"] = volpm
+
+        # TimePMH: prendi il datetime della prima occorrenza del valore HighPM
+        try:
+            high_pm_value = highpm
+            # filtra le righe che hanno quel valore e ordina per Datetime crescente -> prendi la prima
+            high_pm_rows = pm_df[pm_df["High"] == high_pm_value].sort_values("Datetime")
+            if not high_pm_rows.empty:
+                row["TimePMH"] = high_pm_rows.iloc[0]["Datetime"].strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                row["TimePMH"] = None
+        except Exception:
+            row["TimePMH"] = None
+    else:
+        row.update({"OpenPM": None, "HighPM": None, "LowPM": None, "ClosePM": None, "VolumePM": 0, "TimePMH": None})
+
+    # --- Aggregazioni intraday: prendo il PRIMO bucket che parte alle 09:30 per ogni m ---
+    for m in intervals:
+        h, l, v = None, None, 0
+        if not rh_df.empty:
+            # calcola primo bucket rispetto a rh_start_dt
+            high_b, low_b, vol_b = first_bucket_stats(rh_df, rh_start_dt, m)
+            h, l, v = high_b, low_b, vol_b
+        # arrotonda prezzi
+        row[f"High_{m}m"] = round(h, 2) if pd.notnull(h) else None
+        row[f"Low_{m}m"]  = round(l, 2) if pd.notnull(l) else None
+        row[f"Volume_{m}m"] = int(v) if v is not None else 0
+
+    final_data.append(row)
+
+# === Output finale e ordinamento colonne ===
+df_final = pd.DataFrame(final_data)
+
+cols_prior = [
+    "Ticker", "Date",
+    "Open", "High", "Low", "Close", "Volume",
+    "OpenPM", "HighPM", "LowPM", "ClosePM", "VolumePM", "TimePMH"
 ]
+# poi per ogni m: High, Low, Volume (nell'ordine richiesto)
+for m in intervals:
+    cols_prior += [f"High_{m}m", f"Low_{m}m", f"Volume_{m}m"]
 
-agg_dfs = []
-for start, end, label, include_oc, include_time in intervals:
-    df_agg = aggregate_interval(df, start, end, label, include_open_close=include_oc, include_time=include_time)
-    if not df_agg.empty:
-        agg_dfs.append(df_agg)
+# assicurati di avere solo colonne presenti
+cols_present = [c for c in cols_prior if c in df_final.columns]
+df_final = df_final[cols_present]
 
-# --- Merge di tutti gli intervalli su 'Ticker' ---
-from functools import reduce
-df_final = reduce(lambda left, right: pd.merge(left, right, on=['Ticker','Date'], how='outer'), agg_dfs)
-
-# --- Ordine colonne finale ---
-column_order = [
-    'Ticker', 'Date', 'openREG','highREG','lowREG','closeREG','volumeREG','highREGTime','lowREGTime',
-    'openPM','highPM','lowPM','closePM','volumePM','HighPMTime','highPM15m','lowPM15m',
-    'high1m','low1m','volume1m','high5m','low5m','volume5m','high30m','low30m','volume30m',
-    'high1h','low1h','volume1h','high1_30h','low1_30h','volume1_30h','high4h','low4h','volume4h'
-]
-
-# --- Assicura tutte le colonne richieste siano presenti ---
-for col in column_order:
-    if col not in df_final.columns:
-        df_final[col] = pd.NA
-
-df_final = df_final[column_order]
-
-# --- Salva CSV finale ---
-today_str = datetime.now().strftime("%Y-%m-%d")
-output_file = os.path.join(output_folder, f"aggregato_colonna_{today_str}.csv")
-df_final.to_csv(output_file, index=False, float_format="%.4f")
-
-print(f"\n✅ File finale in colonna creato: {output_file}")
-print(df_final.head())
+df_final.to_excel(output_path, index=False)
+print(f"✅ File riepilogativo salvato: {output_path}")
