@@ -15,7 +15,7 @@ print(f"📆 Intervallo temporale: da {start_date} a {end_date}")
 
 # 📂 Percorso file ticker (nome dinamico con data)
 date_str = datetime.now().strftime("%Y-%m-%d")
-file_tickers = f"output/intraday/tickers_{date_str}.csv"
+file_tickers = f"output/tickers_{date_str}.csv"
 
 # 📄 Carica lista ticker
 if file_tickers.endswith(".csv"):
@@ -85,7 +85,7 @@ for ticker in tickers:
 
 # 💾 Salva unico file Excel
 if not all_data.empty:
-    output_path = f"output/dati_intraday1m_{date_str}.xlsx"
+    output_path = f"output/intraday/dati_intraday1m_{date_str}.xlsx"
     all_data.to_excel(output_path, index=True)
     print(f"\n✅ File unico salvato: {output_path}")
 else:
