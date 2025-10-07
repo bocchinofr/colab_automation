@@ -26,9 +26,16 @@ technical.set_filter(filters_dict=filters_dict)
 df_screen = technical.screener_view()
 
 if df_screen is not None and not df_screen.empty:
-    # Assicura che la colonna 'Gap' sia in formato numerico
+    # 🔹 Normalizza e moltiplica la colonna 'Gap%'
     if "Gap" in df_screen.columns:
-        df_screen["Gap%"] = df_screen["Gap"].astype(str).str.replace("%", "").astype(float)
+        df_screen["Gap%"] = (
+            df_screen["Gap"]
+            .astype(str)
+            .str.replace("%", "")
+            .astype(float)
+            .mul(100)
+            .round(2)
+        )
     else:
         df_screen["Gap%"] = None
 
@@ -36,7 +43,7 @@ if df_screen is not None and not df_screen.empty:
     shs_float_list = []
     shs_outstand_list = []
 
-    for ticker in df_screen['Ticker']:
+    for ticker in df_screen["Ticker"]:
         try:
             stock = finvizfinance(ticker)
             stock_fundament = stock.ticker_fundament()
@@ -54,8 +61,8 @@ if df_screen is not None and not df_screen.empty:
     df_screen["Shs Float"] = shs_float_list
     df_screen["Shares Outstanding"] = shs_outstand_list
 
-    # 🔹 Salva il risultato
+    # 🔹 Salva il risultato finale
     df_screen.to_csv(output_file, index=False)
-    print(f"✅ Salvato con colonna Gap% reale e fondamentali: {output_file}")
+    print(f"✅ Salvato con colonna Gap% corretta e fondamentali: {output_file}")
 else:
     print("⚠️ Nessun ticker trovato.")
