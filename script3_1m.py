@@ -13,9 +13,17 @@ end_date = (today - timedelta(days=1)).replace(hour=19, minute=50, second=0, mic
 
 print(f"📆 Intervallo temporale: da {start_date} a {end_date}")
 
+# 📁 Percorso assoluto alla directory del progetto
+base_dir = os.path.dirname(os.path.abspath(__file__))
+output_dir = os.path.join(base_dir, "output")
+intraday_dir = os.path.join(output_dir, "intraday")
+
+# 📁 Assicura che le cartelle esistano
+os.makedirs(intraday_dir, exist_ok=True)
+
 # 📂 Percorso file ticker (nome dinamico con data)
 date_str = datetime.now().strftime("%Y-%m-%d")
-file_tickers = f"output/tickers_{date_str}.csv"
+file_tickers = os.path.join(output_dir, f"tickers_{date_str}.csv")
 
 # 📄 Carica lista ticker
 if file_tickers.endswith(".csv"):
@@ -27,10 +35,6 @@ else:
 
 tickers = df_tickers["Ticker"].dropna().unique().tolist()
 print(f"📊 Trovati {len(tickers)} ticker nel file {file_tickers}")
-
-# 📁 Assicura che le cartelle di output esistano
-for path in ["output", "output/intraday"]:
-    os.makedirs(path, exist_ok=True)
 
 # 📘 DataFrame finale cumulativo
 all_data = pd.DataFrame()
@@ -74,18 +78,15 @@ for ticker in tickers:
             print(f"⚠️ Nessun dato disponibile per {ticker} nell'intervallo selezionato.")
             continue
 
-        # ➕ Aggiungi colonna Ticker
         df["Ticker"] = ticker
-
-        # 📊 Accumula nel DataFrame finale
         all_data = pd.concat([all_data, df])
 
     except Exception as e:
         print(f"❌ Errore con {ticker}: {e}")
 
-# 💾 Salva unico file Excel (con gestione robusta)
+# 💾 Salva unico file Excel (ora con percorso assoluto)
 if not all_data.empty:
-    output_path = f"output/intraday/dati_intraday1m_{date_str}.xlsx"
+    output_path = os.path.join(intraday_dir, f"dati_intraday1m_{date_str}.xlsx")
     try:
         print(f"\n💾 Salvataggio dati in {output_path}")
         all_data.to_excel(output_path, index=True)
