@@ -26,11 +26,11 @@ else:
     raise ValueError("❌ Formato file non supportato. Usa CSV o Excel.")
 
 tickers = df_tickers["Ticker"].dropna().unique().tolist()
-
 print(f"📊 Trovati {len(tickers)} ticker nel file {file_tickers}")
 
-# 📂 Crea cartella output
-os.makedirs("output", exist_ok=True)
+# 📁 Assicura che le cartelle di output esistano
+for path in ["output", "output/intraday"]:
+    os.makedirs(path, exist_ok=True)
 
 # 📘 DataFrame finale cumulativo
 all_data = pd.DataFrame()
@@ -83,10 +83,14 @@ for ticker in tickers:
     except Exception as e:
         print(f"❌ Errore con {ticker}: {e}")
 
-# 💾 Salva unico file Excel
+# 💾 Salva unico file Excel (con gestione robusta)
 if not all_data.empty:
     output_path = f"output/intraday/dati_intraday1m_{date_str}.xlsx"
-    all_data.to_excel(output_path, index=True)
-    print(f"\n✅ File unico salvato: {output_path}")
+    try:
+        print(f"\n💾 Salvataggio dati in {output_path}")
+        all_data.to_excel(output_path, index=True)
+        print(f"✅ File unico salvato: {output_path}")
+    except Exception as e:
+        print(f"❌ Errore durante il salvataggio del file Excel: {e}")
 else:
     print("\n⚠️ Nessun dato scaricato per nessun ticker.")
