@@ -26,7 +26,19 @@ overview.set_filter(filters_dict=filters_dict)
 df_screen = overview.screener_view()
 
 if df_screen is not None and not df_screen.empty:
-    # Aggiunge colonne fondamentali
+    # 🔹 Pulisce la colonna Gap
+    if "Gap" in df_screen.columns:
+        df_screen["Gap%"] = (
+            df_screen["Gap"]
+            .astype(str)
+            .str.replace("%", "", regex=False)
+            .str.replace("+", "", regex=False)
+            .astype(float)
+        )
+    else:
+        df_screen["Gap%"] = None
+
+    # 🔹 Aggiunge colonne fondamentali
     shs_float_list = []
     shs_outstand_list = []
 
@@ -48,7 +60,8 @@ if df_screen is not None and not df_screen.empty:
     df_screen["Shs Float"] = shs_float_list
     df_screen["Shares Outstanding"] = shs_outstand_list
 
+    # 🔹 Salva il risultato
     df_screen.to_csv(output_file, index=False)
-    print(f"✅ Salvato con fondamentali: {output_file}")
+    print(f"✅ Salvato con fondamentali e Gap%: {output_file}")
 else:
     print("⚠️ Nessun ticker trovato.")

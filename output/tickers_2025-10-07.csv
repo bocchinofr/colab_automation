@@ -1,7 +1,7 @@
-Ticker,Company,Sector,Industry,Country,Market Cap,P/E,Price,Change,Volume,Shs Float,Shares Outstanding
-CRML,Critical Metals Corp,Basic Materials,Other Industrial Metals & Mining,United Kingdom,1140000000.0,,11.59,0.4524,158216666.0,28.10M,98.60M
-IONR,ioneer Ltd ADR,Basic Materials,Other Industrial Metals & Mining,Australia,435550000.0,,6.53,0.3747,5855866.0,58.86M,65.20M
-ONMD,OneMedNet Corp,Healthcare,Health Information Services,USA,118010000.0,,2.56,1.4853999999999998,283947570.0,30.44M,46.10M
-PALI,Palisade Bio Inc,Healthcare,Biotechnology,USA,17370000.0,,1.9,0.1906,53746636.0,9.10M,9.12M
-SOPA,Society Pass Inc,Communication Services,Advertising Agencies,USA,32360000.0,,5.3,2.7588999999999997,207798236.0,5.36M,6.11M
-SPRB,Spruce Biosciences Inc,Healthcare,Biotechnology,USA,73480000.0,,130.4,13.784600000000001,24317053.0,0.47M,0.56M
+Ticker,Company,Sector,Industry,Country,Market Cap,P/E,Price,Change,Volume,Gap%,Shs Float,Shares Outstanding
+CRML,Critical Metals Corp,Basic Materials,Other Industrial Metals & Mining,United Kingdom,1140000000.0,,11.59,0.4524,158216666.0,,28.10M,98.60M
+IONR,ioneer Ltd ADR,Basic Materials,Other Industrial Metals & Mining,Australia,435550000.0,,6.53,0.3747,5855866.0,,58.86M,65.20M
+ONMD,OneMedNet Corp,Healthcare,Health Information Services,USA,118000000.0,,2.56,1.4853999999999998,283947570.0,,30.44M,46.10M
+PALI,Palisade Bio Inc,Healthcare,Biotechnology,USA,184110000.0,,1.9,0.1906,53746636.0,,9.10M,9.12M
+SOPA,Society Pass Inc,Communication Services,Advertising Agencies,USA,32360000.0,,5.3,2.7588999999999997,207798236.0,,5.36M,6.11M
+SPRB,Spruce Biosciences Inc,Healthcare,Biotechnology,USA,73420000.0,,130.4,13.784600000000001,24317053.0,,0.47M,0.56M
