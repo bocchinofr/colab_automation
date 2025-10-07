@@ -26,15 +26,9 @@ overview.set_filter(filters_dict=filters_dict)
 df_screen = overview.screener_view()
 
 if df_screen is not None and not df_screen.empty:
-    # 🔹 Pulisce la colonna Gap
-    if "Gap" in df_screen.columns:
-        df_screen["Gap%"] = (
-            df_screen["Gap"]
-            .astype(str)
-            .str.replace("%", "", regex=False)
-            .str.replace("+", "", regex=False)
-            .astype(float)
-        )
+    # 🔹 Corregge la colonna Change (moltiplica per 100 e rinomina in Gap%)
+    if "Change" in df_screen.columns:
+        df_screen["Gap%"] = df_screen["Change"].astype(float) * 100
     else:
         df_screen["Gap%"] = None
 
@@ -62,6 +56,6 @@ if df_screen is not None and not df_screen.empty:
 
     # 🔹 Salva il risultato
     df_screen.to_csv(output_file, index=False)
-    print(f"✅ Salvato con fondamentali e Gap%: {output_file}")
+    print(f"✅ Salvato con fondamentali e Gap% corretto: {output_file}")
 else:
     print("⚠️ Nessun ticker trovato.")
