@@ -1,5 +1,5 @@
 # script1_finviz.py
-from finvizfinance.screener.overview import Overview
+from finvizfinance.screener.technical import Technical
 from finvizfinance.quote import finvizfinance
 import pandas as pd
 from datetime import datetime
@@ -20,15 +20,15 @@ filters_dict = {
     "Price": "Over $1"
 }
 
-# 🔹 Esegue screener
-overview = Overview()
-overview.set_filter(filters_dict=filters_dict)
-df_screen = overview.screener_view()
+# 🔹 Esegue screener sulla vista tecnica (per includere la colonna 'Gap')
+technical = Technical()
+technical.set_filter(filters_dict=filters_dict)
+df_screen = technical.screener_view()
 
 if df_screen is not None and not df_screen.empty:
-    # 🔹 Corregge la colonna Change (moltiplica per 100 e rinomina in Gap%)
-    if "Change" in df_screen.columns:
-        df_screen["Gap%"] = df_screen["Change"].astype(float) * 100
+    # Assicura che la colonna 'Gap' sia in formato numerico
+    if "Gap" in df_screen.columns:
+        df_screen["Gap%"] = df_screen["Gap"].astype(str).str.replace("%", "").astype(float)
     else:
         df_screen["Gap%"] = None
 
@@ -56,6 +56,6 @@ if df_screen is not None and not df_screen.empty:
 
     # 🔹 Salva il risultato
     df_screen.to_csv(output_file, index=False)
-    print(f"✅ Salvato con fondamentali e Gap% corretto: {output_file}")
+    print(f"✅ Salvato con colonna Gap% reale e fondamentali: {output_file}")
 else:
     print("⚠️ Nessun ticker trovato.")
