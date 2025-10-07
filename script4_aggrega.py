@@ -1,24 +1,26 @@
 import pandas as pd
 from datetime import datetime, time, timedelta
 import os
+import re
 
 # === Percorsi ===
 today = datetime.now()
 date_str = today.strftime("%Y-%m-%d")
+
 input_path = f"output/intraday/dati_intraday1m_{date_str}.xlsx"
+finviz_path = f"output/tickers_{date_str}.csv"
 output_dir = "output/intraday"
 output_path = os.path.join(output_dir, f"riepilogo_intraday_{date_str}.xlsx")
 
 os.makedirs(output_dir, exist_ok=True)
-print(f"📄 Leggo file: {input_path}")
+print(f"📄 Leggo file intraday: {input_path}")
 
-# === Carica dati ===
+# === Carica dati intraday ===
 try:
     df = pd.read_excel(input_path)
 except FileNotFoundError:
     raise FileNotFoundError(f"❌ File non trovato: {input_path}")
 
-# Normalizza colonne e datetime
 if "Unnamed: 0" in df.columns:
     df = df.rename(columns={"Unnamed: 0": "Datetime"})
 df["Datetime"] = pd.to_datetime(df["Datetime"], errors="coerce")
@@ -28,49 +30,60 @@ df["Time"] = df["Datetime"].dt.time
 df = df.rename(columns={c: c.strip().capitalize() for c in df.columns})
 
 if "Ticker" not in df.columns:
-    raise ValueError("Colonna 'Ticker' mancante nel file.")
+    raise ValueError("Colonna 'Ticker' mancante nel file intraday.")
 
-# forza tipi numerici per sicurezza
-for col in ["Open","High","Low","Close","Volume"]:
+for col in ["Open", "High", "Low", "Close", "Volume"]:
     if col in df.columns:
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
 tickers = df["Ticker"].dropna().unique()
-print(f"📈 Trovati {len(tickers)} ticker.")
+print(f"📈 Trovati {len(tickers)} ticker intraday.")
 
-# helper: prendi il primo bucket (index 0) rispetto a rh_start_dt
+# === Carica dati Finviz ===
+try:
+    df_finviz = pd.read_csv(finviz_path)
+    print(f"📊 Letto file Finviz: {finviz_path}")
+except FileNotFoundError:
+    print(f"⚠️ File Finviz non trovato ({finviz_path}), continuerò senza queste colonne.")
+    df_finviz = pd.DataFrame(columns=["Ticker", "Gap%", "Shs Float", "Shares Outstanding", "Change from Open"])
+
+df_finviz.columns = [c.strip() for c in df_finviz.columns]
+cols_finviz = ["Ticker", "Gap%", "Shs Float", "Shares Outstanding", "Change from Open"]
+df_finviz = df_finviz[[c for c in cols_finviz if c in df_finviz.columns]].copy()
+
+# === Funzione per convertire "M", "B", "K" in numeri reali ===
+def parse_shares(value):
+    if pd.isna(value):
+        return None
+    s = str(value).replace(",", "").strip().upper()
+    match = re.match(r"([\d\.]+)([KMB]?)", s)
+    if not match:
+        return None
+    num, suffix = match.groups()
+    num = float(num)
+    multiplier = {"K": 1_000, "M": 1_000_000, "B": 1_000_000_000}.get(suffix, 1)
+    return num * multiplier
+
+# === Applica conversione alle colonne Finviz ===
+if "Shs Float" in df_finviz.columns:
+    df_finviz["Shs Float"] = df_finviz["Shs Float"].apply(parse_shares)
+if "Shares Outstanding" in df_finviz.columns:
+    df_finviz["Shares Outstanding"] = df_finviz["Shares Outstanding"].apply(parse_shares)
+
+# === Funzione per bucket intraday ===
 def first_bucket_stats(rh_df, rh_start_dt, m):
-    """
-    rh_df: DataFrame con Datetime colonne, ordinato
-    rh_start_dt: datetime del market open (es. 2025-10-02 09:30:00)
-    m: minuti del bucket (int)
-    ritorna (high, low, volume) del primo bucket; None se non presenti
-    """
     if rh_df.empty:
         return None, None, 0
-
-    # calcola numero di bucket (delta) per ogni riga
     delta_seconds = (rh_df["Datetime"] - rh_start_dt).dt.total_seconds()
-    # bucket index (0 = primo bucket 09:30 .. <09:30+m)
-    bucket = (delta_seconds // (m * 60)).astype("Int64")  # può risultare negativo se riga < open (non dovrebbe)
+    bucket = (delta_seconds // (m * 60)).astype("Int64")
     rh_df = rh_df.assign(_bucket=bucket)
-    # prendi solo bucket 0 (fallback al primo bucket esistente se 0 non esiste)
-    grouped = rh_df.groupby("_bucket").agg({"High":"max","Low":"min","Volume":"sum"})
+    grouped = rh_df.groupby("_bucket").agg({"High": "max", "Low": "min", "Volume": "sum"})
     if grouped.empty:
         return None, None, 0
+    g = grouped.loc[0] if 0 in grouped.index else grouped.iloc[0]
+    return g["High"], g["Low"], int(g["Volume"])
 
-    if 0 in grouped.index:
-        g = grouped.loc[0]
-    else:
-        # fallback: prendi il primo bucket disponibile (ad esempio se non ci sono righe esattamente >=9:30)
-        g = grouped.iloc[0]
-
-    high = g["High"] if pd.notnull(g["High"]) else None
-    low = g["Low"] if pd.notnull(g["Low"]) else None
-    vol = int(g["Volume"]) if pd.notnull(g["Volume"]) else 0
-    return high, low, vol
-
-# === Elaborazione per ogni ticker ===
+# === Calcolo metriche intraday ===
 final_data = []
 intervals = [1, 5, 30, 60, 90, 240]
 
@@ -79,112 +92,89 @@ for ticker in tickers:
     if dft.empty:
         continue
 
-    # tieni solo la data più recente per il ticker
     max_date = dft["Date"].max()
-    # day_df è solo le righe del giorno target (per rh)
     day_df = dft[dft["Date"] == max_date].copy()
 
-    # definisci finestre temporali precise (datetime)
     rh_start_dt = datetime.combine(max_date, time(9,30))
     rh_end_dt   = datetime.combine(max_date, time(15,59))
     pm_start_dt = datetime.combine(max_date - timedelta(days=1), time(16,0))
     pm_end_dt   = datetime.combine(max_date, time(9,29))
 
-    # pm_df: prendiamo SOLO le righe comprese tra pm_start_dt e pm_end_dt
-    pm_df = dft[(dft["Datetime"] >= pm_start_dt) & (dft["Datetime"] <= pm_end_dt)].sort_values("Datetime").copy()
-    # escludi le barre 04:00 e 04:01 se presenti
+    pm_df = dft[(dft["Datetime"] >= pm_start_dt) & (dft["Datetime"] <= pm_end_dt)].copy()
     pm_df = pm_df[~pm_df["Datetime"].dt.strftime("%H:%M").isin(["04:00", "04:01"])]
 
-    # rh_df: righe nel regular hours del giorno target
-    rh_df = day_df[(day_df["Datetime"] >= rh_start_dt) & (day_df["Datetime"] <= rh_end_dt)].sort_values("Datetime").copy()
-
-    # se non ci sono dati né in rh né in pm saltalo
+    rh_df = day_df[(day_df["Datetime"] >= rh_start_dt) & (day_df["Datetime"] <= rh_end_dt)].copy()
     if rh_df.empty and pm_df.empty:
         continue
 
     row = {"Ticker": ticker, "Date": max_date}
 
-    # --- Regular hours ---
+    # Regular hours
     if not rh_df.empty:
-        # Open: preferisci la barra delle 09:30 altrimenti la prima disponibile
-        if any(rh_df["Datetime"] == rh_start_dt):
-            open_v = rh_df.loc[rh_df["Datetime"] == rh_start_dt, "Open"].iloc[0]
-        else:
-            open_v = rh_df["Open"].iloc[0]
-        high_v = rh_df["High"].max() if not rh_df["High"].isna().all() else None
-        low_v  = rh_df["Low"].min()  if not rh_df["Low"].isna().all() else None
-        close_v = rh_df.loc[rh_df["Datetime"] == rh_end_dt, "Close"].iloc[-1] if any(rh_df["Datetime"] == rh_end_dt) else rh_df["Close"].iloc[-1]
-        vol_v = int(rh_df["Volume"].sum()) if "Volume" in rh_df.columns else 0
-
-        row["Open"] = round(open_v, 2) if pd.notnull(open_v) else None
-        row["High"] = round(high_v, 2) if pd.notnull(high_v) else None
-        row["Low"]  = round(low_v, 2)  if pd.notnull(low_v)  else None
-        row["Close"]= round(close_v, 2) if pd.notnull(close_v) else None
-        row["Volume"] = vol_v
+        open_v = rh_df.loc[rh_df["Datetime"] == rh_start_dt, "Open"].iloc[0] if any(rh_df["Datetime"] == rh_start_dt) else rh_df["Open"].iloc[0]
+        high_v, low_v, close_v = rh_df["High"].max(), rh_df["Low"].min(), rh_df["Close"].iloc[-1]
+        vol_v = int(rh_df["Volume"].sum())
+        row.update({
+            "Open": round(open_v,2),
+            "High": round(high_v,2),
+            "Low": round(low_v,2),
+            "Close": round(close_v,2),
+            "Volume": vol_v
+        })
     else:
-        row.update({"Open": None, "High": None, "Low": None, "Close": None, "Volume": 0})
+        row.update({"Open": None,"High": None,"Low": None,"Close": None,"Volume": 0})
 
-    # --- Pre-market ---
+    # Pre-market
     if not pm_df.empty:
-        # OpenPM: preferisci la barra esatta alle 16:00 del giorno precedente altrimenti la prima riga nella finestra
-        if any(pm_df["Datetime"] == pm_start_dt):
-            openpm = pm_df.loc[pm_df["Datetime"] == pm_start_dt, "Open"].iloc[0]
-        else:
-            openpm = pm_df["Open"].iloc[0]
-        highpm = pm_df["High"].max() if not pm_df["High"].isna().all() else None
-        lowpm  = pm_df["Low"].min()  if not pm_df["Low"].isna().all() else None
-        closepm = pm_df.loc[pm_df["Datetime"] == pm_end_dt, "Close"].iloc[-1] if any(pm_df["Datetime"] == pm_end_dt) else pm_df["Close"].iloc[-1]
-        volpm = int(pm_df["Volume"].sum()) if "Volume" in pm_df.columns else 0
-
-        row["OpenPM"] = round(openpm, 2) if pd.notnull(openpm) else None
-        row["HighPM"] = round(highpm, 2) if pd.notnull(highpm) else None
-        row["LowPM"]  = round(lowpm, 2)  if pd.notnull(lowpm)  else None
-        row["ClosePM"]= round(closepm, 2) if pd.notnull(closepm) else None
-        row["VolumePM"] = volpm
-
-        # TimePMH: prendi il datetime della prima occorrenza del valore HighPM
+        openpm = pm_df.iloc[0]["Open"]
+        highpm, lowpm, closepm = pm_df["High"].max(), pm_df["Low"].min(), pm_df["Close"].iloc[-1]
+        volpm = int(pm_df["Volume"].sum())
+        row.update({
+            "OpenPM": round(openpm,2),
+            "HighPM": round(highpm,2),
+            "LowPM": round(lowpm,2),
+            "ClosePM": round(closepm,2),
+            "VolumePM": volpm
+        })
         try:
             high_pm_value = highpm
-            # filtra le righe che hanno quel valore e ordina per Datetime crescente -> prendi la prima
             high_pm_rows = pm_df[pm_df["High"] == high_pm_value].sort_values("Datetime")
-            if not high_pm_rows.empty:
-                row["TimePMH"] = high_pm_rows.iloc[0]["Datetime"].strftime("%Y-%m-%d %H:%M:%S")
-            else:
-                row["TimePMH"] = None
+            row["TimePMH"] = high_pm_rows.iloc[0]["Datetime"].strftime("%Y-%m-%d %H:%M:%S") if not high_pm_rows.empty else None
         except Exception:
             row["TimePMH"] = None
     else:
-        row.update({"OpenPM": None, "HighPM": None, "LowPM": None, "ClosePM": None, "VolumePM": 0, "TimePMH": None})
+        row.update({"OpenPM": None,"HighPM": None,"LowPM": None,"ClosePM": None,"VolumePM": 0,"TimePMH": None})
 
-    # --- Aggregazioni intraday: prendo il PRIMO bucket che parte alle 09:30 per ogni m ---
+    # Bucket aggregations
     for m in intervals:
-        h, l, v = None, None, 0
-        if not rh_df.empty:
-            # calcola primo bucket rispetto a rh_start_dt
-            high_b, low_b, vol_b = first_bucket_stats(rh_df, rh_start_dt, m)
-            h, l, v = high_b, low_b, vol_b
-        # arrotonda prezzi
-        row[f"High_{m}m"] = round(h, 2) if pd.notnull(h) else None
-        row[f"Low_{m}m"]  = round(l, 2) if pd.notnull(l) else None
+        h, l, v = (first_bucket_stats(rh_df, rh_start_dt, m) if not rh_df.empty else (None,None,0))
+        row[f"High_{m}m"] = round(h,2) if pd.notnull(h) else None
+        row[f"Low_{m}m"]  = round(l,2) if pd.notnull(l) else None
         row[f"Volume_{m}m"] = int(v) if v is not None else 0
 
     final_data.append(row)
 
-# === Output finale e ordinamento colonne ===
 df_final = pd.DataFrame(final_data)
 
-cols_prior = [
-    "Ticker", "Date",
-    "Open", "High", "Low", "Close", "Volume",
-    "OpenPM", "HighPM", "LowPM", "ClosePM", "VolumePM", "TimePMH"
-]
-# poi per ogni m: High, Low, Volume (nell'ordine richiesto)
-for m in intervals:
-    cols_prior += [f"High_{m}m", f"Low_{m}m", f"Volume_{m}m"]
+# === Merge con Finviz ===
+df_merged = pd.merge(df_final, df_finviz, on="Ticker", how="left")
 
-# assicurati di avere solo colonne presenti
-cols_present = [c for c in cols_prior if c in df_final.columns]
-df_final = df_final[cols_present]
+# === Converti Gap% in numerico ===
+df_merged["Gap%"] = pd.to_numeric(df_merged["Gap%"], errors="coerce")
 
-df_final.to_excel(output_path, index=False)
+# === FILTRI ESCLUSIVI ===
+df_merged = df_merged[
+    (df_merged["Gap%"] >= 30) &
+    (df_merged["Shs Float"] <= 50_000_000)
+].copy()
+
+print(f"✅ Filtrati: {len(df_merged)} ticker dopo esclusione Gap<30% o Float>50M")
+
+# === Riordino colonne ===
+cols_start = ["Ticker", "Date", "Gap%", "Shs Float", "Shares Outstanding", "Change from Open"]
+cols_intraday = [c for c in df_final.columns if c not in cols_start]
+
+df_merged = df_merged[[c for c in cols_start if c in df_merged.columns] + cols_intraday]
+
+df_merged.to_excel(output_path, index=False)
 print(f"✅ File riepilogativo salvato: {output_path}")
