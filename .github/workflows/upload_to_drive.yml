@@ -37,8 +37,9 @@ jobs:
           ls -l output/intraday/dati_intraday1m_${DATE}.xlsx
           ls -l output/intraday/riepilogo_intraday_${DATE}.xlsx
 
-      - name: Upload intraday files to Google Drive
+      - name: Upload to Google Drive
         run: |
           DATE=$(date +'%Y-%m-%d')
-          rclone copy "output/intraday/dati_intraday1m_${DATE}.xlsx" "gdrive:1DrrdSwWoJE89r_guvGGgpKezpim5G0lk"
-          rclone copy "output/intraday/riepilogo_intraday_${DATE}.xlsx" "gdrive:1DrrdSwWoJE89r_guvGGgpKezpim5G0lk"
+          echo "Uploading intraday files for ${DATE}..."
+          rclone copy "output/intraday" "gdrive:colab_automation/intraday" --create-empty-src-dirs -v
+
