@@ -3,7 +3,7 @@ name: Upload intraday files to Google Drive
 on:
   schedule:
     - cron: '0 8 * * *'  # ogni giorno alle 10:00 italiane (8:00 UTC)
-  workflow_dispatch:      # esecuzione manuale
+  workflow_dispatch:
 
 jobs:
   upload:
@@ -27,13 +27,13 @@ jobs:
         run: |
           DATE=$(date +'%Y-%m-%d')
           echo "Listing intraday folder:"
-          ls -l colab_automation/output/intraday/
+          ls -l output/intraday/
           echo "Checking specific files:"
-          ls -l colab_automation/output/intraday/dati_intraday1m_${DATE}.xlsx
-          ls -l colab_automation/output/intraday/riepilogo_intraday_${DATE}.xlsx
+          ls -l output/intraday/dati_intraday1m_${DATE}.xlsx
+          ls -l output/intraday/riepilogo_intraday_${DATE}.xlsx
 
       - name: Upload intraday files to Google Drive
         run: |
           DATE=$(date +'%Y-%m-%d')
-          rclone copy "colab_automation/output/intraday/dati_intraday1m_${DATE}.xlsx" "gdrive:1DrrdSwWoJE89r_guvGGgpKezpim5G0lk"
-          rclone copy "colab_automation/output/intraday/riepilogo_intraday_${DATE}.xlsx" "gdrive:1DrrdSwWoJE89r_guvGGgpKezpim5G0lk"
+          rclone copy "output/intraday/dati_intraday1m_${DATE}.xlsx" "gdrive:1DrrdSwWoJE89r_guvGGgpKezpim5G0lk"
+          rclone copy "output/intraday/riepilogo_intraday_${DATE}.xlsx" "gdrive:1DrrdSwWoJE89r_guvGGgpKezpim5G0lk"
