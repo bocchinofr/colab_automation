@@ -21,7 +21,8 @@ jobs:
       - name: Configure rclone
         run: |
           mkdir -p ~/.config/rclone
-          echo "${{ secrets.RCLONE_CONF }}" > ~/.config/rclone/rclone.conf
+          echo '${{ secrets.RCLONE_CONF }}' > ~/.config/rclone/rclone.conf
+
 
       - name: Check rclone config
         run: cat ~/.config/rclone/rclone.conf
