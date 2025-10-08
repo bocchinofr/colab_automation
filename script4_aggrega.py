@@ -109,22 +109,31 @@ for ticker in tickers:
 
     row = {"Ticker": ticker, "Date": max_date}
 
-    # Regular hours
+    # --- Regular hours ---
     if not rh_df.empty:
         open_v = rh_df.loc[rh_df["Datetime"] == rh_start_dt, "Open"].iloc[0] if any(rh_df["Datetime"] == rh_start_dt) else rh_df["Open"].iloc[0]
         high_v, low_v, close_v = rh_df["High"].max(), rh_df["Low"].min(), rh_df["Close"].iloc[-1]
         vol_v = int(rh_df["Volume"].sum())
+        
+        # TimeHigh (stesso metodo di TimePMH)
+        try:
+            high_rows = rh_df[rh_df["High"] == high_v].sort_values("Datetime")
+            time_high = high_rows.iloc[0]["Datetime"].strftime("%Y-%m-%d %H:%M:%S") if not high_rows.empty else None
+        except Exception:
+            time_high = None
+
         row.update({
             "Open": round(open_v,2),
             "High": round(high_v,2),
             "Low": round(low_v,2),
             "Close": round(close_v,2),
-            "Volume": vol_v
+            "Volume": vol_v,
+            "TimeHigh": time_high
         })
     else:
-        row.update({"Open": None,"High": None,"Low": None,"Close": None,"Volume": 0})
+        row.update({"Open": None,"High": None,"Low": None,"Close": None,"Volume": 0,"TimeHigh": None})
 
-    # Pre-market
+    # --- Pre-market ---
     if not pm_df.empty:
         openpm = pm_df.iloc[0]["Open"]
         highpm, lowpm, closepm = pm_df["High"].max(), pm_df["Low"].min(), pm_df["Close"].iloc[-1]
@@ -137,15 +146,14 @@ for ticker in tickers:
             "VolumePM": volpm
         })
         try:
-            high_pm_value = highpm
-            high_pm_rows = pm_df[pm_df["High"] == high_pm_value].sort_values("Datetime")
+            high_pm_rows = pm_df[pm_df["High"] == highpm].sort_values("Datetime")
             row["TimePMH"] = high_pm_rows.iloc[0]["Datetime"].strftime("%Y-%m-%d %H:%M:%S") if not high_pm_rows.empty else None
         except Exception:
             row["TimePMH"] = None
     else:
         row.update({"OpenPM": None,"HighPM": None,"LowPM": None,"ClosePM": None,"VolumePM": 0,"TimePMH": None})
 
-    # Bucket aggregations
+    # --- Bucket aggregations ---
     for m in intervals:
         h, l, v = (first_bucket_stats(rh_df, rh_start_dt, m) if not rh_df.empty else (None,None,0))
         row[f"High_{m}m"] = round(h,2) if pd.notnull(h) else None
@@ -170,11 +178,20 @@ df_merged = df_merged[
 
 print(f"✅ Filtrati: {len(df_merged)} ticker dopo esclusione Gap<30% o Float>50M")
 
-# === Riordino colonne ===
+# === Riordino colonne: TimeHigh subito dopo Volume ===
 cols_start = ["Ticker", "Date", "Gap%", "Shs Float", "Shares Outstanding", "Change from Open"]
 cols_intraday = [c for c in df_final.columns if c not in cols_start]
 
-df_merged = df_merged[[c for c in cols_start if c in df_merged.columns] + cols_intraday]
+# Rimuovo TimeHigh da cols_intraday se già presente e lo inserisco subito dopo Volume
+if "TimeHigh" in cols_intraday:
+    cols_intraday.remove("TimeHigh")
+cols_intraday_sorted = []
+for c in cols_intraday:
+    cols_intraday_sorted.append(c)
+    if c == "Volume":
+        cols_intraday_sorted.append("TimeHigh")
+
+df_merged = df_merged[[c for c in cols_start if c in df_merged.columns] + cols_intraday_sorted]
 
 df_merged.to_excel(output_path, index=False)
 print(f"✅ File riepilogativo salvato: {output_path}")
