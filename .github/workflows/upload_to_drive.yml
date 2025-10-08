@@ -41,12 +41,13 @@ jobs:
         run: |
           DATE=$(date +'%Y-%m-%d')
           echo "Uploading intraday files for ${DATE}..."
-          rclone mkdir "gdrive:{1DrrdSwWoJE89r_guvGGgpKezpim5G0lk}"
-          rclone copy "output/intraday" "gdrive:{1DrrdSwWoJE89r_guvGGgpKezpim5G0lk}" --create-empty-src-dirs -v
+          # Copia i file nella cartella 'Estrazioni finiviz yfinance/intraday'
+          rclone copy "output/intraday" "gdrive:1DrrdSwWoJE89r_guvGGgpKezpim5G0lk" --create-empty-src-dirs -v
           
       - name: Verify uploaded files
         run: |
           echo "Files now present in target folder:"
-          rclone ls "gdrive:{1DrrdSwWoJE89r_guvGGgpKezpim5G0lk}"
+          rclone ls "gdrive:1DrrdSwWoJE89r_guvGGgpKezpim5G0lk/intraday"
+
 
 
