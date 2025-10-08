@@ -47,7 +47,7 @@ jobs:
       - name: Verify uploaded files
         run: |
           echo "Files now present in target folder:"
-          rclone ls "gdrive:1DrrdSwWoJE89r_guvGGgpKezpim5G0lk/intraday"
+          rclone ls "gdrive:Estrazioni finiviz yfinance/intraday"
 
 
 
