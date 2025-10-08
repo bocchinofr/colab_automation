@@ -21,11 +21,19 @@ jobs:
       - name: Configure rclone
         run: |
           mkdir -p ~/.config/rclone
-          echo '${{ secrets.RCLONE_CONF }}' > ~/.config/rclone/rclone.conf
+          printf "%b" "${{ secrets.RCLONE_CONF }}" > ~/.config/rclone/rclone.conf
 
-
-      - name: Upload intraday files
+      - name: Check intraday files
         run: |
           DATE=$(date +'%Y-%m-%d')
-          rclone copy "output/intraday/dati_intraday1m_${DATE}.xlsx" "gdrive:1DrrdSwWoJE89r_guvGGgpKezpim5G0lk"
-          rclone copy "output/intraday/riepilogo_intraday_${DATE}.xlsx" "gdrive:1DrrdSwWoJE89r_guvGGgpKezpim5G0lk"
+          echo "Listing intraday folder:"
+          ls -l colab_automation/output/intraday/
+          echo "Checking specific files:"
+          ls -l colab_automation/output/intraday/dati_intraday1m_${DATE}.xlsx
+          ls -l colab_automation/output/intraday/riepilogo_intraday_${DATE}.xlsx
+
+      - name: Upload intraday files to Google Drive
+        run: |
+          DATE=$(date +'%Y-%m-%d')
+          rclone copy "colab_automation/output/intraday/dati_intraday1m_${DATE}.xlsx" "gdrive:1DrrdSwWoJE89r_guvGGgpKezpim5G0lk"
+          rclone copy "colab_automation/output/intraday/riepilogo_intraday_${DATE}.xlsx" "gdrive:1DrrdSwWoJE89r_guvGGgpKezpim5G0lk"
