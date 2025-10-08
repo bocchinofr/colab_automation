@@ -22,11 +22,9 @@ jobs:
         run: |
           mkdir -p ~/.config/rclone
           echo "${{ secrets.RCLONE_CONF }}" > ~/.config/rclone/rclone.conf
-
-
-      - name: Debug rclone.conf
+      
+      - name: Debug config
         run: cat ~/.config/rclone/rclone.conf
-
 
 
       - name: Upload intraday files
