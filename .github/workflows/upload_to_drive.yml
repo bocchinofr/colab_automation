@@ -2,7 +2,7 @@ name: Upload intraday files to Google Drive
 
 on:
   schedule:
-    - cron: '0 7 * * *'  # ogni giorno alle 09:00 italiane (7:00 UTC)
+    - cron: '0 7 * * 2-6'  # ogni giorno alle 09:00 italiane (7:00 UTC) da Martedì a Sabato
   workflow_dispatch:
 
 jobs:
