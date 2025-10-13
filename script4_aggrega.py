@@ -115,12 +115,19 @@ for ticker in tickers:
         high_v, low_v, close_v = rh_df["High"].max(), rh_df["Low"].min(), rh_df["Close"].iloc[-1]
         vol_v = int(rh_df["Volume"].sum())
         
-        # TimeHigh (stesso metodo di TimePMH)
+        # TimeHigh
         try:
             high_rows = rh_df[rh_df["High"] == high_v].sort_values("Datetime")
             time_high = high_rows.iloc[0]["Datetime"].strftime("%Y-%m-%d %H:%M:%S") if not high_rows.empty else None
         except Exception:
             time_high = None
+
+        # TimeLow
+        try:
+            low_rows = rh_df[rh_df["Low"] == low_v].sort_values("Datetime")
+            time_low = low_rows.iloc[0]["Datetime"].strftime("%Y-%m-%d %H:%M:%S") if not low_rows.empty else None
+        except Exception:
+            time_low = None
 
         row.update({
             "Open": round(open_v,2),
@@ -128,10 +135,15 @@ for ticker in tickers:
             "Low": round(low_v,2),
             "Close": round(close_v,2),
             "Volume": vol_v,
-            "TimeHigh": time_high
+            "TimeHigh": time_high,
+            "TimeLow": time_low
         })
     else:
-        row.update({"Open": None,"High": None,"Low": None,"Close": None,"Volume": 0,"TimeHigh": None})
+        row.update({
+            "Open": None, "High": None, "Low": None, "Close": None, "Volume": 0,
+            "TimeHigh": None, "TimeLow": None
+        })
+
 
     # --- Pre-market ---
     if not pm_df.empty:
@@ -190,6 +202,8 @@ for c in cols_intraday:
     cols_intraday_sorted.append(c)
     if c == "Volume":
         cols_intraday_sorted.append("TimeHigh")
+        cols_intraday_sorted.append("TimeLow")  # 👈 aggiunta qui
+
 
 df_merged = df_merged[[c for c in cols_start if c in df_merged.columns] + cols_intraday_sorted]
 
