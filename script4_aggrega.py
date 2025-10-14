@@ -190,22 +190,24 @@ df_merged = df_merged[
 
 print(f"✅ Filtrati: {len(df_merged)} ticker dopo esclusione Gap<30% o Float>50M")
 
-# === Riordino colonne: TimeHigh subito dopo Volume ===
+# === Riordino colonne: TimeHigh e TimeLow subito dopo Volume ===
 cols_start = ["Ticker", "Date", "Gap%", "Shs Float", "Shares Outstanding", "Change from Open"]
 cols_intraday = [c for c in df_final.columns if c not in cols_start]
 
-# Rimuovo TimeHigh da cols_intraday se già presente e lo inserisco subito dopo Volume
-if "TimeHigh" in cols_intraday:
-    cols_intraday.remove("TimeHigh")
+# Rimuovo TimeHigh e TimeLow se già presenti
+for col in ["TimeHigh", "TimeLow"]:
+    if col in cols_intraday:
+        cols_intraday.remove(col)
+
 cols_intraday_sorted = []
 for c in cols_intraday:
     cols_intraday_sorted.append(c)
     if c == "Volume":
         cols_intraday_sorted.append("TimeHigh")
-        cols_intraday_sorted.append("TimeLow")  # 👈 aggiunta qui
-
+        cols_intraday_sorted.append("TimeLow")
 
 df_merged = df_merged[[c for c in cols_start if c in df_merged.columns] + cols_intraday_sorted]
+
 
 df_merged.to_excel(output_path, index=False)
 print(f"✅ File riepilogativo salvato: {output_path}")
