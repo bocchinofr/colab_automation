@@ -85,7 +85,7 @@ def first_bucket_stats(rh_df, rh_start_dt, m):
 
 # === Calcolo metriche intraday ===
 final_data = []
-intervals = [1, 5, 30, 60, 90, 240]
+intervals = [1, 5, 30, 60, 90, 120, 240]
 
 for ticker in tickers:
     dft = df[df["Ticker"] == ticker].copy()
@@ -172,6 +172,31 @@ for ticker in tickers:
         row[f"Low_{m}m"]  = round(l,2) if pd.notnull(l) else None
         row[f"Volume_{m}m"] = int(v) if v is not None else 0
 
+    # --- Close a orari precisi ---
+    if not rh_df.empty:
+        time_targets = {
+            "1030": time(10, 30),
+            "1100": time(11, 0),
+            "1200": time(12, 0),
+            "1400": time(14, 0)
+        }
+
+        for label, t in time_targets.items():
+            target_dt = datetime.combine(max_date, t)
+
+            # Cerca il record più vicino all’orario target
+            close_row = rh_df.iloc[(rh_df["Datetime"] - target_dt).abs().argsort()[:1]]
+
+            row[f"Close_{label}"] = (
+                round(close_row["Close"].iloc[0], 2)
+                if not close_row.empty
+                else None
+            )
+    else:
+        for label in ["1030", "1100", "1200", "1400"]:
+            row[f"Close_{label}"] = None
+
+
     final_data.append(row)
 
 df_final = pd.DataFrame(final_data)
@@ -190,23 +215,43 @@ df_merged = df_merged[
 
 print(f"✅ Filtrati: {len(df_merged)} ticker dopo esclusione Gap<30% o Float>50M")
 
-# === Riordino colonne: TimeHigh e TimeLow subito dopo Volume ===
+
+
+
+# === Riordino colonne: TimeHigh, TimeLow e Close a orari precisi ===
 cols_start = ["Ticker", "Date", "Gap%", "Shs Float", "Shares Outstanding", "Change from Open"]
 cols_intraday = [c for c in df_final.columns if c not in cols_start]
 
-# Rimuovo TimeHigh e TimeLow se già presenti
-for col in ["TimeHigh", "TimeLow"]:
+# Rimuovo TimeHigh, TimeLow e Close se già presenti
+for col in ["TimeHigh", "TimeLow", "Close_1030", "Close_1100", "Close_1200", "Close_1400"]:
     if col in cols_intraday:
         cols_intraday.remove(col)
+
+# Mappa per inserire Close dopo i bucket
+close_after = {
+    "Volume_60m": "Close_1030",
+    "Volume_90m": "Close_1100",
+    "Volume_120m": "Close_1200",
+    "Volume_240m": "Close_1400"
+}
 
 cols_intraday_sorted = []
 for c in cols_intraday:
     cols_intraday_sorted.append(c)
+
+    # Inserimento TimeHigh/TimeLow dopo Volume
     if c == "Volume":
         cols_intraday_sorted.append("TimeHigh")
         cols_intraday_sorted.append("TimeLow")
 
+    # Inserimento Close dopo il bucket corrispondente
+    if c in close_after:
+        cols_intraday_sorted.append(close_after[c])
+
+# Combino colonne di testa + resto ordinate
 df_merged = df_merged[[c for c in cols_start if c in df_merged.columns] + cols_intraday_sorted]
+
+
 
 
 df_merged.to_excel(output_path, index=False)
