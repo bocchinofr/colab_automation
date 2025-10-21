@@ -45,6 +45,8 @@ if df_screen is not None and not df_screen.empty:
     insider_own_list = []
     inst_own_list = []
     short_float_list = []
+    market_cap_list = []
+
 
     for ticker in df_screen["Ticker"]:
         try:
@@ -57,6 +59,7 @@ if df_screen is not None and not df_screen.empty:
             insider_own = stock_fundament.get("Insider Own", None)
             inst_own = stock_fundament.get("Inst Own", None)
             short_float = stock_fundament.get("Short Float", None)
+            market_cap = stock_fundament.get("Market Cap", None) 
 
             # Aggiunta alle liste
             shs_float_list.append(shs_float)
@@ -64,6 +67,7 @@ if df_screen is not None and not df_screen.empty:
             insider_own_list.append(insider_own)
             inst_own_list.append(inst_own)
             short_float_list.append(short_float)
+            market_cap_list.append(market_cap)
 
         except Exception as e:
             print(f"⚠️ Errore con {ticker}: {e}")
@@ -72,6 +76,7 @@ if df_screen is not None and not df_screen.empty:
             insider_own_list.append(None)
             inst_own_list.append(None)
             short_float_list.append(None)
+            market_cap_list.append(None)
 
     # 🔹 Aggiunge le nuove colonne al DataFrame
     df_screen["Shs Float"] = shs_float_list
@@ -79,6 +84,7 @@ if df_screen is not None and not df_screen.empty:
     df_screen["Insider Ownership"] = insider_own_list
     df_screen["Institutional Ownership"] = inst_own_list
     df_screen["Short Float"] = short_float_list
+    df_screen["Market Cap"] = market_cap_list
 
     # 🔹 Rimuove colonne indesiderate
     columns_to_drop = ["Beta", "ATR", "SMA20", "SMA50", "SMA200", "52W High", "52W Low", "RSI"]

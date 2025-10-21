@@ -45,12 +45,15 @@ try:
     print(f"📊 Letto file Finviz: {finviz_path}")
 except FileNotFoundError:
     print(f"⚠️ File Finviz non trovato ({finviz_path}), continuerò senza queste colonne.")
-    df_finviz = pd.DataFrame(columns=["Ticker", "Gap%", "Shs Float", "Shares Outstanding", "Change from Open"])
+    df_finviz = pd.DataFrame(columns=[
+        "Ticker", "Gap%", "Shs Float", "Shares Outstanding", "Change from Open",
+        "Insider Ownership", "Institutional Ownership", "Short Float", "Market Cap"
+    ])
 
 df_finviz.columns = [c.strip() for c in df_finviz.columns]
 cols_finviz = [
     "Ticker", "Gap%", "Shs Float", "Shares Outstanding", "Change from Open",
-    "Insider Ownership", "Institutional Ownership", "Short Float"
+    "Insider Ownership", "Institutional Ownership", "Short Float", "Market Cap"
 ]
 df_finviz = df_finviz[[c for c in cols_finviz if c in df_finviz.columns]].copy()
 
@@ -72,6 +75,8 @@ if "Shs Float" in df_finviz.columns:
     df_finviz["Shs Float"] = df_finviz["Shs Float"].apply(parse_shares)
 if "Shares Outstanding" in df_finviz.columns:
     df_finviz["Shares Outstanding"] = df_finviz["Shares Outstanding"].apply(parse_shares)
+if "Market Cap" in df_finviz.columns:
+    df_finviz["Market Cap"] = df_finviz["Market Cap"].apply(parse_shares)
 
 # === Conversione percentuali in numerico ===
 percent_cols = ["Insider Ownership", "Institutional Ownership", "Short Float"]
@@ -241,7 +246,7 @@ print(f"✅ Filtrati: {len(df_merged)} ticker dopo esclusione Gap<30% o Float>50
 
 # === Riordino colonne: TimeHigh, TimeLow e Close a orari precisi ===
 cols_start = [
-    "Ticker", "Date", "Gap%", "Shs Float", "Shares Outstanding",
+    "Ticker", "Date", "Gap%", "Market Cap", "Shs Float", "Shares Outstanding",
     "Change from Open", "Insider Ownership", "Institutional Ownership", "Short Float"
 ]
 cols_intraday = [c for c in df_final.columns if c not in cols_start]
