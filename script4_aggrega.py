@@ -3,7 +3,7 @@ from datetime import datetime, time, timedelta
 import os
 import re
 
-# === Percorsi ===
+# region ==== Percorsi ===
 today = datetime.now()
 date_str = today.strftime("%Y-%m-%d")
 
@@ -14,8 +14,9 @@ output_path = os.path.join(output_dir, f"riepilogo_intraday_{date_str}.xlsx")
 
 os.makedirs(output_dir, exist_ok=True)
 print(f"📄 Leggo file intraday: {input_path}")
+# endregion
 
-# === Carica dati intraday ===
+# region === Carica dati intraday ===
 try:
     df = pd.read_excel(input_path)
 except FileNotFoundError:
@@ -38,8 +39,10 @@ for col in ["Open", "High", "Low", "Close", "Volume"]:
 
 tickers = df["Ticker"].dropna().unique()
 print(f"📈 Trovati {len(tickers)} ticker intraday.")
+# endregion
 
-# === Carica dati Finviz ===
+
+# region === Carica dati Finviz ===
 try:
     df_finviz = pd.read_csv(finviz_path)
     print(f"📊 Letto file Finviz: {finviz_path}")
@@ -83,7 +86,7 @@ percent_cols = ["Insider Ownership", "Institutional Ownership", "Short Float"]
 for col in percent_cols:
     if col in df_finviz.columns:
         df_finviz[col] = df_finviz[col].str.replace("%", "").astype(float)
-
+# endregion
 
 # === Funzione per bucket intraday ===
 def first_bucket_stats(rh_df, rh_start_dt, m):
@@ -97,6 +100,17 @@ def first_bucket_stats(rh_df, rh_start_dt, m):
         return None, None, 0
     g = grouped.loc[0] if 0 in grouped.index else grouped.iloc[0]
     return g["High"], g["Low"], int(g["Volume"])
+
+# === calcolo vwap ====
+def calc_vwap(df):
+    """Calcola VWAP cumulativo dai dati intraday a 1 minuto"""
+    df = df.copy()
+    df["TypicalPrice"] = (df["High"] + df["Low"] + df["Close"]) / 3
+    df["TPxVol"] = df["TypicalPrice"] * df["Volume"]
+    df["Cumulative_TPxVol"] = df["TPxVol"].cumsum()
+    df["Cumulative_Volume"] = df["Volume"].cumsum()
+    df["VWAP"] = df["Cumulative_TPxVol"] / df["Cumulative_Volume"]
+    return df
 
 # === Calcolo metriche intraday ===
 final_data = []
@@ -121,8 +135,17 @@ for ticker in tickers:
     rh_df = day_df[(day_df["Datetime"] >= rh_start_dt) & (day_df["Datetime"] <= rh_end_dt)].copy()
     if rh_df.empty and pm_df.empty:
         continue
-
+    
     row = {"Ticker": ticker, "Date": max_date}
+
+    if not rh_df.empty:
+        rh_df = calc_vwap(rh_df)
+        # Calcolo VWAP più vicino alle 09:30
+        target_dt = datetime.combine(max_date, time(9,30))
+        vwap_row = rh_df.iloc[(rh_df["Datetime"] - target_dt).abs().argsort()[:1]]
+        row["VWAP_0930"] = round(vwap_row["VWAP"].iloc[0], 2) if not vwap_row.empty else None
+    else:
+        row["VWAP_0930"] = None
 
     # --- Regular hours ---
     if not rh_df.empty:
@@ -247,7 +270,7 @@ print(f"✅ Filtrati: {len(df_merged)} ticker dopo esclusione Gap<30% o Float>50
 # === Riordino colonne: TimeHigh, TimeLow e Close a orari precisi ===
 cols_start = [
     "Ticker", "Date", "Gap%", "Market Cap", "Shs Float", "Shares Outstanding",
-    "Change from Open", "Insider Ownership", "Institutional Ownership", "Short Float"
+    "Change from Open", "Insider Ownership", "Institutional Ownership", "Short Float", "VWAP_0930"
 ]
 cols_intraday = [c for c in df_final.columns if c not in cols_start]
 
