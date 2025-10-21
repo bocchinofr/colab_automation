@@ -217,11 +217,22 @@ df_merged = pd.merge(df_final, df_finviz, on="Ticker", how="left")
 # === Converti Gap% in numerico ===
 df_merged["Gap%"] = pd.to_numeric(df_merged["Gap%"], errors="coerce")
 
+# === Calcolo flottante effettivo ===
+if all(col in df_merged.columns for col in ["Shs Float", "Shares Outstanding", "Institutional Ownership", "Insider Ownership"]):
+    df_merged["Float Effettivo"] = (
+        df_merged["Shs Float"]
+        - (df_merged["Institutional Ownership"] / 100 * df_merged["Shares Outstanding"])
+        - (df_merged["Insider Ownership"] / 100 * df_merged["Shares Outstanding"])
+    )
+else:
+    print("⚠️ Attenzione: una o più colonne necessarie per il calcolo del flottante effettivo non sono presenti.")
+
 # === FILTRI ESCLUSIVI ===
 df_merged = df_merged[
     (df_merged["Gap%"] >= 30) &
-    (df_merged["Shs Float"] <= 50_000_000)
+    (df_merged["Float Effettivo"] <= 50_000_000)
 ].copy()
+
 
 print(f"✅ Filtrati: {len(df_merged)} ticker dopo esclusione Gap<30% o Float>50M")
 
