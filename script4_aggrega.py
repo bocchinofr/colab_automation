@@ -81,11 +81,19 @@ if "Shares Outstanding" in df_finviz.columns:
 if "Market Cap" in df_finviz.columns:
     df_finviz["Market Cap"] = df_finviz["Market Cap"].apply(parse_shares)
 
+
 # === Conversione percentuali in numerico ===
 percent_cols = ["Insider Ownership", "Institutional Ownership", "Short Float"]
 for col in percent_cols:
     if col in df_finviz.columns:
-        df_finviz[col] = df_finviz[col].str.replace("%", "").astype(float)
+        df_finviz[col] = (
+            df_finviz[col]
+            .astype(str)                              # converte tutto in stringa
+            .str.replace("%", "", regex=False)         # rimuove il simbolo %
+            .replace(["-", "N/A", "nan", ""], None)    # sostituisce i valori non validi
+        )
+        df_finviz[col] = pd.to_numeric(df_finviz[col], errors="coerce")  # converte in float
+
 # endregion
 
 # === Funzione per bucket intraday ===
