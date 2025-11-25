@@ -1,0 +1,70 @@
+name: Intraday (2 workflow) & Aggregation
+
+on:
+  workflow_dispatch:  # Permette di lanciare manualmente
+  schedule:
+    # 09:45 ET → 15:45 italiane / 14:45 UTC (lun-ven)
+    - cron: '45 14 * * 1-5'
+    # 14:15 ET → 20:15 italiane / 19:15 UTC (lun-ven)
+    - cron: '15 19 * * 1-5'
+
+jobs:
+  intraday-morning:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+
+      - name: Install dependencies
+        run: |
+          pip install finvizfinance yfinance openpyxl pandas requests
+
+      - name: Run Finviz screener (Script 1)
+        run: python script1_finviz.py
+
+      - name: Run Alpha Vantage Pre-Market (Script 3)
+        run: python script3_1m.py
+
+      - name: Push output files
+        run: |
+          git config --global user.name "bocchinofr"
+          git config --global user.email "bocchinofr@gmail.com"
+          git add output/
+          git commit -m "📈 Output aggiornato automaticamente (morning)" || echo "Nothing to commit"
+          git push
+
+  intraday-afternoon:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+
+      - name: Install dependencies
+        run: |
+          pip install finvizfinance yfinance openpyxl pandas requests
+
+      - name: Run Alpha Vantage Intraday (Script 3)
+        run: python script3_1m.py
+
+      - name: Run Aggregazione (Script 4)
+        run: python script4_aggrega.py
+
+      - name: Push output files
+        run: |
+          git config --global user.name "bocchinofr"
+          git config --global user.email "bocchinofr@gmail.com"
+          git add output/
+          git commit -m "📈 Output aggiornato automaticamente (afternoon)" || echo "Nothing to commit"
+          git push
