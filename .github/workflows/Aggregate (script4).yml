@@ -1,0 +1,35 @@
+name: Aggregate (script4)
+
+on:
+  workflow_dispatch:  # Permette di lanciare manualmente
+  schedule:
+    # 07:00 Italiane → 06:00 UTC (lun-ven)
+    - cron: '0 5 * * 2-6'
+
+jobs:
+  run-riepilogo:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+
+      - name: Install dependencies
+        run: |
+          pip install yfinance openpyxl pandas requests
+
+      - name: Run Intraday Riepilogo (Script 4)
+        run: python script4_riepilogo.py
+
+      - name: Push output file
+        run: |
+          git config --global user.name "bocchinofr"
+          git config --global user.email "bocchinofr@gmail.com"
+          git add output/intraday/riepilogo_intraday_*.xlsx
+          git commit -m "📊 Riepilogo intraday aggiornato automaticamente" || echo "Nothing to commit"
+          git push
