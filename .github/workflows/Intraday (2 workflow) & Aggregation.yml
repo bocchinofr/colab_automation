@@ -29,7 +29,7 @@ jobs:
         run: python script1_finviz.py
 
       - name: Run Alpha Vantage Pre-Market (Script 3)
-        run: python script3_1m.py
+        run: python script3_1m.py premarket
 
       - name: Push output files
         run: |
@@ -56,7 +56,7 @@ jobs:
           pip install finvizfinance yfinance openpyxl pandas requests
 
       - name: Run Alpha Vantage Intraday (Script 3)
-        run: python script3_1m.py
+        run: python script3_1m.py intraday
 
       - name: Run Aggregazione (Script 4)
         run: python script4_aggrega.py
