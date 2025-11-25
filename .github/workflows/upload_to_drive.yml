@@ -34,7 +34,7 @@ jobs:
           echo "Listing intraday folder:"
           ls -l output/intraday/
           echo "Checking specific files:"
-          ls -l output/intraday/dati_intraday1m_${DATE}.xlsx
+          ls -l output/intraday/dati_intraday_1m_yfinance_${DATE}.xlsx
           ls -l output/intraday/riepilogo_intraday_${DATE}.xlsx
 
       - name: Upload to Google Drive
