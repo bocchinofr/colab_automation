@@ -1,3 +1,69 @@
+#region === PRE CHECK SCRIPT =====
+
+def preflight_checks_strict(input_path_premarket, input_path_intraday, finviz_path, output_path):
+    import os
+    import pandas as pd
+
+    print("=== Preflight checks (STRICT) ===")
+
+    # 1️⃣ File essenziali
+    essential_files = {
+        "Premarket intraday": input_path_premarket,
+        "Intraday 1m": input_path_intraday,
+        "Finviz": finviz_path
+    }
+
+    for desc, path in essential_files.items():
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"❌ File mancante: {desc} → {path}")
+        print(f"✅ File trovato: {desc} → {path}")
+
+    # 2️⃣ Cartella output
+    out_dir = os.path.dirname(output_path)
+    if not os.path.exists(out_dir):
+        print(f"⚠️ Cartella output mancante, creo {out_dir}")
+        os.makedirs(out_dir, exist_ok=True)
+    else:
+        print(f"✅ Cartella output esiste → {out_dir}")
+
+    # 3️⃣ Controllo colonne intraday
+    required_cols_intraday = ["Ticker","Open","High","Low","Close","Volume","Datetime"]
+    for path in [input_path_premarket, input_path_intraday]:
+        df_tmp = pd.read_excel(path)
+        missing_cols = [c for c in required_cols_intraday if c not in df_tmp.columns]
+        if missing_cols:
+            raise ValueError(f"❌ File {path} manca colonne essenziali: {missing_cols}")
+        print(f"✅ File {path} ha tutte le colonne essenziali")
+
+    # 4️⃣ Colonne necessarie per Float Effettivo in Finviz
+    df_finviz = pd.read_csv(finviz_path)
+    float_cols = ["Shs Float","Shares Outstanding","Institutional Ownership","Insider Ownership"]
+    missing_float = [c for c in float_cols if c not in df_finviz.columns]
+    if missing_float:
+        raise ValueError(f"❌ Impossibile calcolare Float Effettivo, mancano colonne: {missing_float}")
+    print("✅ Tutte le colonne per Float Effettivo presenti")
+
+    # 5️⃣ Test scrittura output
+    try:
+        pd.DataFrame().to_excel(output_path)
+        print(f"✅ Output path scrivibile → {output_path}")
+    except Exception as e:
+        raise IOError(f"❌ Problema scrittura output: {e}")
+
+    print("✅ Tutti i controlli STRICT superati")
+    print("===============================\n")
+    return True
+
+# ==== Esempio di utilizzo ====
+preflight_checks_strict(input_path_premarket, input_path_intraday, finviz_path, output_path)
+
+
+# endregion
+
+
+
+
+
 import pandas as pd
 from datetime import datetime, time, timedelta
 import os
