@@ -58,9 +58,6 @@ jobs:
       - name: Run Alpha Vantage Intraday (Script 3)
         run: python script3_1m.py intraday
 
-      - name: Run Aggregazione (Script 4)
-        run: python script4_aggrega.py
-
       - name: Push output files
         run: |
           git config --global user.name "bocchinofr"
