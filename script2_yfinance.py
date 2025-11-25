@@ -158,6 +158,21 @@ for ticker in tickers:
             data["High Pre-Market"] = None
             data["Open vs Pre-Market %"] = None
 
+        # 🔹 Prezzi a orari specifici
+        target_times = ["10:30", "11:00", "12:00", "14:00"]
+        for t in target_times:
+            ts = pd.Timestamp(datetime.combine(day, datetime.strptime(t, "%H:%M").time()), tz="America/New_York")
+            try:
+                close_price = hist_1m.loc[ts]["Close"]
+                data[f"Close_{t}"] = round(close_price, 2)
+            except KeyError:
+                closest_idx = hist_1m.index.get_indexer([ts], method="backfill")[0]
+                if closest_idx != -1:
+                    close_price = hist_1m.iloc[closest_idx]["Close"]
+                    data[f"Close_{t}"] = round(close_price, 2)
+                else:
+                    data[f"Close_{t}"] = None
+
         # Intraday (solo 09:30–16:00)
         intraday_market = hist_1m.between_time("09:30", "16:00")
         print(f"🎯 Intraday rows (09:30–16:00): {len(intraday_market)}")
@@ -228,13 +243,10 @@ for ticker in tickers:
                 data[f"Break_PMH_{label}"] = "n/a"
 
         # Filtro finale: Volume 1m
-        # --- modificato ---
         vol_1m = data.get("Volume_1m")
-        # Skip only if Volume_1m is present, non-zero and below threshold
         if vol_1m is not None and vol_1m != 0 and vol_1m < 700_000:
             print("❌ Volume 1m presente e < 700k, skippo...")
             continue
-        # If vol_1m is None or 0, we do NOT skip (as requested)
 
         final_rows.append(data)
 
