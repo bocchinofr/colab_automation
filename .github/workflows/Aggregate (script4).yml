@@ -4,7 +4,7 @@ on:
   workflow_dispatch:  # Permette di lanciare manualmente
   schedule:
     # 07:00 Italiane → 06:00 UTC (lun-ven)
-    - cron: '0 6 * * 1-5'
+    - cron: '0 5 * * 2-6'
 
 jobs:
   run-riepilogo:
