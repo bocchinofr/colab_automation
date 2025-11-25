@@ -13,7 +13,7 @@ date_fin = today.strftime("%Y-%m-%d")
 # ------------------------
 # 📥 Legge ticker dal file Finviz
 # ------------------------
-ticker_file = f"output/tickers_{date_fin}.csv"
+ticker_file = f"output/tickers_{date_str}.csv"
 df_tickers = pd.read_csv(ticker_file, keep_default_na=False)
 tickers = df_tickers['Ticker'].dropna().unique().tolist()
 finviz_map = df_tickers.set_index('Ticker').to_dict('index')

@@ -10,7 +10,7 @@ yesterday = today - timedelta(days=1)
 date_ytd = yesterday.strftime("%Y-%m-%d")
 
 
-input_path = f"output/intraday/dati_intraday_1m_yfinance_{date_ytd}.xlsx"
+input_path = f"output/intraday/dati_intraday_1m_yfinance_{date_str}.xlsx"
 finviz_path = f"output/tickers_{date_str}.csv"
 output_dir = "output/intraday"
 output_path = os.path.join(output_dir, f"riepilogo_intraday_{date_str}.xlsx")
