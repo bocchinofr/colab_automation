@@ -1,4 +1,4 @@
-name: Intraday (2 workflow) & Aggregation
+name: Intraday (2 workflow)
 
 on:
   workflow_dispatch:  # Permette di lanciare manualmente
