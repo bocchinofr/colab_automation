@@ -24,11 +24,11 @@ jobs:
         run: |
           pip install finvizfinance yfinance openpyxl pandas
 
-      - name: Run script 3 (Intraday 1m)
-        run: python script3_1m.py
+      - name: script 2 - intraday yfinance
+        run: python script2_yfinance_1m.py
 
       - name: Run script 4 (Aggrega)
-        run: python script4_aggrega.py
+        run: python script4_aggrega_bk25112025.py
 
       - name: Push output files
         run: |
