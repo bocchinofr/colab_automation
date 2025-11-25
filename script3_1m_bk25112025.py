@@ -1,42 +1,46 @@
-# script_alpha_pre_market.py
 import requests
 import pandas as pd
-from datetime import datetime, time
+from datetime import datetime, timedelta
 import os
-import sys
 
 # 🔑 API Key Alpha Vantage
 API_KEY = "4T18CQ9W52B3P8OF"
 
-# 📂 Percorsi
+# 📅 Calcola date dinamiche
+today = datetime.now()
+start_date = (today - timedelta(days=2)).replace(hour=16, minute=0, second=0, microsecond=0)
+end_date = (today - timedelta(days=1)).replace(hour=19, minute=50, second=0, microsecond=0)
+
+print(f"📆 Intervallo temporale: da {start_date} a {end_date}")
+
+# 📁 Percorso assoluto alla directory del progetto
 base_dir = os.path.dirname(os.path.abspath(__file__))
 output_dir = os.path.join(base_dir, "output")
 intraday_dir = os.path.join(output_dir, "intraday")
+
+# 📁 Assicura che le cartelle esistano
 os.makedirs(intraday_dir, exist_ok=True)
 
-# 📅 Data odierna
+# 📂 Percorso file ticker (nome dinamico con data)
 date_str = datetime.now().strftime("%Y-%m-%d")
 file_tickers = os.path.join(output_dir, f"tickers_{date_str}.csv")
 
-# Se viene passato un parametro da linea di comando, lo usa come suffisso
-# altrimenti default = "premarket"
-suffix = sys.argv[1] if len(sys.argv) > 1 else "premarket"
+# 📄 Carica lista ticker
+if file_tickers.endswith(".csv"):
+    df_tickers = pd.read_csv(file_tickers)
+elif file_tickers.endswith((".xlsx", ".xls")):
+    df_tickers = pd.read_excel(file_tickers, engine="openpyxl")
+else:
+    raise ValueError("❌ Formato file non supportato. Usa CSV o Excel.")
 
-# 📄 Carica ticker filtrati da Finviz
-df_tickers = pd.read_csv(file_tickers)
 tickers = df_tickers["Ticker"].dropna().unique().tolist()
-print(f"📊 Trovati {len(tickers)} ticker dal CSV: {file_tickers}")
+print(f"📊 Trovati {len(tickers)} ticker nel file {file_tickers}")
 
-# 📘 DataFrame finale
+# 📘 DataFrame finale cumulativo
 all_data = pd.DataFrame()
 
-# ⏰ Intervallo pre-market (04:00 - 09:30 ET)
-# Nota: Alpha Vantage restituisce timestamp in ET già formattato come HH:MM:SS
-start_time = time(4, 0)
-end_time = time(9, 30)
-
 for ticker in tickers:
-    print(f"\n⏳ Scarico dati intraday 1m per {ticker}...")
+    print(f"\n⏳ Scarico dati intraday 1m per {ticker} da Alpha Vantage...")
     url = "https://www.alphavantage.co/query"
     params = {
         "function": "TIME_SERIES_INTRADAY",
@@ -44,7 +48,7 @@ for ticker in tickers:
         "interval": "1min",
         "apikey": API_KEY,
         "datatype": "json",
-        # "outputsize": "full"  # rimosso per free API
+        "outputsize": "full"
     }
 
     try:
@@ -64,12 +68,11 @@ for ticker in tickers:
             "4. close": "Close",
             "5. volume": "Volume"
         })
-
         df.index = pd.to_datetime(df.index)
         df = df.sort_index()
 
-        # ⏱️ Filtra per intervallo pre-market
-        df = df[(df.index.time >= start_time) & (df.index.time <= end_time)]
+        # ⏱️ Filtra per intervallo temporale desiderato
+        df = df[(df.index >= start_date) & (df.index <= end_date)]
 
         if df.empty:
             print(f"⚠️ Nessun dato disponibile per {ticker} nell'intervallo selezionato.")
@@ -81,10 +84,14 @@ for ticker in tickers:
     except Exception as e:
         print(f"❌ Errore con {ticker}: {e}")
 
-# 💾 Salva unico file Excel
+# 💾 Salva unico file Excel (ora con percorso assoluto)
 if not all_data.empty:
-    output_path = os.path.join(intraday_dir, f"dati_intraday1m_{suffix}_{date_str}.xlsx")
-    all_data.to_excel(output_path, index=True)
-    print(f"\n✅ File salvato: {output_path}")
+    output_path = os.path.join(intraday_dir, f"dati_intraday1m_{date_str}.xlsx")
+    try:
+        print(f"\n💾 Salvataggio dati in {output_path}")
+        all_data.to_excel(output_path, index=True)
+        print(f"✅ File unico salvato: {output_path}")
+    except Exception as e:
+        print(f"❌ Errore durante il salvataggio del file Excel: {e}")
 else:
-    print("\n⚠️ Nessun dato scaricato per i ticker selezionati.")
+    print("\n⚠️ Nessun dato scaricato per nessun ticker.")

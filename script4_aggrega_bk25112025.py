@@ -7,44 +7,40 @@ import re
 today = datetime.now()
 date_str = today.strftime("%Y-%m-%d")
 
-input_path_premarket = f"output/intraday/dati_intraday1m_premarket_{date_str}.xlsx"
-input_path_intraday  = f"output/intraday/dati_intraday1m_intraday_{date_str}.xlsx"
-
+input_path = f"output/intraday/dati_intraday1m_{date_str}.xlsx"
 finviz_path = f"output/tickers_{date_str}.csv"
 output_dir = "output/intraday"
 output_path = os.path.join(output_dir, f"riepilogo_intraday_{date_str}.xlsx")
 
 os.makedirs(output_dir, exist_ok=True)
-print(f"📄 Leggo file intraday: {input_path_premarket}")
-print(f"📄 Leggo file intraday: {input_path_intraday}")
+print(f"📄 Leggo file intraday: {input_path}")
 # endregion
 
 # region === Carica dati intraday ===
+try:
+    df = pd.read_excel(input_path)
+except FileNotFoundError:
+    raise FileNotFoundError(f"❌ File non trovato: {input_path}")
 
-df_list = []
-for path in [input_path_premarket, input_path_intraday]:
-    if os.path.exists(path):
-        tmp_df = pd.read_excel(path)
-        if "Unnamed: 0" in tmp_df.columns:
-            tmp_df = tmp_df.rename(columns={"Unnamed: 0": "Datetime"})
-        tmp_df["Datetime"] = pd.to_datetime(tmp_df["Datetime"], errors="coerce")
-        tmp_df = tmp_df.dropna(subset=["Datetime"]).copy()
-        tmp_df["Date"] = tmp_df["Datetime"].dt.date
-        tmp_df["Time"] = tmp_df["Datetime"].dt.time
-        tmp_df = tmp_df.rename(columns={c: c.strip().capitalize() for c in tmp_df.columns})
-        df_list.append(tmp_df)
-    else:
-        print(f"⚠️ File non trovato: {path}")
+if "Unnamed: 0" in df.columns:
+    df = df.rename(columns={"Unnamed: 0": "Datetime"})
+df["Datetime"] = pd.to_datetime(df["Datetime"], errors="coerce")
+df = df.dropna(subset=["Datetime"]).copy()
+df["Date"] = df["Datetime"].dt.date
+df["Time"] = df["Datetime"].dt.time
+df = df.rename(columns={c: c.strip().capitalize() for c in df.columns})
 
-if not df_list:
-    raise FileNotFoundError("❌ Nessun file intraday trovato, interrompo lo script.")
+if "Ticker" not in df.columns:
+    raise ValueError("Colonna 'Ticker' mancante nel file intraday.")
 
-# Unisco i due file
-df = pd.concat(df_list, ignore_index=True).sort_values(["Ticker","Datetime"])
+for col in ["Open", "High", "Low", "Close", "Volume"]:
+    if col in df.columns:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
 
 tickers = df["Ticker"].dropna().unique()
 print(f"📈 Trovati {len(tickers)} ticker intraday.")
 # endregion
+
 
 # region === Carica dati Finviz ===
 try:
@@ -99,57 +95,6 @@ for col in percent_cols:
         df_finviz[col] = pd.to_numeric(df_finviz[col], errors="coerce")  # converte in float
 
 # endregion
-
-
-# region === Recupero dati da Yfinance ====
-
-# === Recupera dati di chiusura giornaliera di ieri da YFinance ===
-yesterday = today.date() - timedelta(days=1)
-
-# Lista ticker da usare per YFinance: prendo direttamente quelli trovati nel file intraday
-tickers_yf = tickers  # 'tickers' è già definito come df["Ticker"].dropna().unique()
-
-# Dizionario per salvare dati giornalieri
-daily_data = {}
-
-for ticker in tickers_yf:
-    try:
-        data = yf.download(ticker, start=yesterday, end=today.date(), interval="1d", progress=False)
-        if not data.empty:
-            row = data.iloc[0]
-            daily_data[ticker] = {
-                "Daily_Open": row["Open"],
-                "Daily_High": row["High"],
-                "Daily_Low": row["Low"],
-                "Daily_Close": row["Close"],
-                "Daily_Volume": int(row["Volume"])
-            }
-        else:
-            daily_data[ticker] = {
-                "Daily_Open": None,
-                "Daily_High": None,
-                "Daily_Low": None,
-                "Daily_Close": None,
-                "Daily_Volume": None
-            }
-    except Exception as e:
-        print(f"⚠️ Errore con {ticker} su YFinance: {e}")
-        daily_data[ticker] = {
-            "Daily_Open": None,
-            "Daily_High": None,
-            "Daily_Low": None,
-            "Daily_Close": None,
-            "Daily_Volume": None
-        }
-
-# Trasforma in DataFrame
-df_daily = pd.DataFrame.from_dict(daily_data, orient="index").reset_index().rename(columns={"index": "Ticker"})
-
-# Merge con il DataFrame principale
-df_merged = pd.merge(df_merged, df_daily, on="Ticker", how="left")
-
-# endregion
-
 
 # === Funzione per bucket intraday ===
 def first_bucket_stats(rh_df, rh_start_dt, m):
@@ -365,6 +310,8 @@ for c in cols_intraday:
 
 # Combino colonne di testa + resto ordinate
 df_merged = df_merged[[c for c in cols_start if c in df_merged.columns] + cols_intraday_sorted]
+
+
 
 
 df_merged.to_excel(output_path, index=False)

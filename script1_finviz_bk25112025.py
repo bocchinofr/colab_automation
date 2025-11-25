@@ -13,23 +13,20 @@ os.makedirs(output_dir, exist_ok=True)
 date_str = datetime.now().strftime("%Y-%m-%d")
 output_file = os.path.join(output_dir, f"tickers_{date_str}.csv")
 
-# 🔹 Filtri screener Finviz
+# 🔹 Filtri screener
 filters_dict = {
     "Market Cap.": "-Small (under $2bln)",
     "Gap": "Up 20%",
-    "Price": "Over $1",
-    "Current Volume": "Over 2M",
-    "Float": "Under 50M"
+    "Price": "Over $1"
 }
 
-# 🔹 Screener tecnico (necessario per colonna Gap)
+# 🔹 Esegue screener sulla vista tecnica (per includere la colonna 'Gap')
 technical = Technical()
 technical.set_filter(filters_dict=filters_dict)
 df_screen = technical.screener_view()
 
 if df_screen is not None and not df_screen.empty:
-
-    # 🔹 Normalizza Gap%
+    # 🔹 Normalizza e moltiplica la colonna 'Gap%'
     if "Gap" in df_screen.columns:
         df_screen["Gap%"] = (
             df_screen["Gap"]
@@ -41,31 +38,8 @@ if df_screen is not None and not df_screen.empty:
         )
     else:
         df_screen["Gap%"] = None
-        
-    # 🔹 Filtro post-estrazione: Gap% > 30%
-    df_screen = df_screen[df_screen["Gap%"] > 30]
 
-    # 🔹 Normalizza Volume (rende numerico)
-    if "Current Volume" in df_screen.columns:
-        df_screen["Volume"] = (
-            df_screen["Volume"]
-            .astype(str)
-            .str.replace(",", "")          # rimuove eventuali virgole
-            .astype(float)                 # prima float
-            .astype(int)                   # poi int
-        )
-
-
-    # 🔹 Normalizza Float (in milioni)
-    if "Float" in df_screen.columns:
-        df_screen["Float"] = (
-            df_screen["Float"]
-            .astype(str)
-            .str.replace("M", "")
-            .astype(float)
-        )
-
-    # 🔹 Recupero fondamentali aggiuntivi
+    # 🔹 Aggiunge colonne fondamentali
     shs_float_list = []
     shs_outstand_list = []
     insider_own_list = []
@@ -73,17 +47,27 @@ if df_screen is not None and not df_screen.empty:
     short_float_list = []
     market_cap_list = []
 
+
     for ticker in df_screen["Ticker"]:
         try:
             stock = finvizfinance(ticker)
             stock_fundament = stock.ticker_fundament()
 
-            shs_float_list.append(stock_fundament.get("Shs Float"))
-            shs_outstand_list.append(stock_fundament.get("Shs Outstand"))
-            insider_own_list.append(stock_fundament.get("Insider Own"))
-            inst_own_list.append(stock_fundament.get("Inst Own"))
-            short_float_list.append(stock_fundament.get("Short Float"))
-            market_cap_list.append(stock_fundament.get("Market Cap"))
+            # Recupero dei campi fondamentali
+            shs_float = stock_fundament.get("Shs Float", None)
+            shs_outstand = stock_fundament.get("Shs Outstand", None)
+            insider_own = stock_fundament.get("Insider Own", None)
+            inst_own = stock_fundament.get("Inst Own", None)
+            short_float = stock_fundament.get("Short Float", None)
+            market_cap = stock_fundament.get("Market Cap", None) 
+
+            # Aggiunta alle liste
+            shs_float_list.append(shs_float)
+            shs_outstand_list.append(shs_outstand)
+            insider_own_list.append(insider_own)
+            inst_own_list.append(inst_own)
+            short_float_list.append(short_float)
+            market_cap_list.append(market_cap)
 
         except Exception as e:
             print(f"⚠️ Errore con {ticker}: {e}")
@@ -94,7 +78,7 @@ if df_screen is not None and not df_screen.empty:
             short_float_list.append(None)
             market_cap_list.append(None)
 
-    # 🔹 Aggiunge nuove colonne
+    # 🔹 Aggiunge le nuove colonne al DataFrame
     df_screen["Shs Float"] = shs_float_list
     df_screen["Shares Outstanding"] = shs_outstand_list
     df_screen["Insider Ownership"] = insider_own_list
@@ -102,13 +86,12 @@ if df_screen is not None and not df_screen.empty:
     df_screen["Short Float"] = short_float_list
     df_screen["Market Cap"] = market_cap_list
 
-    # 🔹 Colonne inutili da rimuovere
+    # 🔹 Rimuove colonne indesiderate
     columns_to_drop = ["Beta", "ATR", "SMA20", "SMA50", "SMA200", "52W High", "52W Low", "RSI"]
     df_screen = df_screen.drop(columns=[c for c in columns_to_drop if c in df_screen.columns])
 
-    # 🔹 Salva CSV finale
+    # 🔹 Salva il risultato finale
     df_screen.to_csv(output_file, index=False)
-    print(f"✅ Salvato con nuovi filtri e colonne: {output_file}")
-
+    print(f"✅ Salvato con colonne pulite e fondamentali: {output_file}")
 else:
     print("⚠️ Nessun ticker trovato.")
