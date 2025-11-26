@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 # ------------------------
 today = datetime.now()
 yesterday = today - timedelta(days=1)
-date_str = yesterday.strftime("%Y-%m-%d")
+date_str = today.strftime("%Y-%m-%d")
 date_fin = today.strftime("%Y-%m-%d")
 
 # ------------------------
