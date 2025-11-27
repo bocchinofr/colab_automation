@@ -257,12 +257,34 @@ df_merged = pd.merge(df_final, df_finviz, on="Ticker", how="left")
 df_merged["Gap%"] = pd.to_numeric(df_merged["Gap%"], errors="coerce")
 
 # === Calcolo flottante effettivo ===
-if all(col in df_merged.columns for col in ["Shs Float", "Shares Outstanding", "Institutional Ownership", "Insider Ownership"]):
+# Funzione per normalizzare percentuali sia in formato 35 che 0.35
+def normalize_pct(x):
+    try:
+        if pd.isna(x):
+            return 0.0
+        x = float(x)
+        return x / 100 if x > 1 else x
+    except:
+        return 0.0
+
+required_cols = ["Shs Float", "Shares Outstanding", "Institutional Ownership", "Insider Ownership"]
+
+if all(col in df_merged.columns for col in required_cols):
+
+    # Normalizzo percentuali
+    df_merged["IO_norm"] = df_merged["Institutional Ownership"].apply(normalize_pct)
+    df_merged["Insider_norm"] = df_merged["Insider Ownership"].apply(normalize_pct)
+
+    # Calcolo del float effettivo:
+    # Institution + Insider sono percentuali del FLOAT, non delle Outstanding
     df_merged["Float Effettivo"] = (
         df_merged["Shs Float"]
-        - (df_merged["Institutional Ownership"] / 100 * df_merged["Shares Outstanding"])
-        - (df_merged["Insider Ownership"] / 100 * df_merged["Shares Outstanding"])
+        * (1 - df_merged["IO_norm"] - df_merged["Insider_norm"])
     )
+
+    # Evito numeri negativi
+    df_merged["Float Effettivo"] = df_merged["Float Effettivo"].clip(lower=0)
+
 else:
     print("⚠️ Attenzione: una o più colonne necessarie per il calcolo del flottante effettivo non sono presenti.")
 
