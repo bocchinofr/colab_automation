@@ -7,13 +7,13 @@ from datetime import datetime, timedelta
 # ------------------------
 today = datetime.now()
 yesterday = today - timedelta(days=1)
-date_str = yesterday.strftime("%Y-%m-%d")
+date_str = today.strftime("%Y-%m-%d")
 date_fin = today.strftime("%Y-%m-%d")
 
 # ------------------------
 # 📥 Legge ticker dal file Finviz
 # ------------------------
-ticker_file = f"output/tickers_{date_str}.csv"
+ticker_file = f"output/tickers_{date_fin}.csv"
 df_tickers = pd.read_csv(ticker_file, keep_default_na=False)
 tickers = df_tickers['Ticker'].dropna().unique().tolist()
 finviz_map = df_tickers.set_index('Ticker').to_dict('index')
@@ -162,6 +162,6 @@ for ticker in tickers:
 # Salva file Excel
 # ------------------------
 df_final = pd.DataFrame(final_rows)
-output_path = f"output/intraday/dati_intraday_1m_yfinance_{date_str}.xlsx"
+output_path = f"output/intraday/dati_intraday_1m_yfinance_{date_fin}.xlsx"
 df_final.to_excel(output_path, index=False)
 print(f"✅ File salvato: {output_path}")
