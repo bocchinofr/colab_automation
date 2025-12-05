@@ -17,7 +17,7 @@ output_file = os.path.join(output_dir, f"tickers_{date_str}.csv")
 filters_dict = {
     "Market Cap.": "-Small (under $2bln)",
     "Gap": "Up 20%",
-    "Price": "Over $1",
+    #"Price": "Over $1",
     "Current Volume": "Over 2M",
     "Float": "Under 100M"
 }
