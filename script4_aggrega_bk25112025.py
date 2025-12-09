@@ -259,7 +259,7 @@ df_merged["Gap%"] = pd.to_numeric(df_merged["Gap%"], errors="coerce")
 
 # === FILTRI ESCLUSIVI ===
 df_merged = df_merged[
-    (df_merged["Gap%"] >= 30) &
+    (df_merged["Gap%"] >= 30) 
 ].copy()
 
 
