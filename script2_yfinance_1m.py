@@ -66,6 +66,8 @@ for ticker in tickers:
         # Filtri: float > 50M
         if float_shares is not None and float_shares > 50_000_000:
             print(f"❌ Float troppo alto :) ({float_shares}), skippo...")
+            print(ticker, "yf_float:", yf_float, "finviz_float:", finviz_float)
+
             continue
 
         fundamentals = {
