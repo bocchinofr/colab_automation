@@ -104,7 +104,7 @@ for ticker in tickers:
             market_open_time = pd.Timestamp(datetime.combine(yesterday, datetime.strptime("09:30", "%H:%M").time()))
             market_open_time = market_open_time.tz_localize("America/New_York")
             vol_first_minute = hist_1m.loc[market_open_time]["Volume"]
-            if vol_first_minute < 2_000_000:
+            if vol_first_minute < 1_000_000:
                 print(f"❌ {ticker} volume totale pre-market < 2M ({vol_first_minute}), skippo...")
                 continue
         except Exception as e:
