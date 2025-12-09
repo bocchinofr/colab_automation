@@ -57,8 +57,11 @@ for ticker in tickers:
         finviz_float = parse_finviz_shares(finviz_map.get(ticker, {}).get("Shs Float"))
         finviz_out = parse_finviz_shares(finviz_map.get(ticker, {}).get("Shs Outstanding"))
 
-        float_shares = min([v for v in [yf_float, finviz_float] if v is not None], default=None)
-        shares_out = min([v for v in [yf_outstanding, finviz_out] if v is not None], default=None)
+        float_vals = [v if v is not None else 0 for v in [yf_float, finviz_float]]
+        out_vals = [v if v is not None else 0 for v in [yf_outstanding, finviz_out]]
+
+        float_shares = min(float_vals)
+        shares_out = min(out_vals)
 
         # Filtri: float > 50M
         if float_shares is not None and float_shares > 50_000_000:
