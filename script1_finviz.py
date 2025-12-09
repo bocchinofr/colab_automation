@@ -19,7 +19,7 @@ filters_dict = {
     "Gap": "Up 20%",
     #"Price": "Over $1",
     "Current Volume": "Over 2M",
-    "Float": "Under 100M"
+    #"Float": "Under 100M"
 }
 
 # 🔹 Screener tecnico (necessario per colonna Gap)
