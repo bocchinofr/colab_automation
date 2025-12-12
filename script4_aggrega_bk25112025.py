@@ -262,10 +262,11 @@ df_merged = df_merged[
     (df_merged["Gap%"] >= 30) 
 ].copy()
 
-
 print(f"✅ Filtrati: {len(df_merged)} ticker dopo esclusione Gap<30%")
 
+df_merged = df_merged[df_merged["Open"] > 1].copy()
 
+print(f"✅ Filtrati: {len(df_merged)} ticker dopo esclusione Open <= 1$")
 
 
 # === Riordino colonne: TimeHigh, TimeLow e Close a orari precisi ===
