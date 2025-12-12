@@ -11,9 +11,9 @@ date_ytd = yesterday.strftime("%Y-%m-%d")
 
 
 input_path = f"output/intraday/dati_intraday_D2_1m_yfinance_{date_str}.xlsx"
-finviz_path = f"output/tickers_{date_str}.csv"
+finviz_path = f"output/tickers_{date_ytd}.csv"
 output_dir = "output/intraday"
-output_path = os.path.join(output_dir, f"riepilogo_intraday_{date_str}.xlsx")
+output_path = os.path.join(output_dir, f"riepilogo_intraday_D2_{date_str}.xlsx")
 
 os.makedirs(output_dir, exist_ok=True)
 print(f"📄 Leggo file intraday: {input_path}")
@@ -304,8 +304,6 @@ for c in cols_intraday:
 
 # Combino colonne di testa + resto ordinate
 df_merged = df_merged[[c for c in cols_start if c in df_merged.columns] + cols_intraday_sorted]
-
-
 
 
 df_merged.to_excel(output_path, index=False)

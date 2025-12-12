@@ -167,6 +167,6 @@ for ticker in tickers:
 # Salva file Excel
 # ------------------------
 df_final = pd.DataFrame(final_rows)
-output_path = f"output/intraday/dati_intraday_1m_yfinance_{date_str}.xlsx"
+output_path = f"output/intraday/dati_intraday_1m_D2_yfinance_{date_str}.xlsx"
 df_final.to_excel(output_path, index=False)
 print(f"✅ File salvato: {output_path}")
