@@ -36,7 +36,7 @@ jobs:
           echo "Checking specific files:"
           ls -l output/intraday/dati_intraday_1m_yfinance_${DATE}.xlsx
           ls -l output/intraday/riepilogo_intraday_${DATE}.xlsx
-          ls -l output/intraday/dati_intraday_1m_D2_yfinance_${DATE}.xlsx
+          ls -l output/intraday/dati_intraday_D2_1m_yfinance_${DATE}.xlsx
           ls -l output/intraday/riepilogo_intraday_D2_${DATE}.xlsx      
 
       - name: Upload to Google Drive
