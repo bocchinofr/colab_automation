@@ -109,8 +109,8 @@ for ticker in tickers:
             market_open_time = pd.Timestamp(datetime.combine(yesterday, datetime.strptime("09:30", "%H:%M").time()))
             market_open_time = market_open_time.tz_localize("America/New_York")
             vol_first_minute = hist_1m.loc[market_open_time]["Volume"]
-            if vol_first_minute < 1_000_000:
-                print(f"❌ {ticker} volume totale pre-market < 2M ({vol_first_minute}), skippo...")
+            if vol_first_minute < 100_000:
+                print(f"❌ {ticker} volume totale pre-market < 100K ({vol_first_minute}), skippo...")
                 continue
         except Exception as e:
             print(f"⚠️ Errore volume primo minuto {ticker}: {e}")
@@ -167,6 +167,6 @@ for ticker in tickers:
 # Salva file Excel
 # ------------------------
 df_final = pd.DataFrame(final_rows)
-output_path = f"output/intraday/dati_intraday_1m_D2_yfinance_{date_str}.xlsx"
+output_path = f"output/intraday/dati_intraday_D2_1m_yfinance_{date_str}.xlsx"
 df_final.to_excel(output_path, index=False)
 print(f"✅ File salvato: {output_path}")
