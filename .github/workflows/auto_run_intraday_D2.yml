@@ -2,7 +2,7 @@ name: Run Intraday & Aggregation Scripts Daily
 
 on:
   schedule:
-    - cron: '30 5 * * 3-0'  # Ogni giorno alle 07:30 italiane (05:30 UTC) da Martedì a Sabato
+    - cron: '30 5 * * 3-6'  # Ogni giorno alle 07:30 italiane (05:30 UTC) da Martedì a Sabato
   workflow_dispatch:
 
 jobs:
