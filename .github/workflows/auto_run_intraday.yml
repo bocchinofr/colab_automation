@@ -2,7 +2,8 @@ name: Run Intraday & Aggregation Scripts Daily
 
 on:
   schedule:
-    - cron: '30 5 * * 2-6'  # Ogni giorno alle 07:30 italiane (05:30 UTC) da Martedì a Sabato
+    - cron: '30 5 * * 2-6'  # Martedì–Sabato
+    - cron: '30 5 * * 0'    # Domenica
   workflow_dispatch:
 
 jobs:
@@ -13,7 +14,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GH_PAT }}  # Riutilizza lo stesso secret
+          token: ${{ secrets.GH_PAT }}
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -24,22 +25,49 @@ jobs:
         run: |
           pip install finvizfinance yfinance openpyxl pandas
 
+      # =========================
+      # Giorno settimana (UTC)
+      # =========================
+      - name: Calcola giorno settimana
+        id: day
+        run: echo "day=$(date -u +%w)" >> $GITHUB_OUTPUT
+
+      # =========================
+      # PARTE STANDARD
+      # =========================
       - name: script 2 - intraday yfinance
+        if: contains('2,3,4,5,6', steps.day.outputs.day)
         run: python script2_yfinance_1m.py
 
       - name: Run script 4 (Aggrega)
+        if: contains('2,3,4,5,6', steps.day.outputs.day)
         run: python script4_aggrega_bk25112025.py
 
-#      - name: script 2 - intraday D2 
-#        run: python script2_D2_yfinance_1m.py
-
-#      - name: Run script 4 (Aggrega) D2
-#        run: python script4_D2_aggrega.py
-
-      - name: Push output files
+      - name: Commit output STANDARD
+        if: contains('2,3,4,5,6', steps.day.outputs.day)
         run: |
           git config --global user.name "bocchinofr"
           git config --global user.email "bocchinofr@gmail.com"
           git add output/
-          git commit -m "📈 Output aggiornato automaticamente" || echo "Nothing to commit"
+          git commit -m "📈 Intraday standard output (Mar–Sab)" || echo "Nothing to commit"
+          git push
+
+      # =========================
+      # PARTE D2
+      # =========================
+      - name: script 2 - intraday D2
+        if: contains('0,3,4,5,6', steps.day.outputs.day)
+        run: python script2_D2_yfinance_1m.py
+
+      - name: Run script 4 (Aggrega) D2
+        if: contains('0,3,4,5,6', steps.day.outputs.day)
+        run: python script4_D2_aggrega.py
+
+      - name: Commit output D2
+        if: contains('0,3,4,5,6', steps.day.outputs.day)
+        run: |
+          git config --global user.name "bocchinofr"
+          git config --global user.email "bocchinofr@gmail.com"
+          git add output/
+          git commit -m "📊 Intraday D2 output (Mer–Dom)" || echo "Nothing to commit"
           git push
