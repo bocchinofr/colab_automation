@@ -3,6 +3,7 @@ name: D2 Run Intraday & Aggregation Scripts
 on:
   schedule:
     - cron: '30 5 * * 3-6'  # Ogni giorno alle 07:30 italiane (05:30 UTC) da Martedì a Sabato
+    - cron: '30 5 * * 0'  # Domenica ore 07:30
   workflow_dispatch:
 
 jobs:
