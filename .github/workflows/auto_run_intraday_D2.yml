@@ -1,4 +1,4 @@
-name: Run Intraday & Aggregation Scripts Daily
+name: D2 Run Intraday & Aggregation Scripts
 
 on:
   schedule:
