@@ -2,7 +2,7 @@ name: Run Intraday & Aggregation D2
 
 on:
   schedule:
-    - cron: '20 5 * * 3-7'  # Ogni giorno alle 07:20 italiane (05:20 UTC) da Mercoledì a Domenica
+    - cron: '30 5 * * 3-7'  # Ogni giorno alle 07:20 italiane (05:20 UTC) da Mercoledì a Domenica
   workflow_dispatch:
 
 jobs:
