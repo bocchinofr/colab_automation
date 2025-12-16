@@ -1,8 +1,8 @@
-name: Run Intraday & Aggregation D2
+name: Run Intraday & Aggregation Scripts Daily
 
 on:
   schedule:
-    - cron: '20 5 * * 3-7'  # Ogni giorno alle 07:20 italiane (05:20 UTC) da Mercoledì a Domenica
+    - cron: '30 5 * * 2-6'  # Ogni giorno alle 07:30 italiane (05:30 UTC) da Martedì a Sabato
   workflow_dispatch:
 
 jobs:
@@ -24,17 +24,17 @@ jobs:
         run: |
           pip install finvizfinance yfinance openpyxl pandas
 
-#      - name: script 2 - intraday yfinance
-#        run: python script2_yfinance_1m.py
+      - name: script 2 - intraday yfinance
+        run: python script2_yfinance_1m.py
 
-#      - name: Run script 4 (Aggrega)
-#        run: python script4_aggrega_bk25112025.py
+      - name: Run script 4 (Aggrega)
+        run: python script4_aggrega_bk25112025.py
 
-      - name: script 2 - intraday D2 
-        run: python script2_D2_yfinance_1m.py
+#      - name: script 2 - intraday D2 
+#        run: python script2_D2_yfinance_1m.py
 
-      - name: Run script 4 (Aggrega) D2
-        run: python script4_D2_aggrega.py
+#      - name: Run script 4 (Aggrega) D2
+#        run: python script4_D2_aggrega.py
 
       - name: Push output files
         run: |
