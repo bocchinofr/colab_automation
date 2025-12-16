@@ -1,0 +1,45 @@
+name: Run Intraday & Aggregation Scripts Daily
+
+on:
+  schedule:
+    - cron: '30 5 * * 2-6'  # Ogni giorno alle 07:30 italiane (05:30 UTC) da Martedì a Sabato
+  workflow_dispatch:
+
+jobs:
+  run-scripts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_PAT }}  # Riutilizza lo stesso secret
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+
+      - name: Install dependencies
+        run: |
+          pip install finvizfinance yfinance openpyxl pandas
+
+      - name: script 2 - intraday yfinance
+        run: python script2_yfinance_1m.py
+
+      - name: Run script 4 (Aggrega)
+        run: python script4_aggrega_bk25112025.py
+
+#      - name: script 2 - intraday D2 
+#        run: python script2_D2_yfinance_1m.py
+
+#      - name: Run script 4 (Aggrega) D2
+#        run: python script4_D2_aggrega.py
+
+      - name: Push output files
+        run: |
+          git config --global user.name "bocchinofr"
+          git config --global user.email "bocchinofr@gmail.com"
+          git add output/
+          git commit -m "📈 Output aggiornato automaticamente" || echo "Nothing to commit"
+          git push
