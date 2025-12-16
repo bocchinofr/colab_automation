@@ -2,7 +2,8 @@ name: Upload intraday files to Google Drive
 
 on:
   schedule:
-    - cron: '0 6 * * 2-6'  # ogni giorno alle 08:00 italiane (6:00 UTC) da Martedì a Sabato
+    - cron: '0 6 * * 2-6'  # Martedì–Sabato
+    - cron: '0 6 * * 0'    # Domenica
   workflow_dispatch:
 
 jobs:
@@ -23,33 +24,51 @@ jobs:
           mkdir -p ~/.config/rclone
           echo '${{ secrets.RCLONE_CONF }}' > ~/.config/rclone/rclone.conf
 
-
       - name: Check rclone config
         run: cat ~/.config/rclone/rclone.conf
 
+      # =========================
+      # Giorno settimana (UTC)
+      # =========================
+      - name: Calcola giorno settimana
+        id: day
+        run: echo "day=$(date -u +%w)" >> $GITHUB_OUTPUT
 
-      - name: Check intraday files
+      # =========================
+      # CHECK FILE STANDARD
+      # Martedì → Sabato
+      # =========================
+      - name: Check intraday files STANDARD
+        if: contains('2,3,4,5,6', steps.day.outputs.day)
         run: |
           DATE=$(date +'%Y-%m-%d')
-          echo "Listing intraday folder:"
-          ls -l output/intraday/
-          echo "Checking specific files:"
+          echo "Checking STANDARD files for ${DATE}"
           ls -l output/intraday/dati_intraday_1m_yfinance_${DATE}.xlsx
           ls -l output/intraday/riepilogo_intraday_${DATE}.xlsx
-          ls -l output/intraday/dati_intraday_D2_1m_yfinance_${DATE}.xlsx
-          ls -l output/intraday/riepilogo_intraday_D2_${DATE}.xlsx      
 
+      # =========================
+      # CHECK FILE D2
+      # Mercoledì → Domenica
+      # =========================
+      - name: Check intraday files D2
+        if: contains('0,3,4,5,6', steps.day.outputs.day)
+        run: |
+          DATE=$(date +'%Y-%m-%d')
+          echo "Checking D2 files for ${DATE}"
+          ls -l output/intraday/dati_intraday_D2_1m_yfinance_${DATE}.xlsx
+          ls -l output/intraday/riepilogo_intraday_D2_${DATE}.xlsx
+
+      # =========================
+      # UPLOAD (sempre)
+      # =========================
       - name: Upload to Google Drive
         run: |
           DATE=$(date +'%Y-%m-%d')
           echo "Uploading intraday files for ${DATE}..."
-          # Copia i file nella cartella 'Estrazioni finiviz yfinance/intraday'
-          rclone copy "output/intraday" "gdrive:Estrazioni finiviz yfinance/intraday" --create-empty-src-dirs -v
-          
+          rclone copy "output/intraday" "gdrive:Estrazioni finiviz yfinance/intraday" \
+            --create-empty-src-dirs -v
+
       - name: Verify uploaded files
         run: |
           echo "Files now present in target folder:"
           rclone ls "gdrive:Estrazioni finiviz yfinance/intraday"
-
-
-
