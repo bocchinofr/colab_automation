@@ -103,14 +103,19 @@ for ticker in tickers:
             hist_1m.index = hist_1m.index.tz_convert("America/New_York")
 
         # ------------------------
-        # Filtro volume pre-market tramite primo minuto 09:30
+        # Filtro volume primo minuto Regular Market (robusto)
         # ------------------------
         try:
-            market_open_time = pd.Timestamp(datetime.combine(yesterday, datetime.strptime("09:30", "%H:%M").time()))
-            market_open_time = market_open_time.tz_localize("America/New_York")
-            vol_first_minute = hist_1m.loc[market_open_time]["Volume"]
+            regular_open = hist_1m.between_time("09:30", "09:31")
+
+            if regular_open.empty:
+                print(f"⚠️ {ticker} nessuna barra 09:30–09:31")
+                continue
+
+            vol_first_minute = regular_open.iloc[0]["Volume"]
+
             if vol_first_minute < 1_000_000:
-                print(f"❌ {ticker} volume totale pre-market < 2M ({vol_first_minute}), skippo...")
+                print(f"❌ {ticker} volume primo minuto < 1M ({vol_first_minute}), skippo...")
                 continue
         except Exception as e:
             print(f"⚠️ Errore volume primo minuto {ticker}: {e}")
