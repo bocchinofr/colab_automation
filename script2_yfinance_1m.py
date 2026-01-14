@@ -112,11 +112,12 @@ for ticker in tickers:
                 print(f"⚠️ {ticker} nessuna barra 09:30–09:31")
                 continue
 
-            vol_first_minute = regular_open.iloc[0]["Volume"]
+                first_trade = hist_1m[hist_1m["Volume"] > 0].iloc[0]
+                vol_first_minute = first_trade["Volume"]
 
-            if vol_first_minute < 1_000_000:
-                print(f"❌ {ticker} volume primo minuto < 1M ({vol_first_minute}), skippo...")
-                continue
+                if vol_first_minute < 1_000_000:
+                    print(f"❌ {ticker} volume primo minuto totale < 1M ({vol_first_minute}), skippo...")
+                    continue
         except Exception as e:
             print(f"⚠️ Errore volume primo minuto {ticker}: {e}")
             continue
