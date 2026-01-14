@@ -114,6 +114,7 @@ for ticker in tickers:
 
                 first_trade = hist_1m[hist_1m["Volume"] > 0].iloc[0]
                 vol_first_minute = first_trade["Volume"]
+                print(f"✅ {ticker} primo minuto valido: {first_trade.name}, Volume: {vol_first_minute}")
 
                 if vol_first_minute < 1_000_000:
                     print(f"❌ {ticker} volume primo minuto totale < 1M ({vol_first_minute}), skippo...")
