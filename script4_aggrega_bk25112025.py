@@ -140,15 +140,16 @@ for ticker in tickers:
     pm_start_dt = datetime.combine(max_date - timedelta(days=1), time(16,0))
     pm_end_dt   = datetime.combine(max_date, time(9,29))
 
+    # === Filtra Pre-Market e Regular Session ===
     pm_df = dft[(dft["Datetime"] >= pm_start_dt) & (dft["Datetime"] <= pm_end_dt)].copy()
     pm_df = pm_df[~pm_df["Datetime"].dt.strftime("%H:%M").isin(["04:00", "04:01"])]
-
     rh_df = day_df[(day_df["Datetime"] >= rh_start_dt) & (day_df["Datetime"] <= rh_end_dt)].copy()
     if rh_df.empty and pm_df.empty:
         continue
     
     row = {"Ticker": ticker, "Date": max_date}
 
+    # --- Calcolo VWAP ---
     if not rh_df.empty:
         rh_df = calc_vwap(rh_df)
         # Calcolo VWAP più vicino alle 09:30
@@ -158,11 +159,11 @@ for ticker in tickers:
     else:
         row["VWAP_0930"] = None
 
-    # --- Regular hours ---
+    # --- Regular hours (Open, High, Low, Close) ---
     if not rh_df.empty:
-        open_v = rh_df.loc[rh_df["Datetime"] == rh_start_dt, "Open"].iloc[0] if any(rh_df["Datetime"] == rh_start_dt) else rh_df["Open"].iloc[0]
+        open_v = rh_df.loc[rh_df["Datetime"] == rh_start_dt, "Open"].iloc[0] \
+                 if any(rh_df["Datetime"] == rh_start_dt) else rh_df["Open"].iloc[0]
         high_v, low_v, close_v = rh_df["High"].max(), rh_df["Low"].min(), rh_df["Close"].iloc[-1]
-        vol_v = int(rh_df["Volume"].sum())
         
         # TimeHigh
         try:
@@ -183,22 +184,20 @@ for ticker in tickers:
             "High": round(high_v,2),
             "Low": round(low_v,2),
             "Close": round(close_v,2),
-            "Volume": vol_v,
             "TimeHigh": time_high,
             "TimeLow": time_low
         })
     else:
         row.update({
-            "Open": None, "High": None, "Low": None, "Close": None, "Volume": 0,
+            "Open": None, "High": None, "Low": None, "Close": None,
             "TimeHigh": None, "TimeLow": None
         })
 
-
-    # --- Pre-market ---
+    # --- Pre-market volume (solo ultimo valore cumulato) ---
     if not pm_df.empty:
         openpm = pm_df.iloc[0]["Open"]
         highpm, lowpm, closepm = pm_df["High"].max(), pm_df["Low"].min(), pm_df["Close"].iloc[-1]
-        volpm = int(pm_df["Volume"].sum())
+        volpm = int(pm_df["Volume"].iloc[-1])  # <-- modifica: ultimo valore cumulato
         row.update({
             "OpenPM": round(openpm,2),
             "HighPM": round(highpm,2),
@@ -214,9 +213,14 @@ for ticker in tickers:
     else:
         row.update({"OpenPM": None,"HighPM": None,"LowPM": None,"ClosePM": None,"VolumePM": 0,"TimePMH": None})
 
-    # --- Bucket aggregations ---
+    # --- Regular hours volume: partire da 09:31 (esclude 09:30) ---
+    rh_vol_df = rh_df[rh_df["Datetime"] > rh_start_dt].copy()
+    row["Volume"] = int(rh_vol_df["Volume"].iloc[0]) if not rh_vol_df.empty else 0
+
+    # --- Bucket aggregations (volume) ---
     for m in intervals:
-        h, l, v = (first_bucket_stats(rh_df, rh_start_dt, m) if not rh_df.empty else (None,None,0))
+        # uso rh_vol_df per escludere pre-market
+        h, l, v = (first_bucket_stats(rh_vol_df, rh_vol_df["Datetime"].iloc[0], m) if not rh_vol_df.empty else (None,None,0))
         row[f"High_{m}m"] = round(h,2) if pd.notnull(h) else None
         row[f"Low_{m}m"]  = round(l,2) if pd.notnull(l) else None
         row[f"Volume_{m}m"] = int(v) if v is not None else 0
@@ -232,21 +236,15 @@ for ticker in tickers:
 
         for label, t in time_targets.items():
             target_dt = datetime.combine(max_date, t)
-
             # Cerca il record più vicino all’orario target
             close_row = rh_df.iloc[(rh_df["Datetime"] - target_dt).abs().argsort()[:1]]
-
-            row[f"Close_{label}"] = (
-                round(close_row["Close"].iloc[0], 2)
-                if not close_row.empty
-                else None
-            )
+            row[f"Close_{label}"] = round(close_row["Close"].iloc[0], 2) if not close_row.empty else None
     else:
         for label in ["1030", "1100", "1200", "1400"]:
             row[f"Close_{label}"] = None
 
-
     final_data.append(row)
+
 
 df_final = pd.DataFrame(final_data)
 
