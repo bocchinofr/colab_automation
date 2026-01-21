@@ -193,11 +193,14 @@ for ticker in tickers:
             "TimeHigh": None, "TimeLow": None
         })
 
-    # --- Pre-market volume (solo ultimo valore cumulato) ---
+    # --- Pre-market volume (solo valore alle 09:30) ---
     if not pm_df.empty:
+        # Trova la riga con 09:30
+        volpm_row = pm_df[pm_df["Datetime"].dt.time == time(9,30)]
+        volpm = int(volpm_row["Volume"].iloc[0]) if not volpm_row.empty else 0
+
         openpm = pm_df.iloc[0]["Open"]
         highpm, lowpm, closepm = pm_df["High"].max(), pm_df["Low"].min(), pm_df["Close"].iloc[-1]
-        volpm = int(pm_df["Volume"].iloc[-1])  # <-- modifica: ultimo valore cumulato
         row.update({
             "OpenPM": round(openpm,2),
             "HighPM": round(highpm,2),
@@ -213,9 +216,9 @@ for ticker in tickers:
     else:
         row.update({"OpenPM": None,"HighPM": None,"LowPM": None,"ClosePM": None,"VolumePM": 0,"TimePMH": None})
 
-    # --- Regular hours volume: partire da 09:31 (esclude 09:30) ---
-    rh_vol_df = rh_df[rh_df["Datetime"] > rh_start_dt].copy()
-    row["Volume"] = int(rh_vol_df["Volume"].iloc[0]) if not rh_vol_df.empty else 0
+    # --- Regular hours volume: somma da 09:31 in poi ---
+    rh_vol_df = rh_df[rh_df["Datetime"] > datetime.combine(max_date, time(9,30))].copy()
+    row["Volume"] = int(rh_vol_df["Volume"].sum()) if not rh_vol_df.empty else 0
 
     # --- Bucket aggregations (volume) ---
     for m in intervals:
