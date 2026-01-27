@@ -195,9 +195,16 @@ for ticker in tickers:
 
     # --- Pre-market volume (solo valore alle 09:30) ---
     if not pm_df.empty:
-        # Trova la riga con 09:30
-        volpm_row = pm_df[pm_df["Datetime"].dt.time == time(9,30)]
+        # Preferisco trovare la riga 09:30 con Session Pre-Market (se presente) nel dataframe originale dft.
+        # Questo gestisce il caso in cui esistano sia righe Pre-Market che Regular a 09:30.
+        volpm_row = pd.DataFrame()
+        if "Session" in dft.columns:
+            volpm_row = dft[(dft["Datetime"].dt.time == time(9,30)) & (dft["Session"].str.contains("pre", case=False, na=False))]
+        # fallback: qualsiasi riga 09:30 (PM o Regular) nel dataframe originale
+        if volpm_row.empty:
+            volpm_row = dft[dft["Datetime"].dt.time == time(9,30)]
         volpm = int(volpm_row["Volume"].iloc[0]) if not volpm_row.empty else 0
+
 
         openpm = pm_df.iloc[0]["Open"]
         highpm, lowpm, closepm = pm_df["High"].max(), pm_df["Low"].min(), pm_df["Close"].iloc[-1]
