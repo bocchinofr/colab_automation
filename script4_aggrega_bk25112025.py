@@ -251,9 +251,6 @@ for ticker in tickers:
             # Cerca il record più vicino all’orario target
             close_row = rh_df.iloc[(rh_df["Datetime"] - target_dt).abs().argsort()[:1]]
             row[f"Close_{label}"] = round(close_row["Close"].iloc[0], 2) if not close_row.empty else None
-    else:
-        for label in ["1030", "1100", "1200", "1400"]:
-            row[f"Close_{label}"] = None
 
     final_data.append(row)
 
@@ -302,9 +299,6 @@ df_merged = df_merged[
     [c for c in cols_fixed if c in df_merged.columns] +
     [c for c in intraday_blocks if c in df_merged.columns]
 ]
-
-
-
 
 
 df_merged.to_excel(output_path, index=False)
