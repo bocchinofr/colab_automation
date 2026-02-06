@@ -1,0 +1,4 @@
+Ticker,Price,Change,Change from Open,Gap,Volume,Gap%,Shs Float,Shares Outstanding,Insider Ownership,Institutional Ownership,Short Float,Market Cap
+AIM,1.23,0.1659,-28.49%,0.6303,68187586.0,63.03,3.14M,3.28M,4.06%,3.28%,1.97%,4.03M
+CISS,1.96,0.2895,-2.00%,0.31579999999999997,71059186.0,31.58,0.19M,0.22M,12.30%,32.25%,1.59%,0.44M
+RNAZ,9.97,0.162,-15.29%,0.3718,11696196.0,37.18,0.83M,0.83M,9.08%,6.43%,7.19%,9.14M
