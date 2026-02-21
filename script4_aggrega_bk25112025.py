@@ -143,7 +143,19 @@ for ticker in tickers:
     # === Filtra Pre-Market e Regular Session ===
     pm_df = dft[(dft["Datetime"] >= pm_start_dt) & (dft["Datetime"] <= pm_end_dt)].copy()
     pm_df = pm_df[~pm_df["Datetime"].dt.strftime("%H:%M").isin(["04:00", "04:01"])]
-    rh_df = day_df[(day_df["Datetime"] >= rh_start_dt) & (day_df["Datetime"] <= rh_end_dt)].copy()
+
+    if "Session" in day_df.columns:
+        rh_df = day_df[
+            (day_df["Datetime"] >= rh_start_dt) &
+            (day_df["Datetime"] <= rh_end_dt) &
+            (day_df["Session"].str.contains("Regular", case=False, na=False))
+        ].copy()
+    else:
+        rh_df = day_df[
+            (day_df["Datetime"] >= rh_start_dt) &
+            (day_df["Datetime"] <= rh_end_dt)
+        ].copy()
+
     if rh_df.empty and pm_df.empty:
         continue
     
@@ -227,13 +239,24 @@ for ticker in tickers:
     rh_vol_df = rh_df[rh_df["Datetime"] > datetime.combine(max_date, time(9,30))].copy()
     row["Volume"] = int(rh_vol_df["Volume"].sum()) if not rh_vol_df.empty else 0
 
-    # --- Bucket aggregations (volume) ---
+    # --- Bucket aggregations (prezzi da 09:30, volumi da 09:31) ---
     for m in intervals:
-        # uso rh_vol_df per escludere pre-market
-        h, l, v = (first_bucket_stats(rh_vol_df, rh_vol_df["Datetime"].iloc[0], m) if not rh_vol_df.empty else (None,None,0))
-        row[f"High_{m}m"] = round(h,2) if pd.notnull(h) else None
-        row[f"Low_{m}m"]  = round(l,2) if pd.notnull(l) else None
-        row[f"Volume_{m}m"] = int(v) if v is not None else 0
+
+        # --- HIGH / LOW (partenza 09:30) ---
+        if not rh_df.empty:
+            h, l, _ = first_bucket_stats(rh_df, rh_start_dt, m)
+        else:
+            h, l = None, None
+
+        # --- VOLUME (partenza 09:31) ---
+        if not rh_vol_df.empty:
+            _, _, v = first_bucket_stats(rh_vol_df, rh_start_dt, m)
+        else:
+            v = 0
+
+        row[f"High_{m}m"] = round(h, 2) if pd.notnull(h) else None
+        row[f"Low_{m}m"] = round(l, 2) if pd.notnull(l) else None
+        row[f"Volume_{m}m"] = int(v)
 
     # --- Close per intervalli intraday (Close_Xm) ---
     if not rh_df.empty:
