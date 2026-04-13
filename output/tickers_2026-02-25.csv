@@ -1,0 +1,4 @@
+Ticker,Price,Change,Change from Open,Gap,Volume,Gap%,Shs Float,Shares Outstanding,Insider Ownership,Institutional Ownership,Short Float,Market Cap
+BRTX,0.27,0.3701,3.65%,0.3218,217574004.0,32.18,5.20M,7.98M,42.53%,12.51%,2.55%,5.82M
+TLIH,0.44,0.3774,-12.40%,0.5722999999999999,107034683.0,57.23,4.96M,27.80M,83.12%,0.52%,0.84%,12.88M
+VIR,9.49,0.2773,-4.14%,0.33240000000000003,38126830.0,33.24,94.68M,139.47M,31.95%,56.79%,12.92%,1.32B
