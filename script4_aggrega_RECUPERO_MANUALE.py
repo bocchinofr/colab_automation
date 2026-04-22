@@ -1,0 +1,355 @@
+import pandas as pd
+from datetime import datetime, time, timedelta
+import os
+import re
+
+# region ==== Configurazione date ===
+date_min = "2026-04-21"  # <-- modifica qui
+date_max = "2026-04-22"  # <-- modifica qui
+
+output_dir = "output/intraday"
+output_path = os.path.join(output_dir, f"riepilogo_intraday_{date_min}_{date_max}.xlsx")
+os.makedirs(output_dir, exist_ok=True)
+# endregion
+
+# region === Carica tutti i file intraday nel range ===
+from datetime import date
+
+date_min_dt = datetime.strptime(date_min, "%Y-%m-%d").date()
+date_max_dt = datetime.strptime(date_max, "%Y-%m-%d").date()
+
+all_frames = []
+current = date_min_dt
+while current <= date_max_dt:
+    date_str = current.strftime("%Y-%m-%d")
+    input_path = f"output/intraday/dati_intraday_1m_yfinance_{date_str}.xlsx"
+    if os.path.exists(input_path):
+        print(f"📄 Leggo: {input_path}")
+        try:
+            df_tmp = pd.read_excel(input_path)
+            all_frames.append(df_tmp)
+        except Exception as e:
+            print(f"⚠️ Errore lettura {input_path}: {e}")
+    else:
+        print(f"⏭️ File non trovato, salto: {input_path}")
+    current += timedelta(days=1)
+
+if not all_frames:
+    raise FileNotFoundError("❌ Nessun file trovato nel range di date specificato.")
+
+
+df = pd.concat(all_frames, ignore_index=True)
+print(f"📈 Totale righe caricate: {len(df)}")
+
+# === Preparazione dataframe ===
+if "Unnamed: 0" in df.columns:
+    df = df.rename(columns={"Unnamed: 0": "Datetime"})
+df["Datetime"] = pd.to_datetime(df["Datetime"], errors="coerce")
+df = df.dropna(subset=["Datetime"]).copy()
+df["Date"] = df["Datetime"].dt.date
+df["Time"] = df["Datetime"].dt.time
+df = df.rename(columns={c: c.strip().capitalize() for c in df.columns})
+
+if "Ticker" not in df.columns:
+    raise ValueError("Colonna 'Ticker' mancante nel file intraday.")
+
+for col in ["Open", "High", "Low", "Close", "Volume"]:
+    if col in df.columns:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+
+tickers = df["Ticker"].dropna().unique()
+print(f"📈 Trovati {len(tickers)} ticker unici.")
+# endregion
+
+# region === Finviz — placeholder vuoto ===
+df_finviz = pd.DataFrame(columns=[
+    "Ticker", "Gap%", "Shs Float", "Shares Outstanding",
+    "Change from Open", "Insider Ownership", "Institutional Ownership",
+    "Short Float", "Market Cap"
+])
+print("⚠️ Finviz non caricato — colonne lasciate vuote.")
+# endregion
+
+# === Funzione per convertire "M", "B", "K" in numeri reali ===
+def parse_shares(value):
+    if pd.isna(value):
+        return None
+    s = str(value).replace(",", "").strip().upper()
+    match = re.match(r"([\d\.]+)([KMB]?)", s)
+    if not match:
+        return None
+    num, suffix = match.groups()
+    num = float(num)
+    multiplier = {"K": 1_000, "M": 1_000_000, "B": 1_000_000_000}.get(suffix, 1)
+    return num * multiplier
+
+# === Applica conversione alle colonne Finviz ===
+if "Shs Float" in df_finviz.columns:
+    df_finviz["Shs Float"] = df_finviz["Shs Float"].apply(parse_shares)
+if "Shares Outstanding" in df_finviz.columns:
+    df_finviz["Shares Outstanding"] = df_finviz["Shares Outstanding"].apply(parse_shares)
+if "Market Cap" in df_finviz.columns:
+    df_finviz["Market Cap"] = df_finviz["Market Cap"].apply(parse_shares)
+
+
+# === Conversione percentuali in numerico ===
+percent_cols = ["Insider Ownership", "Institutional Ownership", "Short Float"]
+for col in percent_cols:
+    if col in df_finviz.columns:
+        df_finviz[col] = (
+            df_finviz[col]
+            .astype(str)                              # converte tutto in stringa
+            .str.replace("%", "", regex=False)         # rimuove il simbolo %
+            .replace(["-", "N/A", "nan", ""], None)    # sostituisce i valori non validi
+        )
+        df_finviz[col] = pd.to_numeric(df_finviz[col], errors="coerce")  # converte in float
+
+# endregion
+
+# === Funzione per bucket intraday ===
+def first_bucket_stats(rh_df, rh_start_dt, m):
+    if rh_df.empty:
+        return None, None, 0
+    delta_seconds = (rh_df["Datetime"] - rh_start_dt).dt.total_seconds()
+    bucket = (delta_seconds // (m * 60)).astype("Int64")
+    rh_df = rh_df.assign(_bucket=bucket)
+    grouped = rh_df.groupby("_bucket").agg({"High": "max", "Low": "min", "Volume": "sum"})
+    if grouped.empty:
+        return None, None, 0
+    g = grouped.loc[0] if 0 in grouped.index else grouped.iloc[0]
+    return g["High"], g["Low"], int(g["Volume"])
+
+# === calcolo vwap ====
+def calc_vwap(df):
+    """Calcola VWAP cumulativo dai dati intraday a 1 minuto"""
+    df = df.copy()
+    df["TypicalPrice"] = (df["High"] + df["Low"] + df["Close"]) / 3
+    df["TPxVol"] = df["TypicalPrice"] * df["Volume"]
+    df["Cumulative_TPxVol"] = df["TPxVol"].cumsum()
+    df["Cumulative_Volume"] = df["Volume"].cumsum()
+    df["VWAP"] = df["Cumulative_TPxVol"] / df["Cumulative_Volume"]
+    return df
+
+# === Calcolo metriche intraday ===
+final_data = []
+intervals = [1, 5, 15, 30, 45, 60, 90, 120, 240]
+
+for ticker in tickers:
+    dft = df[df["Ticker"] == ticker].copy()
+    if dft.empty:
+        continue
+
+    for max_date in sorted(dft["Date"].unique()):
+        day_df = dft[dft["Date"] == max_date].copy()
+
+        rh_start_dt = datetime.combine(max_date, time(9,30))
+        rh_end_dt   = datetime.combine(max_date, time(15,59))
+        pm_start_dt = datetime.combine(max_date - timedelta(days=1), time(16,0))
+        pm_end_dt   = datetime.combine(max_date, time(9,29))
+
+        # === Filtra Pre-Market e Regular Session ===
+        pm_df = dft[(dft["Datetime"] >= pm_start_dt) & (dft["Datetime"] <= pm_end_dt)].copy()
+        pm_df = pm_df[~pm_df["Datetime"].dt.strftime("%H:%M").isin(["04:00", "04:01"])]
+
+        if "Session" in day_df.columns:
+            rh_df = day_df[
+                (day_df["Datetime"] >= rh_start_dt) &
+                (day_df["Datetime"] <= rh_end_dt) &
+                (day_df["Session"].str.contains("Regular", case=False, na=False))
+            ].copy()
+        else:
+            rh_df = day_df[
+                (day_df["Datetime"] >= rh_start_dt) &
+                (day_df["Datetime"] <= rh_end_dt)
+            ].copy()
+
+        if rh_df.empty and pm_df.empty:
+            continue
+        
+        row = {"Ticker": ticker, "Date": max_date}
+
+        # --- Calcolo VWAP ---
+        if not rh_df.empty:
+            rh_df = calc_vwap(rh_df)
+            # Calcolo VWAP più vicino alle 09:30
+            target_dt = datetime.combine(max_date, time(9,30))
+            vwap_row = rh_df.iloc[(rh_df["Datetime"] - target_dt).abs().argsort()[:1]]
+            row["VWAP_0930"] = round(vwap_row["VWAP"].iloc[0], 2) if not vwap_row.empty else None
+        else:
+            row["VWAP_0930"] = None
+
+        # --- Regular hours (Open, High, Low, Close) ---
+        if not rh_df.empty:
+            open_v = rh_df.loc[rh_df["Datetime"] == rh_start_dt, "Open"].iloc[0] \
+                    if any(rh_df["Datetime"] == rh_start_dt) else rh_df["Open"].iloc[0]
+            high_v, low_v, close_v = rh_df["High"].max(), rh_df["Low"].min(), rh_df["Close"].iloc[-1]
+            
+            # TimeHigh
+            try:
+                high_rows = rh_df[rh_df["High"] == high_v].sort_values("Datetime")
+                time_high = high_rows.iloc[0]["Datetime"].strftime("%Y-%m-%d %H:%M:%S") if not high_rows.empty else None
+            except Exception:
+                time_high = None
+
+            # TimeLow
+            try:
+                low_rows = rh_df[rh_df["Low"] == low_v].sort_values("Datetime")
+                time_low = low_rows.iloc[0]["Datetime"].strftime("%Y-%m-%d %H:%M:%S") if not low_rows.empty else None
+            except Exception:
+                time_low = None
+
+            row.update({
+                "Open": round(open_v,2),
+                "High": round(high_v,2),
+                "Low": round(low_v,2),
+                "Close": round(close_v,2),
+                "TimeHigh": time_high,
+                "TimeLow": time_low
+            })
+        else:
+            row.update({
+                "Open": None, "High": None, "Low": None, "Close": None,
+                "TimeHigh": None, "TimeLow": None
+            })
+
+        # --- Pre-market volume (solo valore alle 09:30) ---
+        if not pm_df.empty:
+            # Preferisco trovare la riga 09:30 con Session Pre-Market (se presente) nel dataframe originale dft.
+            # Questo gestisce il caso in cui esistano sia righe Pre-Market che Regular a 09:30.
+            volpm_row = pd.DataFrame()
+            if "Session" in dft.columns:
+                volpm_row = dft[(dft["Datetime"].dt.time == time(9,30)) & (dft["Session"].str.contains("pre", case=False, na=False))]
+            # fallback: qualsiasi riga 09:30 (PM o Regular) nel dataframe originale
+            if volpm_row.empty:
+                volpm_row = dft[dft["Datetime"].dt.time == time(9,30)]
+            volpm = int(volpm_row["Volume"].iloc[0]) if not volpm_row.empty else 0
+
+
+            openpm = pm_df.iloc[0]["Open"]
+            highpm, lowpm, closepm = pm_df["High"].max(), pm_df["Low"].min(), pm_df["Close"].iloc[-1]
+            row.update({
+                "OpenPM": round(openpm,2),
+                "HighPM": round(highpm,2),
+                "LowPM": round(lowpm,2),
+                "ClosePM": round(closepm,2),
+                "VolumePM": volpm
+            })
+            try:
+                high_pm_rows = pm_df[pm_df["High"] == highpm].sort_values("Datetime")
+                row["TimePMH"] = high_pm_rows.iloc[0]["Datetime"].strftime("%Y-%m-%d %H:%M:%S") if not high_pm_rows.empty else None
+            except Exception:
+                row["TimePMH"] = None
+        else:
+            row.update({"OpenPM": None,"HighPM": None,"LowPM": None,"ClosePM": None,"VolumePM": 0,"TimePMH": None})
+
+        # --- Regular hours volume: somma da 09:31 in poi ---
+        rh_vol_df = rh_df[rh_df["Datetime"] > datetime.combine(max_date, time(9,30))].copy()
+        row["Volume"] = int(rh_vol_df["Volume"].sum()) if not rh_vol_df.empty else 0
+
+        # --- Bucket aggregations (prezzi da 09:30, volumi da 09:31) ---
+        for m in intervals:
+
+            # --- HIGH / LOW (partenza 09:30) ---
+            if not rh_df.empty:
+                h, l, _ = first_bucket_stats(rh_df, rh_start_dt, m)
+            else:
+                h, l = None, None
+
+            # --- VOLUME (partenza 09:31) ---
+            if not rh_vol_df.empty:
+                _, _, v = first_bucket_stats(rh_vol_df, rh_start_dt, m)
+            else:
+                v = 0
+
+            row[f"High_{m}m"] = round(h, 2) if pd.notnull(h) else None
+            row[f"Low_{m}m"] = round(l, 2) if pd.notnull(l) else None
+            row[f"Volume_{m}m"] = int(v)
+
+        # --- HIGH / LOW per intervalli parziali (es. 5-15m, 15-30m, ...) ---
+        partial_intervals = [
+            (5, 15), (15, 30), (30, 45), (45, 60),
+            (60, 90), (90, 120), (120, 240)
+        ]
+        for (start_m, end_m) in partial_intervals:
+            if not rh_df.empty:
+                start_dt = rh_start_dt + timedelta(minutes=start_m)
+                end_dt   = rh_start_dt + timedelta(minutes=end_m)
+                slice_df = rh_df[
+                    (rh_df["Datetime"] >= start_dt) &
+                    (rh_df["Datetime"] <= end_dt)
+                ]
+                row[f"High_{start_m}_{end_m}m"] = round(slice_df["High"].max(), 2) if not slice_df.empty else None
+                row[f"Low_{start_m}_{end_m}m"]  = round(slice_df["Low"].min(),  2) if not slice_df.empty else None
+            else:
+                row[f"High_{start_m}_{end_m}m"] = None
+                row[f"Low_{start_m}_{end_m}m"]  = None
+
+        # --- Close per intervalli intraday (Close_Xm) ---
+        if not rh_df.empty:
+            for m in intervals:
+                target_dt = rh_start_dt + timedelta(minutes=m)
+                close_row = rh_df.iloc[(rh_df["Datetime"] - target_dt).abs().argsort()[:1]]
+                row[f"Close_{m}m"] = round(close_row["Close"].iloc[0], 2) if not close_row.empty else None
+        else:
+            for m in intervals:
+                row[f"Close_{m}m"] = None
+
+
+            for label, t in time_targets.items():
+                target_dt = datetime.combine(max_date, t)
+                # Cerca il record più vicino all’orario target
+                close_row = rh_df.iloc[(rh_df["Datetime"] - target_dt).abs().argsort()[:1]]
+                row[f"Close_{label}"] = round(close_row["Close"].iloc[0], 2) if not close_row.empty else None
+
+        final_data.append(row)
+
+
+df_final = pd.DataFrame(final_data)
+
+# === Merge con Finviz ===
+df_merged = pd.merge(df_final, df_finviz, on="Ticker", how="left")
+
+# === Converti Gap% in numerico ===
+df_merged["Gap%"] = pd.to_numeric(df_merged["Gap%"], errors="coerce")
+
+
+# === FILTRI ESCLUSIVI ===
+# df_merged = df_merged[(df_merged["Gap%"] >= 30)].copy()
+# print(f"✅ Filtrati: {len(df_merged)} ticker dopo esclusione Gap<30%")
+
+df_merged = df_merged[df_merged["Open"] > 1].copy()
+print(f"✅ Filtrati: {len(df_merged)} ticker dopo esclusione Open <= 1$")
+
+
+# === Riordino colonne intraday ===
+intraday_blocks = []
+for m in intervals:
+    intraday_blocks.extend([
+        f"High_{m}m",
+        f"Low_{m}m",
+        f"Volume_{m}m",
+        f"Close_{m}m"
+    ])
+
+partial_cols = []
+for (s, e) in [(5,15),(15,30),(30,45),(45,60),(60,90),(90,120),(120,240)]:
+    partial_cols.extend([f"High_{s}_{e}m", f"Low_{s}_{e}m"])
+
+cols_fixed = [
+    "Ticker", "Date", "Gap%", "Market Cap", "Shs Float", "Shares Outstanding",
+    "Change from Open", "Insider Ownership", "Institutional Ownership",
+    "Short Float", "VWAP_0930",
+    "Open", "High", "Low", "Close", "Volume",
+    "TimeHigh", "TimeLow",
+    "OpenPM", "HighPM", "LowPM", "ClosePM", "VolumePM", "TimePMH"
+]
+
+df_merged = df_merged[
+    [c for c in cols_fixed if c in df_merged.columns] +
+    [c for c in intraday_blocks if c in df_merged.columns] +
+    [c for c in partial_cols if c in df_merged.columns]
+]
+
+
+df_merged.to_excel(output_path, index=False)
+print(f"✅ File riepilogativo salvato: {output_path}")
