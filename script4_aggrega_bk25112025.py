@@ -268,7 +268,7 @@ for ticker in tickers:
             start_dt = rh_start_dt + timedelta(minutes=start_m)
             end_dt   = rh_start_dt + timedelta(minutes=end_m)
             slice_df = rh_df[
-                (rh_df["Datetime"] >= start_dt) &
+                (rh_df["Datetime"] > start_dt) &
                 (rh_df["Datetime"] <= end_dt)
             ]
             row[f"High_{start_m}_{end_m}m"] = round(slice_df["High"].max(), 2) if not slice_df.empty else None
