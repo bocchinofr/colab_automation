@@ -258,26 +258,6 @@ for ticker in tickers:
         row[f"Low_{m}m"] = round(l, 2) if pd.notnull(l) else None
         row[f"Volume_{m}m"] = int(v)
 
-    # --- HIGH / LOW per intervalli parziali (es. 5-15m, 15-30m, ...) ---
-    partial_intervals = [
-        (5, 15), (15, 30), (30, 45), (45, 60),
-        (60, 90), (90, 120), (120, 240)
-    ]
-    for (start_m, end_m) in partial_intervals:
-        if not rh_df.empty:
-            start_dt = rh_start_dt + timedelta(minutes=start_m)
-            end_dt   = rh_start_dt + timedelta(minutes=end_m)
-            slice_df = rh_df[
-                (rh_df["Datetime"] >= start_dt) &
-                (rh_df["Datetime"] <= end_dt)
-            ]
-            row[f"High_{start_m}_{end_m}m"] = round(slice_df["High"].max(), 2) if not slice_df.empty else None
-            row[f"Low_{start_m}_{end_m}m"]  = round(slice_df["Low"].min(),  2) if not slice_df.empty else None
-        else:
-            row[f"High_{start_m}_{end_m}m"] = None
-            row[f"Low_{start_m}_{end_m}m"]  = None
-
-
     # --- Close per intervalli intraday (Close_Xm) ---
     if not rh_df.empty:
         for m in intervals:
@@ -329,10 +309,6 @@ for m in intervals:
         f"Close_{m}m"
     ])
 
-partial_cols = []
-for (s, e) in [(5,15),(15,30),(30,45),(45,60),(60,90),(90,120),(120,240)]:
-    partial_cols.extend([f"High_{s}_{e}m", f"Low_{s}_{e}m"])
-
 cols_fixed = [
     "Ticker", "Date", "Gap%", "Market Cap", "Shs Float", "Shares Outstanding",
     "Change from Open", "Insider Ownership", "Institutional Ownership",
@@ -344,9 +320,9 @@ cols_fixed = [
 
 df_merged = df_merged[
     [c for c in cols_fixed if c in df_merged.columns] +
-    [c for c in intraday_blocks if c in df_merged.columns] +
-    [c for c in partial_cols if c in df_merged.columns]
+    [c for c in intraday_blocks if c in df_merged.columns]
 ]
+
 
 df_merged.to_excel(output_path, index=False)
 print(f"✅ File riepilogativo salvato: {output_path}")
