@@ -150,6 +150,12 @@ for ticker in tickers:
         regular_market = hist_1m.between_time("09:30", "16:00").copy()
         regular_market.index = regular_market.index.tz_localize(None)
 
+        # FIX OPEN COERENTE
+        if not pre_market.empty:
+            last_pm_close = pre_market.iloc[-1]["Close"]
+            first_idx = regular_market.index[0]
+            regular_market.loc[first_idx, "Open"] = last_pm_clos
+
         for ts, row in regular_market.iterrows():
             data = fundamentals.copy()
             data.update({
