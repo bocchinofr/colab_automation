@@ -97,7 +97,19 @@ jobs:
             --create-empty-src-dirs -v
 
       # =========================
-      # STEP 6 — READY FLAG (FONDAMENTALE)
+      # STEP 6 — TRIGGER PER APPS SCRIPT
+      # =========================
+
+
+      - name: Trigger Apps Script
+        run: |
+          curl -X POST "${{ secrets.APPS_SCRIPT_URL }}" \
+          -H "Content-Type: application/json" \
+          -d '{"event":"github_done"}'
+
+
+      # =========================
+      # STEP 7 — READY FLAG (FONDAMENTALE)
       # =========================
       - name: Mark ready
         run: |
