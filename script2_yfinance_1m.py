@@ -127,6 +127,12 @@ for ticker in tickers:
         # Pre-Market: 04:00 - 09:30 ET
         # ------------------------
         pre_market = hist_1m.between_time("04:00", "09:30").copy()
+        # safe guard
+        last_pm_close = None
+
+        if not pre_market.empty:
+            last_pm_close = pre_market.sort_index().iloc[-1]["Close"]
+
         pre_market.index = pre_market.index.tz_localize(None)
         max_pre = pre_market["High"].max() if not pre_market.empty else None
 
@@ -150,11 +156,9 @@ for ticker in tickers:
         regular_market = hist_1m.between_time("09:30", "16:00").copy()
         regular_market.index = regular_market.index.tz_localize(None)
 
-        # FIX OPEN COERENTE
-        if not pre_market.empty:
-            last_pm_close = pre_market.iloc[-1]["Close"]
+        if last_pm_close is not None and not regular_market.empty:
             first_idx = regular_market.index[0]
-            regular_market.loc[first_idx, "Open"] = last_pm_clos
+            regular_market.loc[first_idx, "Open"] = last_pm_close
 
         for ts, row in regular_market.iterrows():
             data = fundamentals.copy()
