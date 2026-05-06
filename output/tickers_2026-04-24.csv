@@ -1,0 +1,5 @@
+Ticker,Price,Change,Change from Open,Gap,Volume,Gap%,Shs Float,Shares Outstanding,Insider Ownership,Institutional Ownership,Short Float,Market Cap
+AUUD,5.06,0.3075,-25.59%,0.7570999999999999,75831554.0,75.71,-,0.40M,0.06%,2.20%,-,2.53M
+CPIX,3.9,0.2787,-32.29%,0.8885,52195343.0,88.85,8.72M,14.96M,41.67%,19.77%,1.26%,58.33M
+PAPL,0.87,0.449,-7.45%,0.5656,154152452.0,56.56,8.28M,26.09M,-,0.60%,1.77%,22.70M
+TRT,13.78,0.6683,25.27%,0.3317,31144853.0,33.17,5.52M,17.47M,36.89%,28.62%,0.19%,120.57M
