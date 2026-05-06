@@ -2,7 +2,7 @@ name: Full Intraday Pipeline (Finviz → Intraday → Aggregation → Drive)
 
 on:
   schedule:
-    - cron: '17 5 * * *'  # ogni giorno, orario NON round per evitare congestione
+    - cron: '17 3 * * *'  # ogni giorno, orario NON round per evitare congestione
   workflow_dispatch:
 
 jobs:
