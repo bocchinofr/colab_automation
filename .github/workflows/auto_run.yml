@@ -1,19 +1,22 @@
-name: Run Colab Scripts Daily
+name: Full Intraday Pipeline (Finviz → Intraday → Aggregation → Drive)
 
 on:
   schedule:
-    - cron: '0 5 * * 2-6'  # Ogni giorno alle 05:00 UTC (07:00 italiane) da Martedì a Sabato
+    - cron: '17 5 * * *'  # ogni giorno, orario NON round per evitare congestione
   workflow_dispatch:
 
 jobs:
-  run-scripts:
+  pipeline:
     runs-on: ubuntu-latest
 
     steps:
+      # =========================
+      # SETUP
+      # =========================
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GH_PAT }}  # <-- usa il tuo personal token qui
+          token: ${{ secrets.GH_PAT }}
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -24,19 +27,81 @@ jobs:
         run: |
           pip install finvizfinance yfinance openpyxl pandas
 
-      - name: Run script 1 (Finviz)
+      # =========================
+      # GIORNO SETTIMANA (UTC)
+      # =========================
+      - name: Calcola giorno settimana
+        id: day
+        run: echo "day=$(date -u +%w)" >> $GITHUB_OUTPUT
+
+      # =========================
+      # STEP 1 — FINVIZ + DAILY
+      # =========================
+      - name: Run Finviz
         run: python script1_finviz.py
 
-      - name: Run script 2 (Yahoo Finance)
-        run: python script2_yfinance.py
-        
-      #- name: Run script 3 (Intraday 1m)
-      #  run: python script3_intraday.py
-      
-      - name: Push output files
+
+      # =========================
+      # STEP 2 — INTRADAY STANDARD
+      # Martedì → Sabato (2–6)
+      # =========================
+      - name: Intraday STANDARD
+        if: ${{ contains(fromJson('[2,3,4,5,6]'), steps.day.outputs.day) }}
+        run: python script2_yfinance_1m.py
+
+      - name: Aggregazione STANDARD
+        if: ${{ contains(fromJson('[2,3,4,5,6]'), steps.day.outputs.day) }}
+        run: python script4_aggrega_bk25112025.py
+
+      # =========================
+      # STEP 3 — INTRADAY D2
+      # Mercoledì → Domenica (0,3,4,5,6)
+      # =========================
+      - name: Intraday D2
+        if: ${{ contains(fromJson('[0,3,4,5,6]'), steps.day.outputs.day) }}
+        run: python script2_D2_yfinance_1m.py
+
+      - name: Aggregazione D2
+        if: ${{ contains(fromJson('[0,3,4,5,6]'), steps.day.outputs.day) }}
+        run: python script4_D2_aggrega.py
+
+      # =========================
+      # STEP 4 — COMMIT OUTPUT
+      # =========================
+      - name: Commit output
         run: |
           git config --global user.name "bocchinofr"
           git config --global user.email "bocchinofr@gmail.com"
           git add output/
-          git commit -m "📈 Output aggiornato automaticamente" || echo "Nothing to commit"
+          git commit -m "📊 Full pipeline output $(date -u)" || echo "Nothing to commit"
+          git push
+
+      # =========================
+      # STEP 5 — UPLOAD GOOGLE DRIVE
+      # =========================
+      - name: Install rclone
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rclone
+
+      - name: Configure rclone
+        run: |
+          mkdir -p ~/.config/rclone
+          echo '${{ secrets.RCLONE_CONF }}' > ~/.config/rclone/rclone.conf
+
+      - name: Upload to Google Drive
+        run: |
+          DATE=$(date +'%Y-%m-%d')
+          echo "Uploading files for ${DATE}..."
+          rclone copy "output/intraday" "gdrive:Estrazioni finiviz yfinance/intraday" \
+            --create-empty-src-dirs -v
+
+      # =========================
+      # STEP 6 — READY FLAG (FONDAMENTALE)
+      # =========================
+      - name: Mark ready
+        run: |
+          echo "done $(date -u)" > output/_READY.txt
+          git add output/_READY.txt
+          git commit -m "ready flag" || echo "no changes"
           git push
