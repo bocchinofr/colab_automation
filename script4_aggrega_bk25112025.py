@@ -156,6 +156,18 @@ for ticker in tickers:
             (day_df["Datetime"] <= rh_end_dt)
         ].copy()
 
+    # Correggi Open 09:30 Regular con Open Pre-Market 09:30
+    if "Session" in dft.columns and not rh_df.empty:
+        pm_930 = dft[
+            (dft["Datetime"].dt.time == time(9, 30)) &
+            (dft["Session"].str.contains("Pre-Market", case=False, na=False))
+        ]
+        if not pm_930.empty:
+            open_930 = pm_930.iloc[0]["Open"]
+            first_idx = rh_df[rh_df["Datetime"] == rh_start_dt].index
+            if len(first_idx) > 0:
+                rh_df.loc[first_idx[0], "Open"] = open_930
+
     if rh_df.empty and pm_df.empty:
         continue
     
