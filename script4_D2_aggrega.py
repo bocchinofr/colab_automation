@@ -194,25 +194,48 @@ for ticker in tickers:
         })
 
 
-    # --- Pre-market ---
+    # --- Pre-market volume (valore alle 09:30 con Session = Pre-Market) ---
     if not pm_df.empty:
+        # Cerca il volume alle 09:30 con Session = Pre-Market
+        volpm_row = pd.DataFrame()
+        
+        if "Session" in dft.columns:
+            volpm_row = dft[
+                (dft["Datetime"].dt.time == time(9, 30)) & 
+                (dft["Session"].astype(str).str.contains("Pre-Market", case=False, na=False))
+            ]
+        
+        # Fallback: cerca qualsiasi riga alle 09:30
+        if volpm_row.empty:
+            volpm_row = dft[dft["Datetime"].dt.time == time(9, 30)]
+        
+        # Se trovato, prendi il volume
+        if not volpm_row.empty:
+            volpm = int(volpm_row["Volume"].iloc[0])
+        else:
+            # Se non esiste riga 09:30, prendi l'ultimo volume del pre-market
+            volpm = int(pm_df["Volume"].iloc[-1]) if not pm_df.empty else 0
+        
         openpm = pm_df.iloc[0]["Open"]
         highpm, lowpm, closepm = pm_df["High"].max(), pm_df["Low"].min(), pm_df["Close"].iloc[-1]
-        volpm = int(pm_df["Volume"].sum())
+        
         row.update({
-            "OpenPM": round(openpm,2),
-            "HighPM": round(highpm,2),
-            "LowPM": round(lowpm,2),
-            "ClosePM": round(closepm,2),
+            "OpenPM": round(openpm, 2),
+            "HighPM": round(highpm, 2),
+            "LowPM": round(lowpm, 2),
+            "ClosePM": round(closepm, 2),
             "VolumePM": volpm
         })
+        
         try:
             high_pm_rows = pm_df[pm_df["High"] == highpm].sort_values("Datetime")
             row["TimePMH"] = high_pm_rows.iloc[0]["Datetime"].strftime("%Y-%m-%d %H:%M:%S") if not high_pm_rows.empty else None
         except Exception:
             row["TimePMH"] = None
     else:
-        row.update({"OpenPM": None,"HighPM": None,"LowPM": None,"ClosePM": None,"VolumePM": 0,"TimePMH": None})
+        row.update({"OpenPM": None, "HighPM": None, "LowPM": None, "ClosePM": None, "VolumePM": 0, "TimePMH": None})
+
+
 
     # --- Bucket aggregations ---
     for m in intervals:

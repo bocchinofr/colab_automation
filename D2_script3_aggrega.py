@@ -1,4 +1,4 @@
-# D2_riepilogo_intraday.py
+# D2_script3_aggrega.py
 import pandas as pd
 from datetime import datetime, time, timedelta
 import os
@@ -6,9 +6,8 @@ import os
 # region ==== Percorsi ===
 today = datetime.now()
 date_str = today.strftime("%Y-%m-%d")
-yesterday = today - timedelta(days=1)
 
-# Legge il file generato da D2_gainers_intraday.py (che ha già i dati popolati)
+# Legge il file generato da D2_script2_yfinance_1m.py
 input_path = f"output/intraday/D2_gainers_1myfinance.xlsx"
 output_dir = "output/intraday"
 output_path = os.path.join(output_dir, f"D2_riepilogo_intraday_{date_str}.xlsx")
@@ -21,36 +20,12 @@ print(f"📄 Leggo file intraday: {input_path}")
 try:
     df = pd.read_excel(input_path)
     print(f"✅ File caricato: {len(df)} righe")
-    print(f"📊 Colonne disponibili: {df.columns.tolist()}")
 except FileNotFoundError:
     raise FileNotFoundError(f"❌ File non trovato: {input_path}")
 
-# Standardizza nomi colonne (prima lettera maiuscola, resto minuscolo)
+# Standardizza nomi colonne
 df.columns = [c[0].upper() + c[1:].lower() if isinstance(c, str) else c for c in df.columns]
 
-# Rinomina colonne specifiche se necessario
-rename_map = {
-    "Gain_%": "Gain_%",
-    "Price_gain_giorno": "Price_Gain_Giorno",
-    "Volume_gain_giorno": "Volume_Gain_Giorno",
-    "Market cap": "Market Cap",
-    "Short float": "Short Float",
-    "Insider own": "Insider Own",
-    "Inst own": "Inst Own",
-    "Float shares": "Float Shares",
-    "Shares outstanding": "Shares Outstanding"
-}
-for old, new in rename_map.items():
-    if old in df.columns and old != new:
-        df = df.rename(columns={old: new})
-
-# Verifica colonne essenziali
-essential_cols = ["Ticker", "Datetime", "Open", "High", "Low", "Close", "Volume", "Session"]
-missing_cols = [c for c in essential_cols if c not in df.columns]
-if missing_cols:
-    print(f"⚠️ Colonne mancanti: {missing_cols}")
-
-# Prepara dataframe
 df["Datetime"] = pd.to_datetime(df["Datetime"], errors="coerce")
 df = df.dropna(subset=["Datetime"]).copy()
 df["Date"] = df["Datetime"].dt.date
@@ -64,18 +39,17 @@ tickers = df["Ticker"].dropna().unique()
 print(f"📈 Trovati {len(tickers)} ticker intraday.")
 # endregion
 
-# region === Estrai dati fondamentali dal file intraday ===
-# Prendi i valori univoci per ticker (prima riga)
+# region === Estrai dati fondamentali ===
 fundamentals_dict = {}
 for ticker in tickers:
     dft = df[df["Ticker"] == ticker]
     if not dft.empty:
         first_row = dft.iloc[0]
         
-        # Gestisci Gain_% (se è 0.523, moltiplica per 100)
+        # Gestisci Gain_%
         gain_raw = first_row.get("Gain_%", None)
         if gain_raw is not None and pd.notna(gain_raw):
-            if gain_raw < 10:  # Probabilmente è in formato decimale (0.523)
+            if gain_raw < 10:
                 gain_pct = round(gain_raw * 100)
             else:
                 gain_pct = round(gain_raw)
@@ -93,14 +67,6 @@ for ticker in tickers:
             "Float Shares": first_row.get("Float Shares", None),
             "Shares Outstanding": first_row.get("Shares Outstanding", None)
         }
-
-# Debug
-print("\n🔍 Verifica dati estratti (primo ticker):")
-first_ticker = tickers[0] if len(tickers) > 0 else None
-if first_ticker:
-    print(f"   Ticker: {first_ticker}")
-    for k, v in fundamentals_dict[first_ticker].items():
-        print(f"   {k}: {v}")
 # endregion
 
 # === Funzioni di calcolo ===
@@ -150,10 +116,11 @@ for ticker in tickers:
     pm_start_dt = datetime.combine(max_date - timedelta(days=1), time(16, 0))
     pm_end_dt = datetime.combine(max_date, time(9, 29))
 
-    # Filtra Pre-Market e Regular Session
+    # Filtra Pre-Market
     pm_df = dft[(dft["Datetime"] >= pm_start_dt) & (dft["Datetime"] <= pm_end_dt)].copy()
     pm_df = pm_df[~pm_df["Datetime"].dt.strftime("%H:%M").isin(["04:00", "04:01"])]
 
+    # Filtra Regular Session
     if "Session" in day_df.columns:
         rh_df = day_df[
             (day_df["Datetime"] >= rh_start_dt) &
@@ -166,7 +133,7 @@ for ticker in tickers:
             (day_df["Datetime"] <= rh_end_dt)
         ].copy()
 
-    # Correggi Open 09:30 Regular con Open Pre-Market 09:30
+    # Correggi Open 09:30
     if "Session" in dft.columns and not rh_df.empty:
         pm_930 = dft[
             (dft["Datetime"].dt.time == time(9, 30)) &
@@ -181,10 +148,9 @@ for ticker in tickers:
     if rh_df.empty and pm_df.empty:
         continue
 
-    # Prendi i dati fondamentali
     fund_data = fundamentals_dict.get(ticker, {})
     
-    # Calcola GAP% (variazione tra Price_Gain_Giorno e Open di oggi)
+    # Calcola GAP%
     price_gain_day = fund_data.get("Price_Gain_Giorno")
     open_today = None
     
@@ -196,7 +162,7 @@ for ticker in tickers:
     if price_gain_day and open_today and price_gain_day > 0:
         gap_pct = ((open_today - price_gain_day) / price_gain_day) * 100
 
-    # Costruisci riga
+    # Costruisci riga base
     row = {
         "Ticker": ticker,
         "Date": max_date,
@@ -212,7 +178,7 @@ for ticker in tickers:
         "Shares Outstanding": fund_data.get("Shares Outstanding")
     }
 
-    # --- Calcolo VWAP ---
+    # --- VWAP ---
     if not rh_df.empty:
         rh_df_vwap = calc_vwap(rh_df)
         target_dt = datetime.combine(max_date, time(9, 30))
@@ -248,20 +214,34 @@ for ticker in tickers:
             "TimeLow": time_low
         })
         
-        # Volume totale Regular (da 09:31 in poi)
         rh_vol_df = rh_df[rh_df["Datetime"] > datetime.combine(max_date, time(9, 30))].copy()
         row["Volume"] = int(rh_vol_df["Volume"].sum()) if not rh_vol_df.empty else 0
     else:
         row.update({"Open": None, "High": None, "Low": None, "Close": None, "Volume": 0, "TimeHigh": None, "TimeLow": None})
         rh_vol_df = pd.DataFrame()
 
-    # --- Pre-market ---
+    # --- PRE-MARKET (con VolumePM corretto) ---
     if not pm_df.empty:
-        volpm_row = dft[dft["Datetime"].dt.time == time(9, 30)]
-        volpm = int(volpm_row["Volume"].iloc[0]) if not volpm_row.empty else 0
+        # Cerca il volume alle 09:30 con Session = Pre-Market
+        volpm_row = pd.DataFrame()
+        
+        if "Session" in dft.columns:
+            volpm_row = dft[
+                (dft["Datetime"].dt.time == time(9, 30)) & 
+                (dft["Session"].astype(str).str.contains("Pre-Market", case=False, na=False))
+            ]
+        
+        if volpm_row.empty:
+            volpm_row = dft[dft["Datetime"].dt.time == time(9, 30)]
+        
+        if not volpm_row.empty:
+            volpm = int(volpm_row["Volume"].iloc[0])
+        else:
+            volpm = int(pm_df["Volume"].iloc[-1]) if not pm_df.empty else 0
 
         openpm = pm_df.iloc[0]["Open"]
         highpm, lowpm, closepm = pm_df["High"].max(), pm_df["Low"].min(), pm_df["Close"].iloc[-1]
+        
         row.update({
             "OpenPM": round(openpm, 2),
             "HighPM": round(highpm, 2),
@@ -269,6 +249,7 @@ for ticker in tickers:
             "ClosePM": round(closepm, 2),
             "VolumePM": volpm
         })
+        
         try:
             high_pm_rows = pm_df[pm_df["High"] == highpm].sort_values("Datetime")
             row["TimePMH"] = high_pm_rows.iloc[0]["Datetime"].strftime("%Y-%m-%d %H:%M:%S") if not high_pm_rows.empty else None
@@ -293,7 +274,6 @@ for ticker in tickers:
         row[f"Low_{m}m"] = round(l, 2) if pd.notnull(l) else None
         row[f"Volume_{m}m"] = int(v)
         
-        # Close a X minuti
         if not rh_df.empty:
             target_dt = rh_start_dt + timedelta(minutes=m)
             close_row = rh_df.iloc[(rh_df["Datetime"] - target_dt).abs().argsort()[:1]]
@@ -348,10 +328,3 @@ df_final = df_final[final_columns]
 df_final.to_excel(output_path, index=False)
 print(f"\n✅ File riepilogativo salvato: {output_path}")
 print(f"📊 Totale ticker: {len(df_final)}")
-
-# Anteprima
-print("\n🔍 Anteprima prime righe:")
-preview_cols = ["Ticker", "Gain_%", "Price_Gain_Giorno", "GAP_%", "Open", "Close"]
-preview_cols = [c for c in preview_cols if c in df_final.columns]
-if preview_cols:
-    print(df_final[preview_cols].head(10).to_string(index=False))
