@@ -35,14 +35,19 @@ jobs:
         run: echo "day=$(date -u +%w)" >> $GITHUB_OUTPUT
 
       # =========================
-      # STEP 1 — FINVIZ + DAILY
+      # STEP 1 — FINVIZ STANDARD (gap)
       # =========================
-      - name: Run Finviz
+      - name: Run Finviz Gapper
         run: python script1_finviz.py
 
+      # =========================
+      # STEP 1b — FINVIZ D2 (gainers)
+      # =========================
+      - name: Run Finviz Gainers
+        run: python D2_script1_gainfinviz.py
 
       # =========================
-      # STEP 2 — INTRADAY STANDARD
+      # STEP 2 — INTRADAY STANDARD (gap)
       # Martedì → Sabato (2–6)
       # =========================
       - name: Intraday STANDARD
@@ -54,16 +59,16 @@ jobs:
         run: python script4_aggrega_bk25112025.py
 
       # =========================
-      # STEP 3 — INTRADAY D2
-      # Mercoledì → Domenica (0,3,4,5,6)
+      # STEP 3 — INTRADAY D2 (gainers)
+      # Martedì → Sabato (2–6) - stessa schedulazione dello standard
       # =========================
-      - name: Intraday D2
-        if: ${{ contains(fromJson('[0,3,4,5,6]'), steps.day.outputs.day) }}
-        run: python script2_D2_yfinance_1m.py
+      - name: Intraday D2 (gainers)
+        if: ${{ contains(fromJson('[2,3,4,5,6]'), steps.day.outputs.day) }}
+        run: python D2_script2_yfinance_1m.py
 
-      - name: Aggregazione D2
-        if: ${{ contains(fromJson('[0,3,4,5,6]'), steps.day.outputs.day) }}
-        run: python script4_D2_aggrega.py
+      - name: Aggregazione D2 (gainers)
+        if: ${{ contains(fromJson('[2,3,4,5,6]'), steps.day.outputs.day) }}
+        run: python D2_script3_aggrega.py
 
       # =========================
       # STEP 4 — COMMIT OUTPUT
@@ -95,18 +100,19 @@ jobs:
           echo "Uploading files for ${DATE}..."
           rclone copy "output/intraday" "gdrive:Estrazioni finiviz yfinance/intraday" \
             --create-empty-src-dirs -v
+          rclone copy "output" "gdrive:Estrazioni finiviz yfinance/output" \
+            --include "tickers_*.csv" \
+            --include "gainers_*.csv" \
+            --create-empty-src-dirs -v
 
       # =========================
       # STEP 6 — TRIGGER PER APPS SCRIPT
       # =========================
-
-
       - name: Trigger Apps Script
         run: |
           curl -X POST "${{ secrets.APPS_SCRIPT_URL }}" \
           -H "Content-Type: application/json" \
           -d '{"event":"github_done"}'
-
 
       # =========================
       # STEP 7 — READY FLAG (FONDAMENTALE)
