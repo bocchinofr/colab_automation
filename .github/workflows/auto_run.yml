@@ -2,7 +2,7 @@ name: Full Intraday Pipeline (Finviz → Intraday → Aggregation → Drive)
 
 on:
   schedule:
-    - cron: '17 3 * * *'  # ogni giorno, orario NON round per evitare congestione
+    - cron: '17 3 * * *'
   workflow_dispatch:
 
 jobs:
@@ -10,9 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # =========================
-      # SETUP
-      # =========================
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
@@ -27,29 +24,16 @@ jobs:
         run: |
           pip install finvizfinance yfinance openpyxl pandas
 
-      # =========================
-      # GIORNO SETTIMANA (UTC)
-      # =========================
       - name: Calcola giorno settimana
         id: day
         run: echo "day=$(date -u +%w)" >> $GITHUB_OUTPUT
 
-      # =========================
-      # STEP 1 — FINVIZ STANDARD (gap)
-      # =========================
       - name: Run Finviz Gapper
         run: python script1_finviz.py
 
-      # =========================
-      # STEP 1b — FINVIZ D2 (gainers)
-      # =========================
       - name: Run Finviz Gainers
         run: python D2_script1_gainfinviz.py
 
-      # =========================
-      # STEP 2 — INTRADAY STANDARD (gap)
-      # Martedì → Sabato (2–6)
-      # =========================
       - name: Intraday STANDARD
         if: ${{ contains(fromJson('[2,3,4,5,6]'), steps.day.outputs.day) }}
         run: python script2_yfinance_1m.py
@@ -58,10 +42,6 @@ jobs:
         if: ${{ contains(fromJson('[2,3,4,5,6]'), steps.day.outputs.day) }}
         run: python script4_aggrega_bk25112025.py
 
-      # =========================
-      # STEP 3 — INTRADAY D2 (gainers)
-      # Martedì → Sabato (2–6) - stessa schedulazione dello standard
-      # =========================
       - name: Intraday D2 (gainers)
         if: ${{ contains(fromJson('[2,3,4,5,6]'), steps.day.outputs.day) }}
         run: python D2_script2_yfinance_1m.py
@@ -70,9 +50,6 @@ jobs:
         if: ${{ contains(fromJson('[2,3,4,5,6]'), steps.day.outputs.day) }}
         run: python D2_script3_aggrega.py
 
-      # =========================
-      # STEP 4 — COMMIT OUTPUT
-      # =========================
       - name: Commit output
         run: |
           git config --global user.name "bocchinofr"
@@ -81,9 +58,6 @@ jobs:
           git commit -m "📊 Full pipeline output $(date -u)" || echo "Nothing to commit"
           git push
 
-      # =========================
-      # STEP 5 — UPLOAD GOOGLE DRIVE
-      # =========================
       - name: Install rclone
         run: |
           sudo apt-get update
@@ -94,29 +68,45 @@ jobs:
           mkdir -p ~/.config/rclone
           echo '${{ secrets.RCLONE_CONF }}' > ~/.config/rclone/rclone.conf
 
-      - name: Upload to Google Drive
+      - name: Upload to Google Drive (solo file odierni)
         run: |
-          DATE=$(date +'%Y-%m-%d')
-          echo "Uploading files for ${DATE}..."
-          rclone copy "output/intraday" "gdrive:Estrazioni finiviz yfinance/intraday" \
-            --create-empty-src-dirs -v
-          rclone copy "output" "gdrive:Estrazioni finiviz yfinance/output" \
-            --include "tickers_*.csv" \
-            --include "gainers_*.csv" \
-            --create-empty-src-dirs -v
+          DATE=$(date -u +'%Y-%m-%d')
+          echo "📅 Caricamento solo file con data: ${DATE}"
+          
+          mkdir -p temp_upload/intraday
+          mkdir -p temp_upload/output
+          
+          # File intraday
+          if [ -d "output/intraday" ]; then
+            find output/intraday -type f -name "*${DATE}*" -exec cp {} temp_upload/intraday/ \;
+            COUNT=$(ls temp_upload/intraday/ 2>/dev/null | wc -l)
+            echo "✅ File intraday da caricare: $COUNT"
+          fi
+          
+          # File output principali
+          if [ -d "output" ]; then
+            find output -maxdepth 1 -type f \( -name "tickers_*${DATE}*.csv" -o -name "gainers_*${DATE}*.csv" \) -exec cp {} temp_upload/output/ \;
+            COUNT=$(ls temp_upload/output/ 2>/dev/null | wc -l)
+            echo "✅ File output da caricare: $COUNT"
+          fi
+          
+          # Upload
+          if [ "$(ls -A temp_upload/intraday 2>/dev/null)" ] || [ "$(ls -A temp_upload/output 2>/dev/null)" ]; then
+            rclone copy "temp_upload/intraday" "gdrive:Estrazioni finiviz yfinance/intraday" -v
+            rclone copy "temp_upload/output" "gdrive:Estrazioni finiviz yfinance/output" -v
+            echo "✅ Upload completato"
+          else
+            echo "⚠️ Nessun file trovato per ${DATE}"
+          fi
+          
+          rm -rf temp_upload
 
-      # =========================
-      # STEP 6 — TRIGGER PER APPS SCRIPT
-      # =========================
       - name: Trigger Apps Script
         run: |
           curl -X POST "${{ secrets.APPS_SCRIPT_URL }}" \
           -H "Content-Type: application/json" \
           -d '{"event":"github_done"}'
 
-      # =========================
-      # STEP 7 — READY FLAG (FONDAMENTALE)
-      # =========================
       - name: Mark ready
         run: |
           echo "done $(date -u)" > output/_READY.txt
