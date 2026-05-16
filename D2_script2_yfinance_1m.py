@@ -185,7 +185,7 @@ output_dir = "output/intraday"
 os.makedirs(output_dir, exist_ok=True)
 
 df_final = pd.DataFrame(final_rows)
-output_path = os.path.join(output_dir, f"D2_gainers_1myfinance.xlsx")
+output_path = os.path.join(output_dir, f"D2_gainers_1myfinance_{date_str}.xlsx")
 df_final.to_excel(output_path, index=False)
 
 print(f"\n✅ File salvato: {output_path}")

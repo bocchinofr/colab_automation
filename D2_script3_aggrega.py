@@ -8,7 +8,7 @@ today = datetime.now()
 date_str = today.strftime("%Y-%m-%d")
 
 # Legge il file generato da D2_script2_yfinance_1m.py
-input_path = f"output/intraday/D2_gainers_1myfinance.xlsx"
+input_path = f"output/intraday/D2_gainers_1myfinance_{date_str}.xlsx"
 output_dir = "output/intraday"
 output_path = os.path.join(output_dir, f"D2_riepilogo_intraday_{date_str}.xlsx")
 
