@@ -9,7 +9,7 @@ import os
 # ------------------------
 today = datetime.now()
 yesterday = today - timedelta(days=1)
-intraday_date = yesterday  # I dati intraday sono di ieri (giorno dopo il gain)
+intraday_date = yesterday
 
 date_str = today.strftime("%Y-%m-%d")
 yesterday_str = yesterday.strftime("%Y-%m-%d")
@@ -17,7 +17,7 @@ intraday_date_str = intraday_date.strftime("%Y-%m-%d")
 
 print(f"📅 Oggi: {date_str}")
 print(f"📂 Leggo file gainers di ieri: {yesterday_str}")
-print(f"🎯 Recupero dati intraday per: {intraday_date_str} (giorno dopo il gain)")
+print(f"🎯 Recupero dati intraday per: {intraday_date_str}")
 
 # ------------------------
 # 📥 Legge ticker dal file gainers di ieri
@@ -27,35 +27,13 @@ ticker_file = os.path.join(input_dir, f"gainers_{yesterday_str}.csv")
 
 if not os.path.exists(ticker_file):
     print(f"❌ File non trovato: {ticker_file}")
-    print(f"💡 Assicurati di aver eseguito D2_script1_gainfinviz.py ieri")
     exit(1)
 
 df_tickers = pd.read_csv(ticker_file)
 tickers = df_tickers['Ticker'].dropna().unique().tolist()
-
-# Crea un dizionario con i dati Finviz per ogni ticker
 finviz_map = df_tickers.set_index('Ticker').to_dict('index')
 
-print(f"📊 Trovati {len(tickers)} ticker nel file gainers_{yesterday_str}.csv")
-
-# ------------------------
-# Funzione per convertire valori Finviz
-# ------------------------
-def parse_finviz_shares(x):
-    if x is None or x == '' or pd.isna(x):
-        return None
-    x = str(x).replace(',', '').replace('$', '').strip()
-    if x.endswith('M'):
-        return float(x[:-1]) * 1e6
-    elif x.endswith('B'):
-        return float(x[:-1]) * 1e9
-    elif x.endswith('K'):
-        return float(x[:-1]) * 1e3
-    else:
-        try:
-            return float(x)
-        except:
-            return None
+print(f"📊 Trovati {len(tickers)} ticker")
 
 # ------------------------
 # Lista per risultati finali
@@ -67,7 +45,7 @@ for ticker in tickers:
     stock = yf.Ticker(ticker)
 
     # ------------------------
-    # Dati fondamentali (dal file Finviz - relativi al giorno del gain)
+    # Dati fondamentali - INCLUSO SECTOR, INDUSTRY, COUNTRY
     # ------------------------
     fundamentals = {
         "Ticker": ticker,
@@ -77,23 +55,19 @@ for ticker in tickers:
         "Volume_Gain_Giorno": finviz_map.get(ticker, {}).get("Volume"),
         "Short Float": finviz_map.get(ticker, {}).get("Short Float"),
         "Insider Own": finviz_map.get(ticker, {}).get("Insider Own"),
-        "Inst Own": finviz_map.get(ticker, {}).get("Inst Own")
+        "Inst Own": finviz_map.get(ticker, {}).get("Inst Own"),
+        "Float Shares": finviz_map.get(ticker, {}).get("Float Shares"),
+        "Shares Outstanding": finviz_map.get(ticker, {}).get("Shares Outstanding"),
+        # 🆕 NUOVE COLONNE
+        "Sector": finviz_map.get(ticker, {}).get("Sector"),
+        "Industry": finviz_map.get(ticker, {}).get("Industry"),
+        "Country": finviz_map.get(ticker, {}).get("Country")
     }
     
-    # Opzionale: recupera float shares da yfinance
-    try:
-        info = stock.info
-        fundamentals["Float Shares"] = info.get("floatShares")
-        fundamentals["Shares Outstanding"] = info.get("sharesOutstanding")
-    except:
-        fundamentals["Float Shares"] = None
-        fundamentals["Shares Outstanding"] = None
-
     # ------------------------
-    # Dati intraday 1 minuto per il giorno dopo il gain (intraday_date)
+    # Dati intraday (stessa logica di prima)
     # ------------------------
     try:
-        # Scarica i dati per il giorno dopo il gain
         start_date = intraday_date_str
         end_date = (intraday_date + timedelta(days=1)).strftime('%Y-%m-%d')
         
@@ -101,29 +75,25 @@ for ticker in tickers:
             start=start_date,
             end=end_date,
             interval="1m",
-            prepost=True  # include pre-market e after-hours
+            prepost=True
         )
 
         if hist_1m.empty:
-            print(f"⚠️ Nessun dato intraday 1m per {ticker} in data {intraday_date_str}")
+            print(f"⚠️ Nessun dato per {ticker}")
             continue
 
-        # Gestione fuso orario
         if hist_1m.index.tz is None:
             hist_1m.index = hist_1m.index.tz_localize("UTC").tz_convert("America/New_York")
         else:
             hist_1m.index = hist_1m.index.tz_convert("America/New_York")
 
-        # Filtra solo la data target (giorno dopo il gain)
         hist_1m = hist_1m[hist_1m.index.date == intraday_date.date()]
 
         if hist_1m.empty:
             print(f"⚠️ Nessun dato per {ticker} nella data {intraday_date_str}")
             continue
 
-        # ------------------------
-        # Pre-Market: 04:00 - 09:30 ET
-        # ------------------------
+        # Pre-Market
         pre_market = hist_1m.between_time("04:00", "09:30").copy()
         last_pm_close = None
 
@@ -147,13 +117,10 @@ for ticker in tickers:
             })
             final_rows.append(data)
 
-        # ------------------------
-        # Mercato Regolare: 09:30 - 16:00 ET
-        # ------------------------
+        # Regular Market
         regular_market = hist_1m.between_time("09:30", "16:00").copy()
         regular_market.index = regular_market.index.tz_localize(None)
 
-        # Sostituisci l'open del primo minuto con l'ultimo pre-market se disponibile
         if last_pm_close is not None and not regular_market.empty:
             first_idx = regular_market.index[0]
             regular_market.loc[first_idx, "Open"] = last_pm_close
@@ -172,14 +139,14 @@ for ticker in tickers:
             })
             final_rows.append(data)
 
-        print(f"✅ {ticker} - {len(pre_market)} righe Pre-Market, {len(regular_market)} righe Regular")
+        print(f"✅ {ticker} - {len(pre_market)} PM, {len(regular_market)} REG")
 
     except Exception as e:
-        print(f"⚠️ Errore dati intraday {ticker}: {e}")
+        print(f"⚠️ Errore {ticker}: {e}")
         continue
 
 # ------------------------
-# Salva file Excel
+# Salva
 # ------------------------
 output_dir = "output/intraday"
 os.makedirs(output_dir, exist_ok=True)
@@ -190,4 +157,4 @@ df_final.to_excel(output_path, index=False)
 
 print(f"\n✅ File salvato: {output_path}")
 print(f"📊 Totale righe: {len(df_final)}")
-print(f"📈 Ticker processati: {df_final['Ticker'].nunique()}")
+print(f"📈 Ticker: {df_final['Ticker'].nunique()}")
