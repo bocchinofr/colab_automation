@@ -24,7 +24,7 @@ except FileNotFoundError:
     raise FileNotFoundError(f"❌ File non trovato: {input_path}")
 
 # Standardizza nomi colonne
-df.columns = [c[0].upper() + c[1:].lower() if isinstance(c, str) else c for c in df.columns]
+#df.columns = [c[0].upper() + c[1:].lower() if isinstance(c, str) else c for c in df.columns]
 
 df["Datetime"] = pd.to_datetime(df["Datetime"], errors="coerce")
 df = df.dropna(subset=["Datetime"]).copy()
