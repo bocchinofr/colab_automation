@@ -62,6 +62,7 @@ if df_screen is not None and not df_screen.empty:
         print("📊 Recupero dati fondamentali...")
         
         shs_float_list = []
+        shs_outstanding_list = []  # 🆕 NUOVA LISTA per Shares Outstanding
         insider_own_list = []
         inst_own_list = []
         short_float_list = []
@@ -72,6 +73,7 @@ if df_screen is not None and not df_screen.empty:
                 stock_fundament = stock.ticker_fundament()
                 
                 shs_float_list.append(stock_fundament.get("Shs Float"))
+                shares_outstanding_list.append(stock_fundament.get("Shs Outstand"))  # 🆕 Recupera Shares Outstanding
                 insider_own_list.append(stock_fundament.get("Insider Own"))
                 inst_own_list.append(stock_fundament.get("Inst Own"))
                 short_float_list.append(stock_fundament.get("Short Float"))
@@ -81,6 +83,7 @@ if df_screen is not None and not df_screen.empty:
             except Exception as e:
                 print(f"\n⚠️ Errore {ticker}: {e}")
                 shs_float_list.append(None)
+                shs_outstand_list.append(None)  # 🆕 Aggiungi None in caso di errore
                 insider_own_list.append(None)
                 inst_own_list.append(None)
                 short_float_list.append(None)
@@ -89,6 +92,7 @@ if df_screen is not None and not df_screen.empty:
         
         # 🔹 Aggiungi colonne
         df_screen["Shs Float"] = shs_float_list
+        df_screen["Shares Outstanding"] = shs_outstand_list  # 🆕 NUOVA COLONNA
         df_screen["Insider Own"] = insider_own_list
         df_screen["Inst Own"] = inst_own_list
         df_screen["Short Float"] = short_float_list
@@ -110,7 +114,7 @@ if df_screen is not None and not df_screen.empty:
         
         # 🔹 Mostra anteprima
         print("\n🏆 TOP 10:")
-        cols_show = ["Ticker", "Price", "Gain_%", "Volume", "Market Cap"]
+        cols_show = ["Ticker", "Price", "Gain_%", "Volume", "Market Cap", "Shares Outstanding"]  # 🆕 Aggiunta Shares Outstanding
         print(df_screen[cols_show].head(10).to_string(index=False))
         
 else:
