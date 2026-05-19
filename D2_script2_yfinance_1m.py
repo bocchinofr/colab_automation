@@ -29,11 +29,40 @@ if not os.path.exists(ticker_file):
     print(f"❌ File non trovato: {ticker_file}")
     exit(1)
 
+# 🆕 FUNZIONE DI CONVERSIONE
+def convert_finviz_number(value):
+    """Converte stringhe tipo '101.31M' o '1.5B' in interi"""
+    if pd.isna(value) or value is None or value == '':
+        return None
+    if isinstance(value, (int, float)):
+        return int(value) if not pd.isna(value) else None
+    
+    value_str = str(value).strip().upper()
+    
+    try:
+        if value_str.endswith('B'):
+            return int(float(value_str[:-1]) * 1_000_000_000)
+        elif value_str.endswith('M'):
+            return int(float(value_str[:-1]) * 1_000_000)
+        elif value_str.endswith('K'):
+            return int(float(value_str[:-1]) * 1_000)
+        else:
+            return int(float(value_str))
+    except (ValueError, TypeError):
+        return None
+
 df_tickers = pd.read_csv(ticker_file)
+
+# 🆕 CONVERSIONE colonne con suffisso
+for col in ['Shs Float', 'Shares Outstanding', 'Market Cap', 'Volume']:
+    if col in df_tickers.columns:
+        df_tickers[col] = df_tickers[col].apply(convert_finviz_number)
+
 tickers = df_tickers['Ticker'].dropna().unique().tolist()
 finviz_map = df_tickers.set_index('Ticker').to_dict('index')
 
 print(f"📊 Trovati {len(tickers)} ticker")
+
 
 # ------------------------
 # Lista per risultati finali
@@ -53,10 +82,10 @@ for ticker in tickers:
         "Gain_%": finviz_map.get(ticker, {}).get("Gain_%"),
         "Price_Gain_Giorno": finviz_map.get(ticker, {}).get("Price"),
         "Volume_Gain_Giorno": finviz_map.get(ticker, {}).get("Volume"),
-        "Short Float": finviz_map.get(ticker, {}).get("Short Float"),
+        "Shs Float": finviz_map.get(ticker, {}).get("Shs Float"),
         "Insider Own": finviz_map.get(ticker, {}).get("Insider Own"),
         "Inst Own": finviz_map.get(ticker, {}).get("Inst Own"),
-        "Float Shares": finviz_map.get(ticker, {}).get("Float Shares"),
+        "Short Float": finviz_map.get(ticker, {}).get("Short Float"),
         "Shares Outstanding": finviz_map.get(ticker, {}).get("Shares Outstanding"),
         # 🆕 NUOVE COLONNE
         "Sector": finviz_map.get(ticker, {}).get("Sector"),

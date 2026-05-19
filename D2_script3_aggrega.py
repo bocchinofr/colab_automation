@@ -64,7 +64,7 @@ for ticker in tickers:
             "Short Float": first_row.get("Short Float", None),
             "Insider Own": first_row.get("Insider Own", None),
             "Inst Own": first_row.get("Inst Own", None),
-            "Float Shares": first_row.get("Float Shares", None),
+            "Shs Float": first_row.get("Shs Float", None),
             "Shares Outstanding": first_row.get("Shares Outstanding", None)
         }
 # endregion
@@ -174,7 +174,7 @@ for ticker in tickers:
         "Short Float": fund_data.get("Short Float"),
         "Insider Own": fund_data.get("Insider Own"),
         "Inst Own": fund_data.get("Inst Own"),
-        "Float Shares": fund_data.get("Float Shares"),
+        "Shs Float": fund_data.get("Shs Float"),
         "Shares Outstanding": fund_data.get("Shares Outstanding")
     }
 
@@ -311,7 +311,7 @@ close_time_cols = [f"Close_{label}" for label in time_targets.keys()]
 cols_fixed = [
     "Ticker", "Date",
     "Market Cap", "Gain_%", "Price_Gain_Giorno", "Volume_Gain_Giorno", "GAP_%",
-    "Short Float", "Insider Own", "Inst Own", "Float Shares", "Shares Outstanding",
+    "Short Float", "Insider Own", "Inst Own", "Shs Float", "Shares Outstanding",
     "VWAP_0930",
     "Open", "High", "Low", "Close", "Volume",
     "TimeHigh", "TimeLow",

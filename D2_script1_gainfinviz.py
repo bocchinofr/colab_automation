@@ -62,7 +62,7 @@ if df_screen is not None and not df_screen.empty:
         print("📊 Recupero dati fondamentali...")
         
         shs_float_list = []
-        shs_outstanding_list = []  # 🆕 NUOVA LISTA per Shares Outstanding
+        shs_outstand_list = []  # 🆕 NUOVA LISTA per Shares Outstanding
         insider_own_list = []
         inst_own_list = []
         short_float_list = []
@@ -73,7 +73,7 @@ if df_screen is not None and not df_screen.empty:
                 stock_fundament = stock.ticker_fundament()
                 
                 shs_float_list.append(stock_fundament.get("Shs Float"))
-                shares_outstanding_list.append(stock_fundament.get("Shs Outstand"))  # 🆕 Recupera Shares Outstanding
+                shs_outstand_list.append(stock_fundament.get("Shs Outstand"))  # 🆕 Recupera Shares Outstanding
                 insider_own_list.append(stock_fundament.get("Insider Own"))
                 inst_own_list.append(stock_fundament.get("Inst Own"))
                 short_float_list.append(stock_fundament.get("Short Float"))
