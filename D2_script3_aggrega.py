@@ -95,13 +95,15 @@ def calc_vwap(df):
 final_data = []
 intervals = [1, 5, 15, 30, 45, 60, 90, 120, 240]
 
-time_targets = {
-    "0930": time(9, 30), "1000": time(10, 0), "1030": time(10, 30),
-    "1100": time(11, 0), "1130": time(11, 30), "1200": time(12, 0),
-    "1230": time(12, 30), "1300": time(13, 0), "1330": time(13, 30),
-    "1400": time(14, 0), "1430": time(14, 30), "1500": time(15, 0),
-    "1530": time(15, 30), "1600": time(16, 0)
-}
+window_intervals = [
+    ("5_15m",   5,  15),
+    ("15_30m",  15, 30),
+    ("30_45m",  30, 45),
+    ("45_60m",  45, 60),
+    ("60_90m",  60, 90),
+    ("90_120m", 90, 120),
+    ("120_240m",120, 240),
+]
 
 for ticker in tickers:
     dft = df[df["Ticker"] == ticker].copy()
@@ -281,15 +283,18 @@ for ticker in tickers:
         else:
             row[f"Close_{m}m"] = None
 
-    # --- Close per orari specifici ---
+    # --- High/Low per finestre temporali ---
     if not rh_df.empty:
-        for label, t in time_targets.items():
-            target_dt = datetime.combine(max_date, t)
-            close_row = rh_df.iloc[(rh_df["Datetime"] - target_dt).abs().argsort()[:1]]
-            row[f"Close_{label}"] = round(close_row["Close"].iloc[0], 2) if not close_row.empty else None
+        for label, start_m, end_m in window_intervals:
+            start_dt = rh_start_dt + timedelta(minutes=start_m)
+            end_dt   = rh_start_dt + timedelta(minutes=end_m)
+            window_df = rh_df[(rh_df["Datetime"] > start_dt) & (rh_df["Datetime"] <= end_dt)]
+            row[f"High_{label}"] = round(window_df["High"].max(), 2) if not window_df.empty else None
+            row[f"Low_{label}"]  = round(window_df["Low"].min(),  2) if not window_df.empty else None
     else:
-        for label in time_targets.keys():
-            row[f"Close_{label}"] = None
+        for label, _, _ in window_intervals:
+            row[f"High_{label}"] = None
+            row[f"Low_{label}"]  = None
 
     final_data.append(row)
 
@@ -306,8 +311,10 @@ intraday_blocks = []
 for m in intervals:
     intraday_blocks.extend([f"High_{m}m", f"Low_{m}m", f"Volume_{m}m", f"Close_{m}m"])
 
-close_time_cols = [f"Close_{label}" for label in time_targets.keys()]
-
+window_cols = []
+for label, _, _ in window_intervals:
+    window_cols.extend([f"High_{label}", f"Low_{label}"])
+    
 cols_fixed = [
     "Ticker", "Date",
     "Market Cap", "Gain_%", "Price_Gain_Giorno", "Volume_Gain_Giorno", "GAP_%",
@@ -320,7 +327,7 @@ cols_fixed = [
 
 final_columns = [c for c in cols_fixed if c in df_final.columns]
 final_columns += [c for c in intraday_blocks if c in df_final.columns]
-final_columns += [c for c in close_time_cols if c in df_final.columns]
+final_columns += [c for c in window_cols if c in df_final.columns]
 
 df_final = df_final[final_columns]
 
