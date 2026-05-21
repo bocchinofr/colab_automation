@@ -35,6 +35,11 @@ for col in ["Open", "High", "Low", "Close", "Volume"]:
     if col in df.columns:
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
+for col in ["Short Float", "Insider Own", "Inst Own"]:
+    if col in df.columns:
+        df[col] = df[col].astype(str).str.replace("%", "", regex=False).str.strip()
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+
 tickers = df["Ticker"].dropna().unique()
 print(f"📈 Trovati {len(tickers)} ticker intraday.")
 # endregion
