@@ -1,0 +1,6 @@
+Ticker,Company,Sector,Industry,Country,Market Cap,P/E,Price,Volume,Gain_%,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float
+NCPL,Netcapital Inc,Financial,Capital Markets,USA,6440000.0,,0.82,137668194,0.8066,4.38M,6.85M,44.13%,2.49%,2.36%
+ATPC,Agape ATP Corp,Consumer Defensive,Packaged Foods,Malaysia,3590000.0,,3.59,46990243,0.7177,0.47M,1.00M,52.57%,2.62%,2.06%
+PCLA,PicoCELA Inc ADR,Communication Services,Telecom Services,Japan,77890000.0,,2.25,28361226,0.607,34.14M,34.62M,1.39%,0.02%,0.02%
+CODX,Co-Diagnostics Inc,Healthcare,Medical Devices,USA,13370000.0,,3.71,91144761,0.5523,3.42M,3.60M,4.98%,1.44%,2.77%
+NIVF,NewGenIvf Group Ltd,Healthcare,Medical Care Facilities,Thailand,640000.0,,1.12,93367022,0.5154,-,0.57M,0.00%,0.30%,-
