@@ -41,7 +41,7 @@ if df_screen is not None and not df_screen.empty:
             .astype(float)
         )
         
-        # 🔹 FILTRO: teniamo solo gain > 50%
+        # 🔹 FILTRO: teniamo solo gain > 30%
         df_screen = df_screen[df_screen["Gain_%"] > 0.3]
         print(f"📈 Di cui con gain > 50%: {len(df_screen)} ticker")
     
