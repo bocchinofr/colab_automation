@@ -98,7 +98,7 @@ if df_screen is not None and not df_screen.empty:
         df_screen["Short Float"] = short_float_list
         
         # 🔹 Rimuovi colonne inutili
-        cols_to_drop = ["Beta", "ATR", "SMA20", "SMA50", "SMA200", "52W High", "52W Low", "RSI", "Change from Open"]
+        cols_to_drop = ["Beta", "ATR", "SMA20", "SMA50", "SMA200", "52W High", "52W Low", "RSI"]
         cols_to_drop = [c for c in cols_to_drop if c in df_screen.columns]
         if cols_to_drop:
             df_screen = df_screen.drop(columns=cols_to_drop)
