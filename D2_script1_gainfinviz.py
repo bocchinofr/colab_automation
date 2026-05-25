@@ -17,7 +17,7 @@ output_file = os.path.join(output_dir, f"gainers_{date_str}.csv")
 filters_dict = {
     "Market Cap.": "-Small (under $2bln)",   # Small cap under 2B
     "Change": "Up 20%",                      # Prende tutti con gain > 20%
-    "Current Volume": "Over 5M"              # Volume > 5 milioni
+    "Current Volume": "Over 300K"            # Volume > 0.3 milioni
 }
 
 print("🔍 Avvio scansione Finviz...")
