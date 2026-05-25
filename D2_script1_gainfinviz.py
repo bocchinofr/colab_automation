@@ -16,7 +16,7 @@ output_file = os.path.join(output_dir, f"gainers_{date_str}.csv")
 # 🔹 Filtri screener Finviz
 filters_dict = {
     "Market Cap.": "-Small (under $2bln)",   # Small cap under 2B
-    "Change": "Up 20%",                      # Prende tutti con gain > 20%
+    "Change from Open": "Up 20%",                      # Prende tutti con gain > 20%
     "Current Volume": "Over 300K"            # Volume > 0.3 milioni
 }
 
@@ -32,9 +32,9 @@ if df_screen is not None and not df_screen.empty:
     print(f"✅ Trovati {len(df_screen)} ticker con gain > 20%")
     
     # 🔹 Estrai percentuale gain
-    if "Change" in df_screen.columns:
+    if "Change from Open" in df_screen.columns:
         df_screen["Gain_%"] = (
-            df_screen["Change"]
+            df_screen["Change from Open"]
             .astype(str)
             .str.replace("%", "")
             .str.replace("+", "")
@@ -42,7 +42,7 @@ if df_screen is not None and not df_screen.empty:
         )
         
         # 🔹 FILTRO: teniamo solo gain > 50%
-        df_screen = df_screen[df_screen["Gain_%"] > 0.5]
+        df_screen = df_screen[df_screen["Gain_%"] > 0.3]
         print(f"📈 Di cui con gain > 50%: {len(df_screen)} ticker")
     
     if df_screen.empty:
@@ -98,7 +98,7 @@ if df_screen is not None and not df_screen.empty:
         df_screen["Short Float"] = short_float_list
         
         # 🔹 Rimuovi colonne inutili
-        cols_to_drop = ["Beta", "ATR", "SMA20", "SMA50", "SMA200", "52W High", "52W Low", "RSI", "Change"]
+        cols_to_drop = ["Beta", "ATR", "SMA20", "SMA50", "SMA200", "52W High", "52W Low", "RSI", "Change from Open"]
         cols_to_drop = [c for c in cols_to_drop if c in df_screen.columns]
         if cols_to_drop:
             df_screen = df_screen.drop(columns=cols_to_drop)
