@@ -50,27 +50,22 @@ for ticker in tickers:
     dft = df[df["Ticker"] == ticker]
     if not dft.empty:
         first_row = dft.iloc[0]
-        
-        # Gestisci Gain_%
-        gain_raw = first_row.get("Gain_%", None)
-        if gain_raw is not None and pd.notna(gain_raw):
-            if gain_raw < 10:
-                gain_pct = round(gain_raw * 100)
-            else:
-                gain_pct = round(gain_raw)
-        else:
-            gain_pct = None
-        
         fundamentals_dict[ticker] = {
             "Market Cap": first_row.get("Market Cap", None),
-            "Gain_%": gain_pct,
-            "Price_Gain_Giorno": first_row.get("Price_Gain_Giorno", None),
-            "Volume_Gain_Giorno": first_row.get("Volume_Gain_Giorno", None),
+            "d1_change_from_open": first_row.get("d1_change_from_open", None),
+            "d1_change": first_row.get("d1_change", None),
+            "d1_gap": first_row.get("d1_gap", None),
+            "Price_D1": first_row.get("Price_D1", None),
+            "Volume_D1": first_row.get("Volume_D1", None),
             "Short Float": first_row.get("Short Float", None),
             "Insider Own": first_row.get("Insider Own", None),
             "Inst Own": first_row.get("Inst Own", None),
             "Shs Float": first_row.get("Shs Float", None),
-            "Shares Outstanding": first_row.get("Shares Outstanding", None)
+            "Shares Outstanding": first_row.get("Shares Outstanding", None),
+            "Sector": first_row.get("Sector", None),
+            "Industry": first_row.get("Industry", None),
+            "Country": first_row.get("Country", None),
+            "D1_Source": first_row.get("D1_Source", None),
         }
 # endregion
 
@@ -157,32 +152,38 @@ for ticker in tickers:
 
     fund_data = fundamentals_dict.get(ticker, {})
     
-    # Calcola GAP%
-    price_gain_day = fund_data.get("Price_Gain_Giorno")
+    # Calcola D2_GAP% (open D2 vs close D1)
+    price_d1 = fund_data.get("Price_D1")
     open_today = None
     
     if not rh_df.empty:
         open_today = rh_df.loc[rh_df["Datetime"] == rh_start_dt, "Open"].iloc[0] \
             if any(rh_df["Datetime"] == rh_start_dt) else rh_df["Open"].iloc[0]
     
-    gap_pct = None
-    if price_gain_day and open_today and price_gain_day > 0:
-        gap_pct = ((open_today - price_gain_day) / price_gain_day) * 100
+    d2_gap_pct = None
+    if price_d1 and open_today and price_d1 > 0:
+        d2_gap_pct = ((open_today - price_d1) / price_d1) * 100
 
     # Costruisci riga base
     row = {
         "Ticker": ticker,
         "Date": max_date,
+        "D1_Source": fund_data.get("D1_Source"),
         "Market Cap": fund_data.get("Market Cap"),
-        "Gain_%": fund_data.get("Gain_%"),
-        "Price_Gain_Giorno": price_gain_day,
-        "Volume_Gain_Giorno": fund_data.get("Volume_Gain_Giorno"),
-        "GAP_%": round(gap_pct, 2) if gap_pct else None,
+        "d1_change_from_open": fund_data.get("d1_change_from_open"),
+        "d1_change": fund_data.get("d1_change"),
+        "d1_gap": fund_data.get("d1_gap"),
+        "Price_D1": price_d1,
+        "Volume_D1": fund_data.get("Volume_D1"),
+        "D2_GAP_%": round(d2_gap_pct, 2) if d2_gap_pct else None,
         "Short Float": fund_data.get("Short Float"),
         "Insider Own": fund_data.get("Insider Own"),
         "Inst Own": fund_data.get("Inst Own"),
         "Shs Float": fund_data.get("Shs Float"),
-        "Shares Outstanding": fund_data.get("Shares Outstanding")
+        "Shares Outstanding": fund_data.get("Shares Outstanding"),
+        "Sector": fund_data.get("Sector"),
+        "Industry": fund_data.get("Industry"),
+        "Country": fund_data.get("Country"),
     }
 
     # --- VWAP ---
@@ -322,8 +323,11 @@ for label, _, _ in window_intervals:
     
 cols_fixed = [
     "Ticker", "Date",
-    "Market Cap", "Gain_%", "Price_Gain_Giorno", "Volume_Gain_Giorno", "GAP_%",
+    "D1_Source", "Market Cap",
+    "d1_change_from_open", "d1_change", "d1_gap",
+    "Price_D1", "Volume_D1", "D2_GAP_%",
     "Short Float", "Insider Own", "Inst Own", "Shs Float", "Shares Outstanding",
+    "Sector", "Industry", "Country",
     "VWAP_0930",
     "Open", "High", "Low", "Close", "Volume",
     "TimeHigh", "TimeLow",
