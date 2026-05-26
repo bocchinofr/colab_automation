@@ -61,6 +61,10 @@ if df_screen is not None and not df_screen.empty:
     insider_own_list = []
     inst_own_list = []
     short_float_list = []
+    sector_list = []
+    industry_list = []
+    country_list = []
+    market_cap_list = []
 
     for idx, ticker in enumerate(df_screen["Ticker"], 1):
         try:
@@ -72,6 +76,10 @@ if df_screen is not None and not df_screen.empty:
             insider_own_list.append(stock_fundament.get("Insider Own"))
             inst_own_list.append(stock_fundament.get("Inst Own"))
             short_float_list.append(stock_fundament.get("Short Float"))
+            sector_list.append(stock_fundament.get("Sector"))
+            industry_list.append(stock_fundament.get("Industry"))
+            country_list.append(stock_fundament.get("Country"))
+            market_cap_list.append(stock_fundament.get("Market Cap"))
 
             print(f"  [{idx}/{len(df_screen)}] {ticker}", end="\r")
 
@@ -82,6 +90,10 @@ if df_screen is not None and not df_screen.empty:
             insider_own_list.append(None)
             inst_own_list.append(None)
             short_float_list.append(None)
+            sector_list.append(None)
+            industry_list.append(None)
+            country_list.append(None)
+            market_cap_list.append(None)
 
     print("\n")
 
@@ -91,6 +103,10 @@ if df_screen is not None and not df_screen.empty:
     df_screen["Insider Own"] = insider_own_list
     df_screen["Inst Own"] = inst_own_list
     df_screen["Short Float"] = short_float_list
+    df_screen["Sector"] = sector_list
+    df_screen["Industry"] = industry_list
+    df_screen["Country"] = country_list
+    df_screen["Market Cap"] = market_cap_list
 
     # 🔹 Rimuovi colonne inutili (Change NON rimosso)
     cols_to_drop = ["Beta", "ATR", "SMA20", "SMA50", "SMA200", "52W High", "52W Low", "RSI"]

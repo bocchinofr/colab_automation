@@ -1,0 +1,26 @@
+Ticker,Price,Change,Change from Open,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+RYOJ,5.0,1.4875999999999998,105.76,0.209,41283104,2.30M,11.55M,80.05%,0.04%,0.08%,Industrials,Consulting Services,Japan,57.75M
+AKTX,18.27,2.5545,84.17,0.93,34043124,1.14M,1.14M,0.40%,5.91%,1.42%,Healthcare,Biotechnology,USA,20.83M
+VCIG,1.33,0.6479,55.48,0.0598,31792472,4.57M,6.63M,13.13%,0.33%,3.97%,Industrials,Consulting Services,Malaysia,8.82M
+QTEX,0.73,1.4001,52.6,0.5728,788564736,41.91M,43.58M,3.82%,14.69%,2.16%,Technology,Computer Hardware,Israel,31.68M
+CODX,5.07,0.3666,51.12,-0.0957,10017872,3.42M,3.60M,4.98%,1.44%,2.77%,Healthcare,Medical Devices,USA,18.26M
+HYLN,5.99,0.4261999999999999,39.63,0.0214,20171480,123.47M,178.32M,30.76%,24.99%,11.23%,Consumer Cyclical,Auto Parts,USA,1.07B
+FJET,7.2,0.3981,37.67,0.0155,12461100,29.36M,44.17M,33.53%,6.60%,6.23%,Industrials,Aerospace & Defense,USA,318.05M
+UZX,0.45,0.293,32.97,-0.0275,3353991,2.37M,11.16M,78.81%,0.33%,0.47%,Consumer Cyclical,Internet Retail,Japan,4.98M
+FEMY,0.44,0.2985,30.2,-0.0027,15310028,54.98M,60.39M,8.96%,15.71%,3.51%,Healthcare,Medical Instruments & Supplies,USA,26.45M
+HMR,1.5,0.2930999999999999,29.31,0.0,748700,5.48M,58.41M,90.62%,0.13%,2.81%,Industrials,Marine Shipping,Greece,87.59M
+THH,0.4,0.34,26.81,0.0567,7553122,20.52M,450.00M,59.00%,0.56%,0.19%,Industrials,Specialty Business Services,Japan,20.12M
+CPSH,6.0,0.2848,25.79,0.0214,3406899,14.59M,18.01M,18.81%,35.00%,2.14%,Technology,Electronic Components,USA,108.04M
+ZBAO,1.0,0.2314999999999999,25.68,-0.0200999999999999,665128,8.69M,16.16M,73.87%,0.24%,4.03%,Financial,Insurance Brokers,China,33.27M
+NXXT,0.86,0.2305,24.53,-0.0118999999999999,48598032,65.75M,156.59M,58.19%,6.61%,9.80%,Utilities,Utilities - Renewable,USA,135.40M
+PHGE,0.82,0.105,24.26,-0.1107,19168362,7.42M,10.11M,41.72%,1.82%,1.23%,Healthcare,Biotechnology,USA,8.28M
+HOVR,3.14,0.2661,23.14,0.0282,8545050,37.51M,44.96M,17.14%,14.40%,6.47%,Industrials,Aerospace & Defense,Canada,142.13M
+MSN,0.5,0.2026,22.63,-0.0192999999999999,978053,5.80M,21.04M,72.44%,4.25%,0.97%,Technology,Consumer Electronics,USA,10.48M
+SERA,2.07,0.15,22.49,-0.0611,539273,29.37M,38.18M,24.99%,46.72%,1.02%,Healthcare,Medical Devices,USA,81.06M
+SIDU,5.12,0.2397,22.34,0.0133,40577368,80.58M,80.86M,0.43%,14.88%,9.00%,Industrials,Aerospace & Defense,USA,414.03M
+AIB,2.81,0.2773,22.17,0.0455,3044706,11.30M,37.65M,69.99%,0.26%,4.27%,Technology,Software - Application,USA,105.80M
+VSME,1.05,0.2918,22.09,0.0579999999999999,599871,2.71M,2.74M,1.92%,0.18%,8.29%,Communication Services,Advertising Agencies,Hong Kong,2.90M
+KULR,4.61,0.1912,21.96,-0.0233,6388826,42.90M,46.26M,7.37%,22.62%,22.05%,Technology,Electronic Components,USA,213.23M
+WETO,1.07,0.1505,21.63,-0.0541,502552,5.70M,22.00M,74.09%,0.35%,0.46%,Technology,Software - Infrastructure,China,23.54M
+NAKA,7.23,0.0915,21.31,-0.1002,481826,11.07M,17.25M,36.38%,17.96%,5.06%,Financial,Capital Markets,USA,125.82M
+GAME,0.46,0.1737999999999999,20.47,-0.0256,2258488,76.12M,95.76M,18.76%,19.58%,7.76%,Communication Services,Electronic Gaming & Multimedia,USA,42.89M
