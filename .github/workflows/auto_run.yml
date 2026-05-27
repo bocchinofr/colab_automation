@@ -34,6 +34,14 @@ jobs:
       - name: Run Finviz Gainers
         run: python D2_script1_gainfinviz.py
 
+      - name: Commit Finviz output
+        run: |
+          git config --global user.name "bocchinofr"
+          git config --global user.email "bocchinofr@gmail.com"
+          git add output/
+          git commit -m "📋 Finviz output $(date -u)" || echo "Nothing to commit"
+          git push
+
       - name: Intraday STANDARD
         if: ${{ contains(fromJson('[2,3,4,5,6]'), steps.day.outputs.day) }}
         run: python script2_yfinance_1m.py
