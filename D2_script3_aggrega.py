@@ -53,8 +53,8 @@ for ticker in tickers:
         fundamentals_dict[ticker] = {
             "Market Cap": first_row.get("Market Cap", None),
             "d1_change_from_open": first_row.get("d1_change_from_open", None),
-            "d1_change": first_row.get("d1_change", None),
-            "d1_gap": first_row.get("d1_gap", None),
+            "d1_change": round(first_row.get("d1_change", None) * 100) if first_row.get("d1_change") is not None else None,            
+            "d1_gap": round(first_row.get("d1_gap", None) * 100) if first_row.get("d1_gap") is not None else None,            
             "Price_D1": first_row.get("Price_D1", None),
             "Volume_D1": first_row.get("Volume_D1", None),
             "Short Float": first_row.get("Short Float", None),
@@ -323,11 +323,11 @@ for label, _, _ in window_intervals:
     
 cols_fixed = [
     "Ticker", "Date",
-    "D1_Source", "Market Cap",
+    "D1_Source", "Sector", "Industry", "Country",
+    "Market Cap",
     "d1_change_from_open", "d1_change", "d1_gap",
     "Price_D1", "Volume_D1", "D2_GAP_%",
     "Short Float", "Insider Own", "Inst Own", "Shs Float", "Shares Outstanding",
-    "Sector", "Industry", "Country",
     "VWAP_0930",
     "Open", "High", "Low", "Close", "Volume",
     "TimeHigh", "TimeLow",
