@@ -1,24 +1,24 @@
 Ticker,Price,Change,Change from Open,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
 AIMD,3.16,1.0654,106.54,0.0,17181946,1.88M,6.11M,77.93%,1.56%,1.15%,Technology,Scientific & Technical Instruments,USA,26.94M
-PCLA,12.0,0.8127,93.55,-0.0634,4439234,34.14M,34.62M,1.39%,0.02%,0.02%,Communication Services,Telecom Services,Japan,415.44M
-VCIG,2.9,1.1805,75.23,0.2444,79682696,4.57M,6.63M,31.17%,0.33%,3.97%,Industrials,Consulting Services,Malaysia,19.24M
+PCLA,12.0,0.8127,93.55,-0.0634,4439234,,,,,,,,,
+VCIG,2.9,1.1805,75.23,0.2444,79682696,,,,,,,,,
 CPSH,11.12,0.8533,57.28,0.1783,25049824,14.59M,18.01M,18.95%,35.00%,2.14%,Technology,Electronic Components,USA,200.24M
-MWC,7.7,0.4583,43.12,0.0189,2571564,-,56.14M,-,-,-,Consumer Cyclical,Auto Parts,Japan,432.28M
-MSW,1.7,0.2592,32.81,-0.0519,6549585,4.56M,12.97M,64.85%,0.94%,0.55%,Industrials,Engineering & Construction,Hong Kong,22.06M
+MWC,7.7,0.4583,43.12,0.0189,2571564,,,,,,,,,
+MSW,1.7,0.2592,32.81,-0.0519,6549585,,,,,,,,,
 CODX,9.11,0.7968000000000001,32.61,0.355,50928528,3.42M,3.60M,4.98%,1.44%,2.77%,Healthcare,Medical Devices,USA,32.82M
 ECOR,8.91,0.3358,31.22,0.018,618593,5.12M,8.13M,38.23%,11.36%,6.54%,Healthcare,Medical Devices,USA,73.91M
-NRXP,4.31,0.3385,31.0,0.0217,4342005,32.02M,33.47M,11.62%,17.40%,13.76%,Healthcare,Biotechnology,USA,156.15M
+NRXP,4.31,0.3385,31.0,0.0217,4342005,,,,,,,,,
 AKTX,17.81,-0.0252,29.53,-0.2473999999999999,2536624,1.14M,1.14M,0.40%,5.91%,1.42%,Healthcare,Biotechnology,USA,20.30M
-NAMI,0.39,0.2987,29.43,0.0034,360702,-,79.07M,-,0.00%,-,Communication Services,Internet Content & Information,China,30.60M
-NCPL,1.07,0.3065,28.92,0.0134,8046295,4.38M,6.85M,44.13%,2.49%,2.36%,Financial,Capital Markets,USA,8.40M
-SNGX,0.51,0.315,28.54,0.0231,93813960,14.80M,14.82M,0.15%,1.76%,6.90%,Healthcare,Biotechnology,USA,7.60M
-NXL,0.48,0.2711,26.68,0.0034,2990962,16.33M,20.58M,20.68%,5.13%,3.51%,Healthcare,Medical Devices,USA,9.88M
+NAMI,0.39,0.2987,29.43,0.0034,360702,,,,,,,,,
+NCPL,1.07,0.3065,28.92,0.0134,8046295,,,,,,,,,
+SNGX,0.51,0.315,28.54,0.0231,93813960,,,,,,,,,
+NXL,0.48,0.2711,26.68,0.0034,2990962,,,,,,,,,
 AGPU,6.92,0.2959,26.51,0.0243,1239518,7.20M,10.40M,30.82%,3.27%,2.90%,Technology,Software - Infrastructure,USA,72.00M
 ATOM,12.11,0.3106,25.62,0.0433,3743152,36.50M,38.72M,5.73%,41.65%,13.31%,Technology,Semiconductor Equipment & Materials,USA,468.86M
-LICN,1.08,0.2851,25.58,0.0233,953426,16.33M,16.44M,0.68%,0.00%,0.03%,Industrials,Specialty Business Services,China,17.75M
+LICN,1.08,0.2851,25.58,0.0233,953426,,,,,,,,,
 EDIT,3.08,0.1159,25.2,-0.1086999999999999,9667398,97.45M,97.87M,0.47%,54.10%,10.27%,Healthcare,Biotechnology,USA,301.55M
-SKIN,0.86,0.2481,24.81,0.0,4320330,79.33M,129.14M,38.79%,61.29%,20.84%,Consumer Defensive,Household & Personal Products,USA,111.24M
-LFS,3.62,0.0197,22.71,-0.1689999999999999,1576693,-,26.16M,-,0.24%,-,Communication Services,Entertainment,Japan,94.70M
+SKIN,0.86,0.2481,24.81,0.0,4320330,,,,,,,,,
+LFS,3.62,0.0197,22.71,-0.1689999999999999,1576693,,,,,,,,,
 ALP,0.45,0.2409,21.78,0.019,38583288,19.64M,23.43M,16.20%,13.64%,4.50%,Financial,Asset Management,United Kingdom,10.59M
-MGRX,0.55,0.2151,21.78,-0.0022,1272737,14.56M,16.97M,15.16%,4.81%,3.10%,Healthcare,Health Information Services,USA,9.41M
+MGRX,0.55,0.2151,21.78,-0.0022,1272737,,,,,,,,,
 CXAI,0.23,0.2523,21.23,0.0331,45144308,60.07M,70.09M,14.30%,7.11%,6.34%,Technology,Software - Application,USA,15.93M
