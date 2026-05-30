@@ -53,6 +53,7 @@ for ticker in tickers:
         info = stock.info
         yf_float = info.get("floatShares")
         yf_outstanding = info.get("sharesOutstanding")
+        yf_open = info.get("open")
 
         finviz_float = parse_finviz_shares(finviz_map.get(ticker, {}).get("Shs Float"))
         finviz_out = parse_finviz_shares(finviz_map.get(ticker, {}).get("Shs Outstanding"))
@@ -156,10 +157,6 @@ for ticker in tickers:
         regular_market = hist_1m.between_time("09:30", "16:00").copy()
         regular_market.index = regular_market.index.tz_localize(None)
 
-        if last_pm_close is not None and not regular_market.empty:
-            first_idx = regular_market.index[0]
-            regular_market.loc[first_idx, "Open"] = last_pm_close
-
         for ts, row in regular_market.iterrows():
             data = fundamentals.copy()
             data.update({
@@ -170,6 +167,7 @@ for ticker in tickers:
                 "Low": round(row["Low"], 2),
                 "Close": round(row["Close"], 2),
                 "Volume": int(row["Volume"]),
+                "Open_Real": round(yf_open, 2) if yf_open is not None else round(row["Open"], 2),
                 "Max Pre-Market": max_pre
             })
             final_rows.append(data)
