@@ -177,6 +177,7 @@ for ticker in tickers:
                 if any(rh_df["Datetime"] == rh_start_dt) else rh_df["Open_Real"].iloc[0]
         high_v, low_v, close_v = rh_df["High"].max(), rh_df["Low"].min(), rh_df["Close"].iloc[-1]
         
+        
         # TimeHigh
         try:
             high_rows = rh_df[rh_df["High"] == high_v].sort_values("Datetime")
