@@ -173,8 +173,8 @@ for ticker in tickers:
 
     # --- Regular hours (Open, High, Low, Close) ---
     if not rh_df.empty:
-        open_v = rh_df.loc[rh_df["Datetime"] == rh_start_dt, "Open_real"].iloc[0] \
-                if any(rh_df["Datetime"] == rh_start_dt) else rh_df["Open_real"].iloc[0]
+        open_v = rh_df.loc[rh_df["Datetime"] == rh_start_dt, "Open_Real"].iloc[0] \
+                if any(rh_df["Datetime"] == rh_start_dt) else rh_df["Open_Real"].iloc[0]
         high_v, low_v, close_v = rh_df["High"].max(), rh_df["Low"].min(), rh_df["Close"].iloc[-1]
         
         # TimeHigh
