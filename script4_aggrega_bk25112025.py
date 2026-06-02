@@ -25,13 +25,6 @@ try:
 except FileNotFoundError:
     raise FileNotFoundError(f"❌ File non trovato: {input_path}")
 
-
-# Aggiungi questo debug:
-print("🔍 COLONNE DISPONIBILI NEL FILE EXCEL:")
-print(df.columns.tolist())
-print("\n🔍 PRIME 5 RIGHE:")
-print(df.head())
-
 if "Unnamed: 0" in df.columns:
     df = df.rename(columns={"Unnamed: 0": "Datetime"})
 df["Datetime"] = pd.to_datetime(df["Datetime"], errors="coerce")
@@ -163,21 +156,6 @@ for ticker in tickers:
             (day_df["Datetime"] <= rh_end_dt)
         ].copy()
 
-    # DEBUG: Verifica cosa sta succedendo
-    print(f"\n🔍 DEBUG per {ticker}:")
-    print(f"  day_df shape: {day_df.shape}")
-    print(f"  Colonne day_df: {day_df.columns.tolist()}")
-    print(f"  Session uniche in day_df: {day_df['Session'].unique() if 'Session' in day_df.columns else 'N/A'}")
-    print(f"  rh_df shape: {rh_df.shape}")
-    print(f"  rh_df index: {rh_df.index[:5] if len(rh_df) > 0 else 'vuoto'}")
-    if 'Open_Real' in day_df.columns:
-        print(f"  Open_Real non nulli in day_df: {day_df['Open_Real'].notna().sum()}")
-        print(f"  Righe con Open_Real non nullo: {day_df[day_df['Open_Real'].notna()][['Datetime', 'Session', 'Open_Real']].head()}")
-
-
-
-
-
     if rh_df.empty and pm_df.empty:
         continue
     
@@ -195,8 +173,8 @@ for ticker in tickers:
 
     # --- Regular hours (Open, High, Low, Close) ---
     if not rh_df.empty:
-        open_v = rh_df.loc[rh_df["Datetime"] == rh_start_dt, "Open_Real"].iloc[0] \
-                if any(rh_df["Datetime"] == rh_start_dt) else rh_df["Open_Real"].iloc[0]
+        open_v = rh_df.loc[rh_df["Datetime"] == rh_start_dt, "Open_real"].iloc[0] \
+                if any(rh_df["Datetime"] == rh_start_dt) else rh_df["Open_real"].iloc[0]
         high_v, low_v, close_v = rh_df["High"].max(), rh_df["Low"].min(), rh_df["Close"].iloc[-1]
         
 
