@@ -151,32 +151,28 @@ for ticker in tickers:
     pm_df = dft[(dft["Datetime"] >= pm_start_dt) & (dft["Datetime"] <= pm_end_dt)].copy()
     pm_df = pm_df[~pm_df["Datetime"].dt.strftime("%H:%M").isin(["04:00", "04:01"])]
 
-
-
-
-   
     if "Session" in day_df.columns:
-    rh_df = day_df[
-        (day_df["Datetime"] >= rh_start_dt) &
-        (day_df["Datetime"] <= rh_end_dt) &
-        (day_df["Session"].str.contains("Regular", case=False, na=False))
-    ].copy()
+        rh_df = day_df[
+            (day_df["Datetime"] >= rh_start_dt) &
+            (day_df["Datetime"] <= rh_end_dt) &
+            (day_df["Session"].str.contains("Regular", case=False, na=False))
+        ].copy()
     else:
         rh_df = day_df[
             (day_df["Datetime"] >= rh_start_dt) &
             (day_df["Datetime"] <= rh_end_dt)
         ].copy()
 
-    # Debug per verificare che Open_Real esista in rh_df
-    if 'Open_Real' not in rh_df.columns:
-        print(f"⚠️ Attenzione: 'Open_Real' non trovato in rh_df per {ticker}")
-        print(f"Colonne rh_df: {rh_df.columns.tolist()}")
-        # Se non c'è, usa la colonna 'Open'
-        open_col = 'Open'
-    else:
-        open_col = 'Open_Real'
-
-
+    # DEBUG: Verifica cosa sta succedendo
+    print(f"\n🔍 DEBUG per {ticker}:")
+    print(f"  day_df shape: {day_df.shape}")
+    print(f"  Colonne day_df: {day_df.columns.tolist()}")
+    print(f"  Session uniche in day_df: {day_df['Session'].unique() if 'Session' in day_df.columns else 'N/A'}")
+    print(f"  rh_df shape: {rh_df.shape}")
+    print(f"  rh_df index: {rh_df.index[:5] if len(rh_df) > 0 else 'vuoto'}")
+    if 'Open_Real' in day_df.columns:
+        print(f"  Open_Real non nulli in day_df: {day_df['Open_Real'].notna().sum()}")
+        print(f"  Righe con Open_Real non nullo: {day_df[day_df['Open_Real'].notna()][['Datetime', 'Session', 'Open_Real']].head()}")
 
 
 
@@ -199,8 +195,8 @@ for ticker in tickers:
 
     # --- Regular hours (Open, High, Low, Close) ---
     if not rh_df.empty:
-        open_v = rh_df.loc[rh_df["Datetime"] == rh_start_dt, open_col].iloc[0] \
-                if any(rh_df["Datetime"] == rh_start_dt) else rh_df[open_col].iloc[0]
+        open_v = rh_df.loc[rh_df["Datetime"] == rh_start_dt, "Open_Real"].iloc[0] \
+                if any(rh_df["Datetime"] == rh_start_dt) else rh_df["Open_Real"].iloc[0]
         high_v, low_v, close_v = rh_df["High"].max(), rh_df["Low"].min(), rh_df["Close"].iloc[-1]
         
 
