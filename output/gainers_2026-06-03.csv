@@ -1,0 +1,23 @@
+Ticker,Price,Change,Change from Open,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+LASE,2.42,1.6092,100.83,0.2992,287024608,24.60M,38.57M,36.22%,3.29%,7.23%,Industrials,Specialty Industrial Machinery,USA,93.34M
+DEVS,0.6,0.5710000000000001,71.03,-0.0815,146302928,5.90M,13.25M,55.50%,1.95%,2.69%,Industrials,Pollution & Treatment Controls,USA,7.97M
+DXST,4.95,2.0937,66.67,0.8562000000000001,76446336,1.22M,1.82M,32.90%,0.90%,1.42%,Industrials,Waste Management,China,8.98M
+ASTC,45.5,0.2853,58.87,-0.191,12699642,1.38M,1.76M,21.73%,6.42%,3.00%,Technology,Scientific & Technical Instruments,USA,80.03M
+VCIG,8.99,0.1939,54.2,-0.2257999999999999,1883248,,,,,,,,,
+RKTO,2.22,0.6567000000000001,49.49,0.1082,39144800,-,16.27M,2.89%,4.11%,-,Healthcare,Biotechnology,USA,46.67M
+SWMR,78.52,0.3772999999999999,39.27,-0.0111,1845153,5.60M,11.21M,50.03%,2.06%,7.64%,Technology,Software - Infrastructure,USA,880.21M
+MYND,0.58,0.4488,38.97,0.0425,2584633,45.98M,46.22M,0.52%,0.47%,0.08%,Consumer Defensive,Education & Training Services,China,26.78M
+GNTA,2.2,0.3333,38.36,-0.0364,6074045,-,23.43M,-,8.70%,-,Healthcare,Biotechnology,Italy,51.55M
+PUSA,6.4,0.3389,37.63,-0.0272,6044601,12.66M,20.20M,41.42%,5.69%,8.65%,Consumer Cyclical,Leisure,USA,138.27M
+NTCL,1.6,0.2903,33.33,-0.0323,1950613,11.79M,18.49M,46.37%,1.51%,0.98%,Technology,Software - Application,Singapore,31.99M
+TDTH,3.77,0.386,33.22,0.0404,402968,-,3.57M,-,0.65%,-,Technology,Information Technology Services,Singapore,13.46M
+FOFO,4.01,0.3502,33.22,0.0135,917658,3.03M,7.57M,60.02%,0.33%,0.35%,Industrials,Consulting Services,Hong Kong,30.36M
+POAS,0.32,0.1978,25.54,-0.0458999999999999,4379809,8.72M,16.45M,69.77%,1.07%,3.81%,Healthcare,Medical Devices,Singapore,9.25M
+MSS,1.13,0.1893,22.83,-0.0317,1244589,1.43M,2.32M,50.33%,3.49%,3.07%,Consumer Defensive,Grocery Stores,USA,6.65M
+TOPS,1.11,0.2001,22.13,-0.0173,11051908,,,,,,,,,
+VRAX,0.22,0.2097,22.0,-0.0084,16874066,,,,,,,,,
+OPTX,13.23,0.2205,21.94,0.0009,2203159,6.85M,36.99M,83.00%,3.73%,9.88%,Technology,Electronic Components,USA,532.90M
+CTRM,2.35,0.2113,21.13,0.0,503870,9.65M,9.66M,0.12%,3.87%,0.16%,Industrials,Marine Shipping,Cyprus,22.71M
+AGPU,8.76,0.2066,20.66,0.0,676671,7.20M,10.40M,30.82%,3.27%,4.51%,Technology,Software - Infrastructure,USA,91.14M
+QMCO,12.54,0.1954,20.23,-0.0056999999999999,3310249,13.97M,14.13M,4.57%,11.14%,10.99%,Technology,Computer Hardware,USA,183.56M
+CRMT,8.34,0.2157,20.0,0.0131,616741,7.61M,8.30M,8.37%,96.69%,19.14%,Consumer Cyclical,Auto & Truck Dealerships,USA,69.24M
