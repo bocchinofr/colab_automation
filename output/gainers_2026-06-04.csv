@@ -1,0 +1,19 @@
+Ticker,Price,Change,Change from Open,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+SBEV,0.24,0.7101999999999999,72.0,-0.0056999999999999,499888192,,,,,,,,,
+WCT,2.57,1.7935,61.13,0.7337,85218080,,,,,,,,,
+SOAR,0.43,0.3519,54.5,-0.125,107537008,,,,,,,,,
+BMGL,0.66,0.1962,53.1,-0.2187,26949148,6.02M,18.79M,67.97%,0.29%,0.41%,Healthcare,Medical Care Facilities,Singapore,12.32M
+DBGI,0.93,0.3303999999999999,47.84,-0.1001,57967224,22.99M,22.99M,0.00%,4.20%,5.12%,Consumer Cyclical,Apparel Retail,USA,21.41M
+ANY,5.65,0.445,46.75,-0.0153,26851644,4.15M,4.24M,3.36%,3.11%,3.58%,Financial,Capital Markets,USA,23.98M
+VSA,6.11,0.3197,42.09,-0.0713,1226477,,,,,,,,,
+FOFO,6.59,0.6434000000000001,35.6,0.212,3117323,3.03M,7.57M,60.02%,0.33%,0.35%,Industrials,Consulting Services,Hong Kong,49.89M
+ATPC,4.25,0.431,32.4,0.0808,4785936,0.47M,1.00M,52.57%,2.62%,1.11%,Consumer Defensive,Packaged Foods,Malaysia,4.25M
+QMCO,15.95,0.2719,30.84,-0.0279,4852486,,,,,,,,,
+FNGR,0.9,0.2948,28.09,0.0108,15127271,46.14M,61.28M,24.71%,2.46%,2.54%,Communication Services,Telecom Services,Singapore,54.91M
+DLXY,0.5,0.2062999999999999,27.44,-0.0533999999999999,1769342,2.06M,7.17M,87.37%,0.71%,2.78%,Energy,Oil & Gas Refining & Marketing,Singapore,8.13M
+FOXX,2.86,0.2076,23.81,-0.0246,14780759,0.99M,7.01M,85.96%,11.36%,0.74%,Technology,Consumer Electronics,USA,20.14M
+ALOY,13.8,0.1856,21.37,-0.0232,4897185,56.27M,61.21M,8.07%,4.46%,5.36%,Basic Materials,Other Industrial Metals & Mining,USA,844.75M
+EEIQ,3.64,0.1519,20.93,-0.0475,610689,0.85M,1.46M,42.85%,1.23%,2.80%,Consumer Defensive,Education & Training Services,USA,5.39M
+FATN,7.92,0.2185,20.55,0.0108,745474,8.89M,14.02M,36.60%,2.48%,1.59%,Technology,Software - Infrastructure,USA,111.07M
+LESL,4.67,0.1823,20.36,-0.0177,563784,,,,,,,,,
+CING,4.88,0.2109,20.2,0.0074,1125631,10.75M,11.91M,20.17%,8.95%,14.67%,Healthcare,Biotechnology,USA,65.73M
