@@ -1,0 +1,21 @@
+Ticker,Price,Change,Change from Open,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+INDP,4.75,1.1493,121.96,-0.0317,43515180,3.46M,113.24M,96.94%,0.07%,1.74%,Healthcare,Biotechnology,USA,537.90M
+VERU,4.23,0.88,94.04,-0.0311,91628503,13.99M,16.05M,12.84%,23.87%,4.24%,Healthcare,Biotechnology,USA,67.89M
+SDOT,11.37,0.6844,80.48,-0.0667,9210060,0.69M,0.74M,6.81%,0.63%,1.12%,Consumer Defensive,Farm Products,USA,8.46M
+DXF,0.83,0.4395,57.75,-0.0875,13689029,-,1.57M,-,5.72%,-,Financial,Credit Services,China,1.31M
+RYDE,0.92,0.1631,51.59,-0.2327,1411645,142.91M,166.23M,14.03%,0.35%,1.07%,Technology,Software - Application,Singapore,152.93M
+LSE,4.43,0.3859,38.59,0.0,391612,1.52M,17.02M,91.04%,0.00%,0.41%,Energy,Oil & Gas Equipment & Services,China,19.14M
+WXM,6.0,0.5792,35.14,0.1686,963128,0.47M,0.55M,53.67%,0.38%,4.24%,Industrials,Industrial Distribution,China,6.14M
+PMI,0.32,0.0387,32.02,-0.2133,57418943,30.65M,75.26M,66.81%,0.43%,1.55%,Healthcare,Medical Devices,USA,29.51M
+PCLA,8.03,0.3015,30.15,0.0,428804,9.56M,34.62M,1.39%,0.06%,0.09%,Communication Services,Telecom Services,Japan,77.17M
+LASE,3.62,0.1565,29.75,-0.1085999999999999,67102708,24.60M,38.57M,36.22%,3.29%,7.23%,Industrials,Specialty Industrial Machinery,USA,139.62M
+MEHA,0.09,0.2826,28.45,-0.0015,30954041,36.55M,42.74M,14.49%,1.09%,1.75%,Consumer Defensive,Packaged Foods,USA,3.74M
+NEXR,1.56,0.5294,26.83,0.2059,76120722,1.76M,1.77M,0.44%,0.02%,1.83%,Consumer Cyclical,Internet Retail,Israel,2.75M
+NCT,3.99,0.1239,26.67,-0.1127,609513,0.32M,1.22M,73.66%,2.04%,0.53%,Industrials,Marine Shipping,Hong Kong,4.87M
+RMSG,1.1,0.2353,26.29,-0.0219,12400192,5.07M,5.07M,0.00%,1.12%,5.64%,Technology,Software - Application,USA,5.58M
+NXXT,0.69,0.2306,23.23,-0.0014,10317614,65.75M,156.59M,58.19%,6.61%,10.64%,Utilities,Utilities - Renewable,USA,108.52M
+ABSI,7.34,0.2357,22.54,0.0084,9153763,133.33M,155.35M,14.31%,75.02%,24.17%,Healthcare,Biotechnology,USA,1.14B
+EGG,10.85,0.1421,22.46,-0.0674,532010,8.26M,12.26M,70.52%,0.00%,0.20%,Industrials,Consulting Services,Singapore,303.86M
+LNZA,6.99,0.2826,22.42,0.0476999999999999,575191,7.78M,10.09M,35.60%,5.20%,1.28%,Industrials,Waste Management,USA,84.50M
+MYO,1.29,0.1727,20.56,-0.0273,1136021,35.80M,38.57M,7.28%,39.18%,10.65%,Healthcare,Medical Devices,USA,49.84M
+HYLN,7.62,0.1796,20.38,-0.0200999999999999,7785092,121.03M,178.32M,32.13%,24.99%,10.76%,Consumer Cyclical,Auto Parts,USA,1.36B
