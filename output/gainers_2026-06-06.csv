@@ -1,0 +1,13 @@
+Ticker,Price,Change,Change from Open,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+SCAG,0.84,1.9458,209.51,-0.0482,88771425,26.63M,72.24M,63.14%,0.00%,0.08%,Industrials,Farm & Heavy Construction Machinery,China,60.91M
+SPHL,5.35,1.2394,130.6,-0.0289,40273295,1.24M,1.65M,89.91%,0.10%,0.90%,Consumer Cyclical,Residential Construction,Singapore,65.60M
+NOTV,0.17,0.918,94.5,-0.0139,1043293515,31.46M,34.89M,9.82%,13.92%,9.67%,Healthcare,Diagnostics & Research,USA,5.79M
+SUGP,1.0,0.3897,44.29,-0.0369,39924857,0.47M,0.56M,67.91%,0.65%,8.77%,Industrials,Security & Protection Services,Hong Kong,1.46M
+SNBR,0.48,0.3642,39.65,-0.0231,299303505,18.58M,23.05M,19.40%,75.66%,34.36%,Consumer Cyclical,"Furnishings, Fixtures & Appliances",USA,11.01M
+CURV,1.64,0.1798999999999999,36.67,-0.1367,2843632,34.32M,99.50M,65.51%,28.25%,12.28%,Consumer Cyclical,Apparel Retail,USA,163.18M
+BNAI,22.17,0.3568,35.93,-0.0018,9268908,3.78M,6.49M,41.98%,9.70%,16.07%,Technology,Software - Infrastructure,USA,144.28M
+YXT,0.54,0.318,35.75,-0.0291,8935948,,,,,,,,,
+ELOG,1.21,0.3822,34.59,0.027,7173253,6.32M,12.02M,47.40%,0.63%,0.35%,Industrials,Integrated Freight & Logistics,China,14.54M
+BMGL,0.54,0.1226999999999999,28.63,-0.1272,5383936,6.02M,18.79M,67.97%,0.29%,0.41%,Healthcare,Medical Care Facilities,Singapore,10.23M
+LBGJ,1.13,0.2122,21.51,-0.0024,428064,3.05M,3.36M,9.19%,1.22%,6.40%,Industrials,Specialty Industrial Machinery,China,3.79M
+CALC,1.06,0.2462,20.45,0.0346,2937114,9.25M,15.75M,37.32%,7.56%,1.47%,Healthcare,Biotechnology,USA,16.75M
