@@ -1,0 +1,13 @@
+Ticker,Price,Change,Change from Open,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+SCAG,0.84,1.9458,209.51,-0.0482,92764464,26.63M,72.24M,63.14%,0.00%,0.08%,Industrials,Farm & Heavy Construction Machinery,China,60.91M
+SPHL,5.35,1.2394,123.85,0.0004,40607248,1.24M,1.65M,89.91%,0.10%,0.90%,Consumer Cyclical,Residential Construction,Singapore,65.60M
+NOTV,0.17,0.918,94.5,-0.0139,1066872960,31.46M,34.89M,9.82%,13.92%,9.67%,Healthcare,Diagnostics & Research,USA,5.79M
+SUGP,1.0,0.3897,42.23,-0.0229,40503572,,,,,,,,,
+ELOG,1.21,0.3822,42.19,-0.0279,10226784,6.32M,12.02M,47.40%,0.63%,0.35%,Industrials,Integrated Freight & Logistics,China,14.54M
+SNBR,0.48,0.3642,39.49,-0.022,305128064,18.58M,23.05M,19.40%,75.66%,34.36%,Consumer Cyclical,"Furnishings, Fixtures & Appliances",USA,11.01M
+CURV,1.64,0.1798999999999999,36.67,-0.1367,2850783,34.32M,99.50M,65.51%,28.25%,12.28%,Consumer Cyclical,Apparel Retail,USA,163.18M
+BNAI,22.17,0.3568,35.93,-0.0018,9366657,3.78M,6.49M,41.98%,9.70%,16.07%,Technology,Software - Infrastructure,USA,144.28M
+YXT,0.54,0.318,35.75,-0.0291,9356711,,,,,,,,,
+BMGL,0.54,0.1226999999999999,30.56,-0.1401,5414447,6.02M,18.79M,67.97%,0.29%,0.41%,Healthcare,Medical Care Facilities,Singapore,10.23M
+LBGJ,1.13,0.2122,21.51,-0.0024,447842,3.05M,3.36M,9.19%,1.22%,6.40%,Industrials,Specialty Industrial Machinery,China,3.79M
+CALC,1.06,0.2462,20.45,0.0346,2994528,9.25M,15.75M,37.32%,7.56%,1.47%,Healthcare,Biotechnology,USA,16.75M
