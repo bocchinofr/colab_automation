@@ -1,0 +1,22 @@
+Ticker,Price,Change,Change from Open,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+INHD,39.49,36.6095,3457.66,0.0571,278035999,2.51M,2.52M,0.43%,0.37%,10.99%,Basic Materials,Steel,Hong Kong,99.54M
+NPT,4.95,2.8372,277.86,0.0155,141207701,3.51M,22.00M,84.19%,0.18%,0.14%,Consumer Cyclical,Specialty Retail,China,109.82M
+BYAH,2.65,1.5,120.83,0.1321,19893942,1.02M,33.87M,96.99%,0.00%,2.75%,Consumer Defensive,Household & Personal Products,China,8.53M
+SUNE,5.88,4.2035,97.32,1.6372,313284995,3.30M,3.41M,19.91%,10.80%,6.32%,Technology,Solar,USA,24.24M
+ITOC,0.51,0.8061,81.91,-0.0070999999999999,33233776,8.29M,17.05M,51.40%,0.57%,3.60%,Healthcare,Medical Devices,China,8.62M
+MTEN,1.94,0.8131,76.36,0.0279999999999999,16269406,0.84M,1.22M,31.02%,3.02%,4.92%,Industrials,Metal Fabrication,China,2.37M
+TDIC,0.5,1.2366,60.37,0.3946,565029057,2.95M,7.20M,60.10%,1.16%,39.28%,Communication Services,Advertising Agencies,Hong Kong,18.91M
+ILLR,0.33,0.5064,49.95,0.0046,20044380,177.51M,197.47M,10.11%,0.00%,0.60%,Technology,Software - Application,USA,65.14M
+SDOT,20.53,0.6911,43.17,0.1812,4543576,0.69M,0.74M,6.81%,0.63%,1.12%,Consumer Defensive,Farm Products,USA,15.28M
+PN,4.21,0.4222999999999999,40.8,0.0101,11679888,1.11M,14.31M,92.28%,0.01%,5.48%,Technology,Solar,China,60.25M
+SMTK,0.84,1.0553,35.64,0.5153,269186062,17.39M,21.20M,18.93%,7.47%,2.66%,Technology,Semiconductor Equipment & Materials,United Kingdom,18.01M
+GRAN,1.42,0.3971,34.43,0.0392,11009690,4.71M,19.91M,81.08%,0.26%,0.22%,Financial,Capital Markets,Hong Kong,35.49M
+ENHA,3.44,0.3984,29.81,0.0771999999999999,5321682,69.25M,122.23M,43.35%,18.11%,0.28%,Consumer Defensive,Packaged Foods,Hong Kong,420.47M
+CLWT,1.48,0.203,29.23,-0.0691,1101888,3.19M,7.90M,56.91%,2.38%,0.65%,Industrials,Pollution & Treatment Controls,Hong Kong,10.97M
+DLTH,4.31,0.2982,27.51,0.0181,1194078,13.36M,38.13M,64.97%,20.04%,2.39%,Consumer Cyclical,Apparel Retail,USA,164.33M
+YXT,0.41,-0.2448999999999999,26.15,-0.4014999999999999,1049902,51.24M,54.43M,5.05%,6.98%,0.48%,Technology,Software - Application,China,22.12M
+CDTG,4.01,0.261,25.71,0.0031,659033,1.60M,3.02M,46.95%,0.12%,0.13%,Industrials,Waste Management,China,12.11M
+LNKS,1.79,0.226,24.31,-0.0137,705950,1.50M,1.77M,15.59%,0.07%,47.69%,Industrials,Electrical Equipment & Parts,Malaysia,3.17M
+POAS,0.31,0.0210999999999999,23.11,-0.1705,774087,8.72M,16.45M,69.77%,1.07%,3.81%,Healthcare,Medical Devices,Singapore,8.91M
+SBEV,0.32,0.2648,21.62,0.04,17265944,10.96M,10.96M,0.02%,6.47%,1.97%,Consumer Defensive,Beverages - Wineries & Distilleries,USA,3.47M
+CHSN,1.3,0.1926999999999999,20.37,-0.0092,714955,0.55M,0.59M,6.31%,0.00%,11.07%,Consumer Cyclical,Restaurants,China,4.73M
