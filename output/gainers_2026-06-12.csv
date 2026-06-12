@@ -1,0 +1,29 @@
+Ticker,Price,Change,Change from Open,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+INHD,39.49,0.0,3457.66,-0.9719,278899136,2.51M,2.52M,0.43%,0.37%,5.84%,Basic Materials,Steel,Hong Kong,99.54M
+GELS,1.53,1.9738,193.16,0.0144,153365328,5.62M,9.44M,-,0.62%,1.37%,Healthcare,Drug Manufacturers - Specialty & Generic,Australia,16.39M
+INDP,3.57,0.4571,46.91,-0.0081999999999999,4237709,3.46M,113.24M,96.94%,0.07%,0.50%,Healthcare,Biotechnology,USA,404.28M
+UBXG,4.79,0.4784,44.71,0.0216,2387555,1.26M,9.35M,86.51%,0.04%,0.90%,Communication Services,Advertising Agencies,China,9.58M
+MNTS,16.3,0.4374,38.72,0.0362,21941462,10.44M,10.55M,1.00%,17.46%,28.67%,Industrials,Aerospace & Defense,USA,171.93M
+PETZ,1.7,0.0559,34.92,-0.2173999999999999,748618,6.84M,10.32M,33.77%,0.37%,2.80%,Consumer Cyclical,Restaurants,China,17.55M
+BQ,1.21,0.3596,33.69,0.017,4089132,2.80M,2.88M,19.21%,0.88%,3.26%,Consumer Cyclical,Specialty Retail,China,3.48M
+RITR,0.75,0.297,31.3,-0.0121999999999999,20419420,17.29M,45.63M,72.31%,0.21%,0.91%,Industrials,Engineering & Construction,Hong Kong,46.57M
+ADIL,2.98,0.3796,30.7,0.0556,20709200,2.11M,2.14M,1.44%,1.66%,2.24%,Healthcare,Biotechnology,USA,6.39M
+HWH,1.86,0.3099,28.28,0.0210999999999999,1202203,1.51M,7.48M,79.81%,0.82%,1.08%,Consumer Cyclical,Leisure,USA,13.91M
+SMSI,4.55,0.2673999999999999,28.17,-0.0111,5740668,5.11M,5.12M,0.00%,6.97%,1.86%,Technology,Software - Application,USA,23.26M
+CRMT,2.69,0.135,28.1,-0.1139,2430451,7.61M,8.30M,8.37%,96.71%,18.61%,Consumer Cyclical,Auto & Truck Dealerships,USA,22.33M
+VELO,30.61,0.3496,27.54,0.0582,16853996,13.70M,26.22M,54.01%,22.40%,20.42%,Technology,Computer Hardware,USA,912.21M
+TOON,1.08,0.2410999999999999,25.58,-0.0116999999999999,3896370,55.87M,56.53M,5.53%,26.58%,1.65%,Communication Services,Entertainment,USA,63.87M
+HTCO,5.79,0.2614,25.05,0.0087,1250686,3.22M,7.39M,56.35%,8.97%,12.60%,Industrials,Marine Shipping,Singapore,52.47M
+YOOV,0.59,0.2294,25.03,-0.0167,11872841,183.13M,226.99M,19.32%,0.05%,0.03%,Industrials,Security & Protection Services,Singapore,133.67M
+GCTK,0.41,0.0224,25.02,-0.1822,9576139,6.06M,6.26M,3.21%,4.33%,6.00%,Healthcare,Medical Instruments & Supplies,USA,2.57M
+SXTC,2.26,0.2841,24.86,0.0283999999999999,1156136,27.32M,38.22M,28.52%,0.20%,0.02%,Healthcare,Drug Manufacturers - Specialty & Generic,China,86.37M
+CPSH,8.59,0.2614,24.85,0.0103,5505318,15.61M,18.01M,19.01%,25.92%,9.87%,Technology,Electronic Components,USA,165.52M
+XOS,4.27,0.1667,24.85,-0.0655999999999999,1356466,6.84M,11.98M,49.93%,3.81%,7.21%,Industrials,Farm & Heavy Construction Machinery,USA,58.32M
+SLGB,0.91,0.1388,24.62,-0.0862,1437157,3.00M,43.00M,93.02%,0.22%,0.45%,Industrials,Integrated Freight & Logistics,Hong Kong,39.13M
+ASTI,8.71,0.2460999999999999,24.25,0.0029,7766123,8.48M,9.46M,10.39%,12.62%,16.47%,Technology,Solar,USA,82.41M
+NUAI,5.46,0.2188,23.53,-0.0134,9836121,84.64M,101.29M,16.44%,13.86%,11.92%,Technology,Software - Infrastructure,USA,553.05M
+SPCE,5.73,0.2166,23.49,-0.0149,124743416,99.74M,100.68M,0.94%,16.74%,22.51%,Industrials,Aerospace & Defense,USA,576.92M
+MSW,1.42,0.0519,23.48,-0.1481,2358998,4.56M,12.97M,64.85%,0.94%,0.47%,Industrials,Engineering & Construction,Hong Kong,18.42M
+TGHL,0.66,0.1932999999999999,22.2,-0.0235,13334209,12.72M,14.87M,49.71%,0.48%,1.53%,Technology,Software - Infrastructure,Singapore,16.70M
+GLMD,0.62,0.1730999999999999,21.43,-0.0339,596571,6.40M,6.58M,3.07%,4.84%,0.27%,Healthcare,Biotechnology,Israel,4.06M
+RFL,2.12,0.191,20.45,-0.0112,578937,35.14M,51.21M,32.44%,6.77%,0.19%,Real Estate,Real Estate Services,USA,110.29M
