@@ -1,0 +1,16 @@
+Ticker,Price,Change,Change from Open,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+INHD,39.49,0.0,3457.66,-0.9719,278899136,4.52M,4.52M,0.07%,0.21%,3.24%,Basic Materials,Steel,Hong Kong,99.54M
+RGNT,9.4,5.266699999999999,452.94,0.1333,186534160,,,,,,,,,
+PRFX,2.49,0.8309000000000001,83.09,0.0,47331192,,,,,,,,,
+HQ,17.82,0.6334000000000001,53.36,0.0650999999999999,6244363,8.17M,31.83M,74.35%,5.25%,3.88%,Technology,Software - Infrastructure,Singapore,567.27M
+QTEX,2.2,0.7054,43.79,0.186,122263016,,,,,,,,,
+GPUS,0.27,0.7548999999999999,34.57,0.304,710020288,456.79M,461.46M,1.01%,6.82%,5.99%,Industrials,Aerospace & Defense,USA,125.25M
+QH,8.37,0.1402999999999999,30.17,-0.124,1513843,,,,,,,,,
+TGE,1.16,0.1153999999999999,28.93,-0.1349,790812,,,,,,,,,
+WTO,0.98,0.1705999999999999,26.06,-0.0713999999999999,1579152,,,,,,,,,
+ARQQ,17.92,0.3176,24.7,0.0566,3048939,4.83M,15.65M,69.17%,26.26%,35.42%,Technology,Software - Infrastructure,United Kingdom,280.48M
+MTEN,3.39,0.3725,24.63,0.1012,36041228,0.84M,1.22M,31.02%,3.02%,7.05%,Industrials,Metal Fabrication,China,4.14M
+MMA,0.53,0.2054,24.0,-0.0279,3723812,21.14M,26.48M,20.19%,1.86%,2.17%,Consumer Cyclical,Leisure,Australia,13.96M
+NCRA,0.12,0.1161,21.95,-0.0848,4907010,5.28M,15.30M,65.49%,2.13%,6.94%,Consumer Defensive,Packaged Foods,Taiwan,1.91M
+BTQ,5.35,0.2861,21.04,0.0625,12880252,96.47M,141.31M,31.76%,14.42%,9.79%,Technology,Software - Infrastructure,Canada,756.28M
+BGM,0.46,0.2239999999999999,20.79,0.0133,1476625,36.02M,78.29M,80.42%,0.11%,0.70%,Healthcare,Drug Manufacturers - Specialty & Generic,China,84.44M
