@@ -1,0 +1,22 @@
+Ticker,Price,Change,Change from Open,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+INHD,39.49,0.0,3457.66,-0.9719,278899136,4.52M,4.52M,0.04%,0.21%,3.24%,Basic Materials,Steel,Hong Kong,178.52M
+NMRA,1.56,0.7059000000000001,64.2,0.0389,28535158,78.52M,182.16M,57.62%,25.37%,7.11%,Healthcare,Biotechnology,USA,289.04M
+CCTG,1.48,0.8989,63.12,0.1641,122567200,3.01M,3.91M,23.11%,2.09%,3.24%,Industrials,Electrical Equipment & Parts,Hong Kong,5.79M
+RTB,9.37,0.4048,54.11,-0.0885,758864,0.38M,1.28M,69.96%,4.09%,27.96%,Technology,Software - Application,USA,12.00M
+WBX,3.95,0.3958,42.6,-0.0212,493987,4.36M,17.96M,75.70%,0.75%,3.31%,Technology,Electronic Components,Spain,70.95M
+VNCE,6.95,0.3872,39.28,-0.004,1901815,4.33M,12.85M,66.31%,7.15%,0.36%,Consumer Cyclical,Apparel Manufacturing,USA,89.29M
+TRNR,0.72,0.3746,37.22,0.0017,17787888,-,0.04M,0.00%,2.66%,-,Consumer Cyclical,Personal Services,USA,1.68M
+CRVO,4.52,0.8226,35.33,0.3468,200677920,4.80M,9.26M,48.20%,19.11%,5.48%,Healthcare,Biotechnology,USA,41.85M
+FTHM,0.63,0.4379999999999999,32.15,0.0881,13092565,19.29M,32.72M,41.16%,10.11%,0.96%,Real Estate,Real Estate Services,USA,20.75M
+OTLK,1.57,0.3534,30.83,0.0345,42830636,130.09M,160.15M,18.77%,6.91%,12.40%,Healthcare,Biotechnology,USA,251.43M
+GLXG,2.24,0.1914999999999999,28.0,-0.0691,1604029,1.71M,2.52M,32.36%,0.40%,0.72%,Industrials,Staffing & Employment Services,Hong Kong,5.65M
+VSME,2.75,-0.1538,26.73,-0.3323,2179123,2.57M,2.74M,6.97%,0.18%,2.69%,Communication Services,Advertising Agencies,Hong Kong,7.60M
+OBAI,1.11,1.0763,22.39,0.6964,497839584,14.71M,21.07M,39.89%,0.66%,1.35%,Technology,Software - Infrastructure,USA,27.15M
+RKTO,1.17,0.1359,21.81,-0.0675,4789454,21.68M,22.32M,2.89%,3.52%,29.68%,Healthcare,Biotechnology,USA,26.12M
+SRXH,0.19,0.2102,21.64,-0.0051,192263216,565.82M,590.25M,4.14%,0.26%,3.32%,Consumer Defensive,Packaged Foods,USA,112.15M
+QRHC,1.45,0.0584,20.83,-0.1241,423085,15.43M,21.01M,26.79%,50.49%,0.48%,Industrials,Waste Management,USA,30.56M
+MOBI,13.24,0.2025,20.8,-0.0045,360489,15.80M,33.25M,52.47%,-,2.18%,Healthcare,Medical Devices,USA,440.22M
+WYFI,35.65,0.1891,20.32,-0.0116999999999999,4993983,,,,,,,,,
+FLZH,3.85,0.2221999999999999,20.31,0.0159,8288177,1.59M,1.66M,4.37%,2.48%,1.07%,Industrials,Farm & Heavy Construction Machinery,USA,6.39M
+RRGB,6.05,0.2297,20.04,0.0243999999999999,1114581,15.32M,18.25M,17.20%,52.52%,13.20%,Consumer Cyclical,Restaurants,USA,111.92M
+CCHH,0.56,0.1166,20.0,-0.0695,1373360,4.14M,21.95M,78.71%,1.33%,0.59%,Consumer Cyclical,Restaurants,Malaysia,10.96M
