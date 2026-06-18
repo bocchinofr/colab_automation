@@ -1,0 +1,18 @@
+Ticker,Price,Change,Change from Open,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+INHD,39.49,0.0,3457.66,-0.9719,278899136,4.52M,4.52M,0.04%,0.21%,3.24%,Basic Materials,Steel,Hong Kong,178.52M
+SNBR,0.39,1.2084,123.37,-0.0113,911600832,18.58M,23.05M,19.39%,75.61%,33.01%,Consumer Cyclical,"Furnishings, Fixtures & Appliances",USA,8.99M
+SDOT,17.18,0.9815,56.18,0.2687,3032508,0.74M,0.74M,0.47%,0.63%,3.20%,Consumer Defensive,Farm Products,USA,12.79M
+FTFT,0.74,-0.0635,51.67,-0.3826,664322,2.96M,5.24M,49.56%,0.01%,1.08%,Technology,Software - Application,USA,4.34M
+ICCM,6.4,2.0047,51.3,0.9859,152922480,1.24M,2.71M,55.73%,3.84%,1.93%,Healthcare,Medical Devices,Israel,17.96M
+ELTX,4.71,0.7065,49.29,0.1431,51120416,13.15M,18.64M,31.10%,13.98%,14.42%,Healthcare,Biotechnology,USA,89.90M
+BIRD,5.48,0.3909,42.71,-0.0254,47781448,5.71M,6.22M,35.26%,16.30%,17.49%,Consumer Cyclical,Apparel Retail,USA,48.31M
+TANH,0.58,0.3432,34.88,-0.0042,2251205,14.28M,14.28M,0.02%,0.43%,3.22%,Consumer Defensive,Household & Personal Products,China,8.28M
+GPUS,0.4,0.5304,32.63,0.1538,603972416,432.79M,437.69M,1.01%,7.19%,6.32%,Industrials,Aerospace & Defense,USA,183.69M
+CAST,5.15,0.3732999999999999,32.39,0.0373,12450899,16.52M,26.93M,59.56%,1.39%,0.68%,Communication Services,Broadcasting,USA,212.91M
+VRM,10.7,0.3579,31.61,0.0317,698187,1.77M,5.21M,2.58%,-,3.11%,Financial,Credit Services,USA,55.72M
+VMAR,3.5,0.341,25.0,0.0728,1082907,0.19M,0.20M,7.87%,4.43%,6.65%,Consumer Cyclical,Recreational Vehicles,Canada,0.72M
+RXT,7.53,0.2126,24.77,-0.0282,65688716,96.35M,249.10M,61.34%,17.09%,15.93%,Technology,Software - Infrastructure,USA,1.88B
+HQ,23.61,0.2626,24.39,0.015,3052896,8.17M,31.83M,74.35%,5.25%,3.88%,Technology,Software - Infrastructure,Singapore,751.59M
+INDP,4.5,0.2097,23.63,-0.0215,749137,3.46M,113.24M,96.94%,0.07%,0.50%,Healthcare,Biotechnology,USA,509.59M
+NIXX,1.05,0.1812,21.77,-0.0299,4341719,24.12M,26.89M,17.15%,5.68%,4.55%,Industrials,Staffing & Employment Services,USA,30.58M
+BTTC,0.82,0.1867,21.43,-0.0227,447377,1.87M,10.77M,82.61%,0.51%,0.23%,Technology,Software - Application,Malaysia,8.84M
