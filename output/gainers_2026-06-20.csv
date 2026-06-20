@@ -1,0 +1,14 @@
+Ticker,Price,Change,Change from Open,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+BESS,5.82,0.3791,34.41,0.0260999999999999,2556377,4.40M,7.07M,38.03%,11.04%,1.82%,Utilities,Utilities - Renewable,USA,41.31M
+PMNT,0.2,0.1364,33.33,-0.1477,720621,,,,,,,,,
+HQ,32.0,0.3554,32.78,0.0208,8666143,8.17M,31.83M,74.35%,5.25%,3.88%,Technology,Software - Infrastructure,Singapore,1.02B
+EXFY,1.56,0.3,26.83,0.025,12261520,59.77M,84.27M,38.02%,31.10%,6.67%,Technology,Software - Application,USA,150.44M
+KALA,3.61,0.2689,26.67,0.0018,954787,18.56M,18.59M,0.18%,0.18%,0.38%,Healthcare,Biotechnology,USA,67.11M
+WYHG,4.89,0.2225,25.71,-0.0275,1050088,,,,,,,,,
+MDCX,0.46,0.3007999999999999,25.34,0.0378,11401372,10.24M,40.00M,13.32%,19.63%,29.15%,Healthcare,Drug Manufacturers - General,Canada,25.92M
+NEOV,2.78,0.3112999999999999,24.66,0.0519,17212575,44.51M,56.61M,21.36%,18.53%,8.57%,Industrials,Electrical Equipment & Parts,USA,157.37M
+CLWT,1.91,0.2166,23.23,-0.0127,1740617,3.08M,7.90M,58.48%,2.38%,1.38%,Industrials,Pollution & Treatment Controls,Hong Kong,14.16M
+OM,5.05,0.2562,22.87,0.0224,524245,17.67M,18.53M,4.66%,84.18%,12.58%,Healthcare,Medical Devices,USA,93.51M
+SOWG,3.87,0.2246999999999999,22.86,-0.0032,866364,,,,,,,,,
+GNPX,0.59,0.2246999999999999,21.14,0.011,1592459,-,9.04M,0.37%,0.99%,-,Healthcare,Biotechnology,USA,6.47M
+DOMO,2.42,0.21,20.4,0.005,6087349,37.69M,41.89M,16.53%,66.20%,7.78%,Technology,Software - Application,USA,109.27M
