@@ -1,0 +1,12 @@
+Ticker,Price,Change,Change from Open,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+BESS,5.82,0.3791,34.41,0.0260999999999999,2584474,4.40M,7.07M,38.03%,11.04%,1.82%,Utilities,Utilities - Renewable,USA,41.32M
+HQ,32.0,0.3554,32.78,0.0208,8690877,8.17M,31.83M,74.35%,5.25%,3.88%,Technology,Software - Infrastructure,Singapore,1.02B
+KALA,3.61,0.2689,26.67,0.0018,958875,18.56M,18.59M,0.18%,0.18%,0.38%,Healthcare,Biotechnology,USA,67.11M
+MDCX,0.46,0.3007999999999999,25.83,0.0338,12185096,10.24M,40.00M,13.32%,19.63%,29.15%,Healthcare,Drug Manufacturers - General,Canada,5.41M
+NEOV,2.78,0.3112999999999999,24.66,0.0519,17500968,44.51M,56.61M,21.36%,18.53%,8.57%,Industrials,Electrical Equipment & Parts,USA,157.38M
+EXFY,1.56,0.3,23.81,0.05,12527623,59.78M,84.27M,38.02%,31.10%,6.67%,Technology,Software - Application,USA,150.45M
+CLWT,1.91,0.2166,23.23,-0.0127,1781187,3.08M,7.90M,58.48%,2.38%,1.38%,Industrials,Pollution & Treatment Controls,Hong Kong,14.15M
+OM,5.05,0.2562,22.87,0.0224,525986,17.67M,18.53M,4.66%,84.18%,12.58%,Healthcare,Medical Devices,USA,93.63M
+SOWG,3.87,0.2246999999999999,22.86,-0.0032,869190,19.26M,20.12M,4.25%,0.12%,1.03%,Consumer Defensive,Confectioners,USA,77.86M
+GNPX,0.59,0.2246999999999999,21.14,0.011,1609143,-,9.04M,0.37%,0.99%,-,Healthcare,Biotechnology,USA,6.27M
+DOMO,2.42,0.21,20.4,0.005,6136234,37.69M,41.89M,16.53%,57.63%,7.78%,Technology,Software - Application,USA,109.26M
