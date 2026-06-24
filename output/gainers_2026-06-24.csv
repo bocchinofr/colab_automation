@@ -1,0 +1,16 @@
+Ticker,Price,Change,Change from Open,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+FCUV,4.11,0.8923000000000001,88.53,0.0037,76876713,1.66M,2.07M,19.67%,0.89%,0.21%,Technology,Scientific & Technical Instruments,USA,2.12M
+ADTX,0.04,1.1719,74.48,0.2448,4302555008,0.80M,0.82M,1.45%,0.09%,11.67%,Healthcare,Biotechnology,USA,0.03M
+XCH,1.01,0.5229,50.41,0.0125,3181617,,,,,,,,,
+ARQQ,29.04,0.3557,37.96,-0.0173,3225670,5.36M,17.40M,69.17%,23.60%,31.92%,Technology,Software - Infrastructure,United Kingdom,505.37M
+CRMT,3.86,0.2824,33.56,-0.0399,12116182,7.61M,8.30M,8.38%,96.71%,18.61%,Consumer Cyclical,Auto & Truck Dealerships,USA,32.05M
+FOFO,3.73,0.3227,31.34,0.0070999999999999,1867148,3.03M,7.57M,60.02%,0.33%,1.51%,Industrials,Consulting Services,Hong Kong,28.24M
+BTQ,5.87,0.3221,31.03,0.009,14204722,96.47M,141.31M,31.76%,14.42%,9.79%,Technology,Software - Infrastructure,Canada,829.78M
+CGTL,0.42,0.2487,24.32,0.0045,92838607,16.38M,17.23M,36.35%,0.57%,9.05%,Consumer Cyclical,Specialty Retail,Hong Kong,10.81M
+MYSE,2.68,0.1602,23.5,-0.0605999999999999,464231,4.78M,5.07M,5.80%,4.23%,4.47%,Technology,Software - Application,USA,13.42M
+NAMI,0.22,0.0369,23.35,-0.1594,26758474,-,79.07M,-,0.00%,-,Communication Services,Internet Content & Information,China,17.33M
+WHLR,2.97,-0.2184,23.24,-0.3657999999999999,516746,0.55M,0.55M,0.00%,16.63%,5.09%,Real Estate,REIT - Retail,USA,1.63M
+VVOS,0.47,0.1594,21.75,-0.0476999999999999,974866,10.25M,13.49M,26.22%,13.12%,7.67%,Healthcare,Medical Devices,USA,6.48M
+MGRX,0.35,0.1924,20.82,-0.0131,9105564,14.59M,16.97M,14.99%,4.81%,1.58%,Healthcare,Health Information Services,USA,5.96M
+SDOT,10.1,0.0914,20.32,-0.093,708365,0.74M,0.74M,0.47%,0.63%,3.20%,Consumer Defensive,Farm Products,USA,7.52M
+XAIR,0.47,0.1442999999999999,20.0,-0.0465,457225,,,,,,,,,
