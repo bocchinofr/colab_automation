@@ -27,6 +27,41 @@ technical = Technical()
 technical.set_filter(filters_dict=filters_dict)
 df_screen = technical.screener_view()
 
+# ════════════════════════════════════════════════════════════
+# 🩹 WORKAROUND TEMPORANEO — bug libreria finvizfinance 1.3.0
+# Bug noto: la libreria duplica la prima lettera del ticker
+# (es. "ELVA" -> "EELVA"), causando 404 su Finviz.
+# Segnalato qui: https://github.com/lit26/finvizfinance/issues/158
+# Nessuna fix ufficiale rilasciata al 2026-07-16.
+#
+# ⚠️ RIMUOVERE questo blocco (e i due controlli sotto) non appena
+# i maintainer rilasciano una nuova versione che risolve il problema.
+# ════════════════════════════════════════════════════════════
+if df_screen is not None and not df_screen.empty and "Ticker" in df_screen.columns:
+
+    def fix_duplicated_ticker(t):
+        t = str(t).strip()
+        if len(t) >= 2 and t[0] == t[1]:
+            return t[1:]
+        return t
+
+    fixed_tickers = df_screen["Ticker"].apply(fix_duplicated_ticker)
+    changed_mask = fixed_tickers != df_screen["Ticker"]
+    if changed_mask.any():
+        print(f"🔧 [WORKAROUND] Corretti {changed_mask.sum()} ticker duplicati: "
+              f"{list(zip(df_screen['Ticker'][changed_mask], fixed_tickers[changed_mask]))}")
+    df_screen["Ticker"] = fixed_tickers
+
+    # Scarta ticker chiaramente malformati (parsing rotto) prima di chiamare Finviz
+    before_count = len(df_screen)
+    df_screen = df_screen[df_screen["Ticker"].str.len().between(1, 5)]
+    dropped = before_count - len(df_screen)
+    if dropped > 0:
+        print(f"🔧 [WORKAROUND] Scartati {dropped} ticker malformati (lunghezza anomala)")
+# ════════════════════════════════════════════════════════════
+# 🩹 FINE WORKAROUND TEMPORANEO
+# ════════════════════════════════════════════════════════════
+
 if df_screen is not None and not df_screen.empty:
 
     # 🔹 Normalizza Gap%
