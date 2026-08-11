@@ -1,6 +1,5 @@
 # script1_finviz.py
 from finvizfinance.screener.technical import Technical
-from finvizfinance.quote import finvizfinance
 import yfinance as yf
 import pandas as pd
 from datetime import datetime
@@ -120,6 +119,18 @@ if df_screen is not None and not df_screen.empty:
             insider_own = info.get("heldPercentInsiders")
             inst_own = info.get("heldPercentInstitutions")
             short_float = info.get("shortPercentOfFloat")
+
+            # Verifica coerenza Float / Outstanding
+            if (
+                float_shares is not None and
+                shares_outstanding is not None and
+                float_shares > shares_outstanding * 1.05
+            ):
+                print(
+                    f"⚠️ {ticker}: FLOAT anomalo "
+                    f"({float_shares:,}) > OUTSTANDING ({shares_outstanding:,}) -> Float ignorato"
+                )
+                float_shares = None
 
             print(
                 f"{ticker} | "
