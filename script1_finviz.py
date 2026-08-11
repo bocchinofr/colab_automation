@@ -108,19 +108,6 @@ if df_screen is not None and not df_screen.empty:
     short_float_list = []
     market_cap_list = []
 
-    print("====================================")
-    import finvizfinance
-    print("VERSIONE FINVIZFINANCE:", finvizfinance.__version__)
-    print("TEST FULL INFO")
-
-    test_stock = finvizfinance("AAPL")
-    test_info = test_stock.ticker_full_info()
-
-    print(type(test_info))
-    print(test_info)
-
-    print("====================================")
-
     for ticker in df_screen["Ticker"]:
 
         stock = finvizfinance(ticker)
