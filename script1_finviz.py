@@ -108,17 +108,16 @@ if df_screen is not None and not df_screen.empty:
     short_float_list = []
     market_cap_list = []
 
-    for ticker in df_screen["Ticker"]:
+    import yfinance as yf
 
-        stock = finvizfinance(ticker)
+    test = yf.Ticker("AAPL")
 
-        try:
-            stock_fundament = stock.ticker_fundament()
-            print(f"{ticker} -> {stock_fundament}")
-        except Exception as e:
-            print(f"ERRORE ticker_fundament per {ticker}: {e}")
-
-        break
+    print("MARKET CAP:", test.info.get("marketCap"))
+    print("FLOAT:", test.info.get("floatShares"))
+    print("SHARES:", test.info.get("sharesOutstanding"))
+    print("INSIDERS:", test.info.get("heldPercentInsiders"))
+    print("INST:", test.info.get("heldPercentInstitutions"))
+    print("SHORT:", test.info.get("shortPercentOfFloat"))
 
 
 else:
