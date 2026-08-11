@@ -135,9 +135,5 @@ if df_screen is not None and not df_screen.empty:
             break
 
 
-    # 🔹 Salva CSV finale
-    df_screen.to_csv(output_file, index=False)
-    print(f"✅ Salvato con nuovi filtri e colonne: {output_file}")
-
 else:
     print("⚠️ Nessun ticker trovato.")
