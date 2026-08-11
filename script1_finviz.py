@@ -13,15 +13,6 @@ os.makedirs(output_dir, exist_ok=True)
 date_str = datetime.now().strftime("%Y-%m-%d")
 output_file = os.path.join(output_dir, f"tickers_{date_str}.csv")
 
-
-stock = finvizfinance("AAPL")
-
-fund = stock.ticker_fundament()
-
-print("Numero campi:", len(fund))
-print(fund)
-
-
 # 🔹 Filtri screener Finviz
 filters_dict = {
     "Market Cap.": "-Small (under $2bln)",
@@ -116,6 +107,14 @@ if df_screen is not None and not df_screen.empty:
     inst_own_list = []
     short_float_list = []
     market_cap_list = []
+
+    print("====================================")
+    print("TEST FINVIZ")
+    test_stock = finvizfinance("AAPL")
+    test_fund = test_stock.ticker_fundament()
+    print("Numero campi:", len(test_fund))
+    print(test_fund)
+    print("====================================")
 
     for ticker in df_screen["Ticker"]:
         try:
