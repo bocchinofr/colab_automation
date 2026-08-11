@@ -134,9 +134,6 @@ if df_screen is not None and not df_screen.empty:
             print(f"{ticker} -> {stock_fundament}")
             break
 
-    # 🔹 Colonne inutili da rimuovere
-    columns_to_drop = ["Beta", "ATR", "SMA20", "SMA50", "SMA200", "52W High", "52W Low", "RSI"]
-    df_screen = df_screen.drop(columns=[c for c in columns_to_drop if c in df_screen.columns])
 
     # 🔹 Salva CSV finale
     df_screen.to_csv(output_file, index=False)
