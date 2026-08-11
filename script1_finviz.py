@@ -109,11 +109,14 @@ if df_screen is not None and not df_screen.empty:
     market_cap_list = []
 
     print("====================================")
-    print("TEST FINVIZ")
+    print("TEST FULL INFO")
+
     test_stock = finvizfinance("AAPL")
-    test_fund = test_stock.ticker_fundament()
-    print("Numero campi:", len(test_fund))
-    print(test_fund)
+    test_info = test_stock.ticker_full_info()
+
+    print(type(test_info))
+    print(test_info)
+
     print("====================================")
 
     for ticker in df_screen["Ticker"]:
