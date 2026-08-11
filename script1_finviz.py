@@ -134,14 +134,6 @@ if df_screen is not None and not df_screen.empty:
             print(f"{ticker} -> {stock_fundament}")
             break
 
-    # 🔹 Aggiunge nuove colonne
-    df_screen["Shs Float"] = shs_float_list
-    df_screen["Shares Outstanding"] = shs_outstand_list
-    df_screen["Insider Ownership"] = insider_own_list
-    df_screen["Institutional Ownership"] = inst_own_list
-    df_screen["Short Float"] = short_float_list
-    df_screen["Market Cap"] = market_cap_list
-
     # 🔹 Colonne inutili da rimuovere
     columns_to_drop = ["Beta", "ATR", "SMA20", "SMA50", "SMA200", "52W High", "52W Low", "RSI"]
     df_screen = df_screen.drop(columns=[c for c in columns_to_drop if c in df_screen.columns])
