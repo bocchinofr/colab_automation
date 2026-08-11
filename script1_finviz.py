@@ -122,17 +122,16 @@ if df_screen is not None and not df_screen.empty:
     print("====================================")
 
     for ticker in df_screen["Ticker"]:
+
+        stock = finvizfinance(ticker)
+
         try:
-            stock = finvizfinance(ticker)
-
-            try:
-                stock_fundament = stock.ticker_fundament()
-            except Exception as e:
-                print(f"ERRORE ticker_fundament per {ticker}: {e}")
-                stock_fundament = {}
-
+            stock_fundament = stock.ticker_fundament()
             print(f"{ticker} -> {stock_fundament}")
-            break
+        except Exception as e:
+            print(f"ERRORE ticker_fundament per {ticker}: {e}")
+
+        break
 
 
 else:
