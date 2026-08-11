@@ -13,6 +13,15 @@ os.makedirs(output_dir, exist_ok=True)
 date_str = datetime.now().strftime("%Y-%m-%d")
 output_file = os.path.join(output_dir, f"tickers_{date_str}.csv")
 
+
+stock = finvizfinance("AAPL")
+
+fund = stock.ticker_fundament()
+
+print("Numero campi:", len(fund))
+print(fund)
+
+
 # 🔹 Filtri screener Finviz
 filters_dict = {
     "Market Cap.": "-Small (under $2bln)",
