@@ -49,12 +49,28 @@ fundamentals_dict = {}
 for ticker in tickers:
     dft = df[df["Ticker"] == ticker]
     if not dft.empty:
+        d1_change = first_row.get("d1_change")
+        d1_gap = first_row.get("d1_gap")
+
+        d1_change = (
+            round(float(d1_change) * 100)
+            if pd.notna(d1_change)
+            else None
+        )
+
+        d1_gap = (
+            round(float(d1_gap) * 100)
+            if pd.notna(d1_gap)
+            else None
+        )
         first_row = dft.iloc[0]
         fundamentals_dict[ticker] = {
             "Market Cap": first_row.get("Market Cap", None),
-            "d1_change_from_open": first_row.get("d1_change_from_open", None),
-            "d1_change": round(first_row.get("d1_change", None) * 100) if first_row.get("d1_change") is not None else None,            
-            "d1_gap": round(first_row.get("d1_gap", None) * 100) if first_row.get("d1_gap") is not None else None,            
+            "d1_change_from_open": first_row.get("d1_change_from_open")
+            if pd.notna(first_row.get("d1_change_from_open"))
+            else None,
+            "d1_change": d1_change,
+            "d1_gap": d1_gap,
             "Price_D1": first_row.get("Price_D1", None),
             "Volume_D1": first_row.get("Volume_D1", None),
             "Short Float": first_row.get("Short Float", None),
