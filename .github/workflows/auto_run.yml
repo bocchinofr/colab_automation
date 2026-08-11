@@ -31,6 +31,10 @@ jobs:
           import finvizfinance.quote
           print(finvizfinance.quote.__file__)
           "
+      - name: Show quote.py around ticker_fundament
+        run: |
+          sed -n '130,180p' /opt/hostedtoolcache/Python/3.12.13/x64/lib/python3.12/site-packages/finvizfinance/quote.py
+          
       - name: Calcola giorno settimana
         id: day
         run: echo "day=$(date -u +%w)" >> $GITHUB_OUTPUT
