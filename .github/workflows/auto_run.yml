@@ -24,7 +24,13 @@ jobs:
         run: |
           pip install git+https://github.com/lit26/finvizfinance.git
           pip install yfinance openpyxl pandas
-
+      - name: Show finvizfinance quote.py
+        run: |
+          python -c "
+          import finvizfinance, inspect
+          import finvizfinance.quote
+          print(finvizfinance.quote.__file__)
+          "
       - name: Calcola giorno settimana
         id: day
         run: echo "day=$(date -u +%w)" >> $GITHUB_OUTPUT
