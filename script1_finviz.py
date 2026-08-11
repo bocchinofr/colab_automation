@@ -109,6 +109,7 @@ if df_screen is not None and not df_screen.empty:
     market_cap_list = []
 
     print("====================================")
+    import finvizfinance
     print("VERSIONE FINVIZFINANCE:", finvizfinance.__version__)
     print("TEST FULL INFO")
 
