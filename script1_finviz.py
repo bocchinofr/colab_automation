@@ -1,6 +1,7 @@
 # script1_finviz.py
 from finvizfinance.screener.technical import Technical
 from finvizfinance.quote import finvizfinance
+import yfinance as yf
 import pandas as pd
 from datetime import datetime
 import os
@@ -108,17 +109,57 @@ if df_screen is not None and not df_screen.empty:
     short_float_list = []
     market_cap_list = []
 
-    import yfinance as yf
+    for ticker in df_screen["Ticker"]:
 
-    test = yf.Ticker("AAPL")
+        try:
+            info = yf.Ticker(ticker).info
 
-    print("MARKET CAP:", test.info.get("marketCap"))
-    print("FLOAT:", test.info.get("floatShares"))
-    print("SHARES:", test.info.get("sharesOutstanding"))
-    print("INSIDERS:", test.info.get("heldPercentInsiders"))
-    print("INST:", test.info.get("heldPercentInstitutions"))
-    print("SHORT:", test.info.get("shortPercentOfFloat"))
+            market_cap = info.get("marketCap")
+            float_shares = info.get("floatShares")
+            shares_outstanding = info.get("sharesOutstanding")
+            insider_own = info.get("heldPercentInsiders")
+            inst_own = info.get("heldPercentInstitutions")
+            short_float = info.get("shortPercentOfFloat")
 
+            print(
+                f"{ticker} | "
+                f"MC={market_cap} | "
+                f"FLOAT={float_shares}"
+            )
+
+            shs_float_list.append(float_shares)
+            shs_outstand_list.append(shares_outstanding)
+            insider_own_list.append(insider_own)
+            inst_own_list.append(inst_own)
+            short_float_list.append(short_float)
+            market_cap_list.append(market_cap)
+
+        except Exception as e:
+            print(f"⚠️ Errore con {ticker}: {e}")
+
+            shs_float_list.append(None)
+            shs_outstand_list.append(None)
+            insider_own_list.append(None)
+            inst_own_list.append(None)
+            short_float_list.append(None)
+            market_cap_list.append(None)
+
+    # 🔹 Aggiunge nuove colonne
+    df_screen["Shs Float"] = shs_float_list
+    df_screen["Shares Outstanding"] = shs_outstand_list
+    df_screen["Insider Ownership"] = insider_own_list
+    df_screen["Institutional Ownership"] = inst_own_list
+    df_screen["Short Float"] = short_float_list
+    df_screen["Market Cap"] = market_cap_list
+
+
+    # 🔹 Colonne inutili da rimuovere
+    columns_to_drop = ["Beta", "ATR", "SMA20", "SMA50", "SMA200", "52W High", "52W Low", "RSI"]
+    df_screen = df_screen.drop(columns=[c for c in columns_to_drop if c in df_screen.columns])
+
+    # 🔹 Salva CSV finale
+    df_screen.to_csv(output_file, index=False)
+    print(f"✅ Salvato con nuovi filtri e colonne: {output_file}")
 
 else:
     print("⚠️ Nessun ticker trovato.")
