@@ -1,6 +1,6 @@
 # D2_script1_gainfinviz.py
 from finvizfinance.screener.technical import Technical
-from finvizfinance.quote import finvizfinance
+import yfinance as yf
 import pandas as pd
 from datetime import datetime
 import os
@@ -103,20 +103,48 @@ if df_screen is not None and not df_screen.empty:
 
     for idx, ticker in enumerate(df_screen["Ticker"], 1):
         try:
-            stock = finvizfinance(ticker)
-            stock_fundament = stock.ticker_fundament()
+            info = yf.Ticker(ticker).info
 
-            shs_float_list.append(stock_fundament.get("Shs Float"))
-            shs_outstand_list.append(stock_fundament.get("Shs Outstand"))
-            insider_own_list.append(stock_fundament.get("Insider Own"))
-            inst_own_list.append(stock_fundament.get("Inst Own"))
-            short_float_list.append(stock_fundament.get("Short Float"))
-            sector_list.append(stock_fundament.get("Sector"))
-            industry_list.append(stock_fundament.get("Industry"))
-            country_list.append(stock_fundament.get("Country"))
-            market_cap_list.append(stock_fundament.get("Market Cap"))
+            market_cap = info.get("marketCap")
+            float_shares = info.get("floatShares")
+            shares_outstanding = info.get("sharesOutstanding")
+            insider_own = info.get("heldPercentInsiders")
+            inst_own = info.get("heldPercentInstitutions")
+            short_float = info.get("shortPercentOfFloat")
 
-            print(f"  [{idx}/{len(df_screen)}] {ticker}", end="\r")
+            # Settore / Industry / Country
+            sector = info.get("sector")
+            industry = info.get("industry")
+            country = info.get("country")
+
+            # Controllo coerenza Float / Outstanding
+            if (
+                float_shares is not None and
+                shares_outstanding is not None and
+                float_shares > shares_outstanding * 1.05
+            ):
+                print(
+                    f"\n⚠️ {ticker}: FLOAT anomalo "
+                    f"({float_shares:,}) > OUTSTANDING ({shares_outstanding:,}) "
+                    f"-> Float ignorato"
+                )
+                float_shares = None
+
+            shs_float_list.append(float_shares)
+            shs_outstand_list.append(shares_outstanding)
+            insider_own_list.append(insider_own)
+            inst_own_list.append(inst_own)
+            short_float_list.append(short_float)
+            sector_list.append(sector)
+            industry_list.append(industry)
+            country_list.append(country)
+            market_cap_list.append(market_cap)
+
+            print(
+                f"  [{idx}/{len(df_screen)}] "
+                f"{ticker} | MC={market_cap} | FLOAT={float_shares}",
+                end="\r"
+            )
 
         except Exception as e:
             print(f"\n⚠️ Errore {ticker}: {e}")
