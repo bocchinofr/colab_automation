@@ -124,15 +124,23 @@ if df_screen is not None and not df_screen.empty:
     for ticker in df_screen["Ticker"]:
         try:
             stock = finvizfinance(ticker)
+            stock_fundament = stock.ticker_fundament()
 
-            try:
-                stock_fundament = stock.ticker_fundament()
-            except Exception as e:
-                print(f"ERRORE ticker_fundament per {ticker}: {e}")
-                stock_fundament = {}
+            shs_float_list.append(stock_fundament.get("Shs Float"))
+            shs_outstand_list.append(stock_fundament.get("Shs Outstand"))
+            insider_own_list.append(stock_fundament.get("Insider Own"))
+            inst_own_list.append(stock_fundament.get("Inst Own"))
+            short_float_list.append(stock_fundament.get("Short Float"))
+            market_cap_list.append(stock_fundament.get("Market Cap"))
 
-            print(f"{ticker} -> {stock_fundament}")
-            break
+        except Exception as e:
+            print(f"⚠️ Errore con {ticker}: {e}")
+            shs_float_list.append(None)
+            shs_outstand_list.append(None)
+            insider_own_list.append(None)
+            inst_own_list.append(None)
+            short_float_list.append(None)
+            market_cap_list.append(None)
 
     # 🔹 Aggiunge nuove colonne
     df_screen["Shs Float"] = shs_float_list
