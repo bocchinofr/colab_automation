@@ -1,0 +1,14 @@
+Ticker,Price,Change %,Change from Open %,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+AACG,1.11,21.99%,31.02%,-0.0689,13202743,5976213.0,43208251,0.03445,0.07419,0.0005,Consumer Defensive,Education & Training Services,China,47961160
+BSEM,3.1,-18.42%,34.78%,-0.3947,647979,13398265.0,16984057,0.20906,0.0,,Healthcare,Biotechnology,United States,52650572
+BYSI,1.0,34.27%,31.09%,0.0243,38970428,31948867.0,41119820,0.14265999,0.14622,0.065799996,Healthcare,Biotechnology,United States,40967676
+CDTG,1.6,31.15%,29.03%,0.0163999999999999,1181401,2766994.0,3021027,0.06057,0.00123,0.0053,Industrials,Waste Management,China,4833643
+DRMA,1.57,13.77%,29.75%,-0.1232,1288987,3168282.0,4022143,0.24816999,0.08168,0.0161,Healthcare,Biotechnology,United States,6314764
+FGI,11.72,147.78%,38.37%,0.7907,102312161,530964.0,1931271,0.72946,0.0101,0.040799998,Consumer Cyclical,"Furnishings, Fixtures & Appliances",United States,22634496
+HCTI,1.73,39.52%,33.08%,0.0484,45231786,2026789.0,2027783,1.0000001e-05,0.00839,0.08180001,Healthcare,Health Information Services,United States,3508064
+INHD,10.84,57.33%,66.51%,-0.0552,2855844,2518846.0,4520698,0.0013600001,0.01212,0.6021,Basic Materials,Steel,Hong Kong,49004368
+NCPL,0.33,-0.91%,41.57%,-0.3,18017943,4383679.0,7847899,0.4409,0.02078,0.0092,Financial Services,Capital Markets,United States,2576465
+NXGL,0.49,18.93%,22.11%,-0.026,1643184,7074833.0,9225242,0.14592,0.127,0.0167,Healthcare,Medical Instruments & Supplies,United States,4508376
+OPRX,8.78,24.72%,28.74%,-0.0312,1125268,14172135.0,18832836,0.12875,0.70663,0.0759,Healthcare,Health Information Services,United States,165352288
+PMA,1.62,36.13%,40.87%,-0.0336,1328889,,6975000,0.10844,0.0075,0.0881,Industrials,Engineering & Construction,Hong Kong,21019500
+RMCF,1.65,8.55%,22.22%,-0.1118,4336448,6090233.0,9439587,0.32514998,0.34855,0.0274,Consumer Defensive,Confectioners,United States,15575318
