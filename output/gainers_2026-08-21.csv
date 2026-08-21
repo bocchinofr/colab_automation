@@ -1,0 +1,13 @@
+Ticker,Price,Change %,Change from Open %,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+BIVI,1.86,38.81%,20.39%,0.153,49110644,7501304.0,8451148,0.0029699998,0.19779,0.1067,Healthcare,Biotechnology,United States,15719135
+BRLS,1.75,91.89%,110.84%,-0.0899,47004660,6468397.0,21463306,0.455,0.0029199999,0.0504,Consumer Defensive,Packaged Foods,Canada,37560788
+INDP,1.38,46.81%,46.51%,0.002,11750392,3816060.0,133242324,0.82445,0.0030399999,0.0007,Healthcare,Biotechnology,United States,183874400
+MGN,0.11,9.90%,22.52%,-0.103,144265019,,800000,0.18266001,0.05289,0.0515,Industrials,Engineering & Construction,Malaysia,102675
+NWGL,0.59,21.59%,30.20%,-0.0661,1133313,,4936559,0.0,0.031229999,0.111,Basic Materials,Lumber & Wood Production,Macau,9799474
+NXTT,8.0,20.48%,22.32%,-0.0151,4674746,1451663.0,1472962,,,0.0002,Technology,Software - Application,Japan,11783696
+PCLA,8.49,32.66%,33.70%,-0.0078,5125329,1090024.0,9613805,0.338,1.0000001e-05,0.0659,Communication Services,Telecom Services,Japan,81621200
+TGHL,0.81,17.73%,20.48%,-0.0227999999999999,5886056,12722768.0,14866470,0.1442,0.00505,0.0121,Technology,Software - Infrastructure,Singapore,20422008
+USDE,4.0,29.45%,23.84%,0.0453,6979500,23294797.0,24029375,0.10647,0.18563999,,Financial Services,Capital Markets,United States,96117504
+WYHG,5.71,23.86%,30.66%,-0.0521,3773624,6876841.0,12581166,0.0,0.00328,0.0125,Consumer Defensive,Packaged Foods,China,71838456
+XOS,3.72,28.28%,25.68%,0.0207,15009945,7385748.0,14217852,0.44992,0.04946,0.0709,Industrials,Farm & Heavy Construction Machinery,United States,52890408
+ZSTK,5.89,18.75%,41.25%,-0.1593,1557829,6918451.0,17489828,0.63585,0.00402,0.0023999999,Financial Services,Asset Management,Canada,103015088
