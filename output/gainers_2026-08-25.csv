@@ -1,0 +1,9 @@
+Ticker,Price,Change %,Change from Open %,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+DAIC,1.73,306.10%,60.14%,1.5359,102227996,692763.0,30259579,0.26374,0.11017,0.0396,Technology,Information Technology Services,United States,52349072
+GGR,2.93,29.07%,36.92%,-0.0573,1479068,14128783.0,20073579,0.5795,0.07085,0.0058999998,Consumer Cyclical,Auto Manufacturers,Taiwan,58815592
+GIPR,0.75,150.67%,149.42%,0.005,285771143,985504.0,1861303,0.12367,0.063439995,0.1299,Real Estate,REIT - Diversified,United States,1400630
+NXGL,0.38,15.15%,23.58%,-0.0682,25008168,7554926.0,9747663,0.1381,0.13674,0.0167,Healthcare,Medical Instruments & Supplies,United States,3704112
+RFAI,51.04,-12.00%,24.55%,-0.2934,430490,4831290.0,8343765,0.34457,0.63676,0.00059999997,Financial Services,Shell Companies,Singapore,425865760
+TJGC,6.1,30.90%,32.03%,-0.0086,4935461,6349985.0,10100023,0.38968,0.00909,0.0239,Communication Services,Advertising Agencies,Hong Kong,61610140
+VBIO,0.17,35.40%,38.33%,-0.0212,109754347,,4151259,0.00625,0.02735,0.2039,Healthcare,Biotechnology,United States,689108
+WETO,27.59,6.07%,20.38%,-0.1188,383338,176268.0,820800,0.01512,0.00166,0.0089,Technology,Software - Infrastructure,United States,22645872
