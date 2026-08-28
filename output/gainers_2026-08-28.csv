@@ -1,0 +1,6 @@
+Ticker,Price,Change %,Change from Open %,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+CYAB,0.47,54.57%,26.97%,0.2173999999999999,169712047,9100677,17597071,0.27958,0.1322,,Technology,Software - Infrastructure,Israel,8444835
+FNGR,0.64,266.49%,109.46%,0.7497,864533331,47345700,61310361,0.24700001,0.02431,0.0184,Communication Services,Telecom Services,Singapore,38772672
+KXIN,0.99,-34.07%,41.25%,-0.5333,5040906,1418651,1509096,0.0,0.018509999,0.033299997,Consumer Cyclical,Auto & Truck Dealerships,China,1604314
+SWVL,2.72,23.08%,20.89%,0.0181,1730371,4747512,9964344,0.28351998,0.010989999,0.0074,Industrials,Railroads,United Arab Emirates,27107998
+WCT,0.78,3.98%,96.57%,-0.471,7244896,1144246,2905328,0.01174,0.00035,0.0913,Technology,Software - Application,Hong Kong,3567667
