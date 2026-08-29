@@ -1,0 +1,11 @@
+Ticker,Price,Change %,Change from Open %,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+AREN,1.12,19.15%,23.08%,-0.0319,16878662,13144349,47610653,0.72392,0.07863,0.0306,Communication Services,Internet Content & Information,United States,53323932
+CHAI,0.4,57.11%,68.78%,-0.0691,303351772,8216706,25866846,0.49978,0.0853,0.0307,Communication Services,Internet Content & Information,United States,10346739
+CLGN,0.36,23.58%,23.83%,-0.0021,8981818,8560922,18908207,0.29794002,0.099300005,0.0015,Healthcare,Biotechnology,Israel,6769138
+DUO,0.96,37.56%,42.04%,-0.0315,64142157,38529139,38529284,0.00306,0.0070999996,0.0034,Real Estate,Real Estate Services,China,37014184
+FNGR,0.4,129.53%,31.70%,0.7428,1246831212,47345700,61310361,0.24700001,0.02431,0.0184,Communication Services,Telecom Services,Singapore,24401524
+KXIN,1.43,-4.67%,104.26%,-0.5333,8489486,1418651,1509096,0.0,0.018509999,0.033299997,Consumer Cyclical,Auto & Truck Dealerships,China,2364879
+NCNA,1.76,19.73%,21.38%,-0.0136,1018257,4309196,4161971,1.0000001e-05,0.026010001,0.0323,Healthcare,Biotechnology,United Kingdom,7325069
+SWVL,3.12,41.18%,36.24%,0.0362,4842127,4747512,9964344,0.28351998,0.010989999,0.0074,Industrials,Railroads,United Arab Emirates,31088752
+TJGC,9.9,24.69%,24.84%,-0.0013,576671,6349985,10100023,0.38968,0.00909,0.0846,Communication Services,Advertising Agencies,Hong Kong,99990224
+WCT,1.09,45.53%,175.11%,-0.471,20681200,1144246,2905328,0.01174,0.00035,0.0913,Technology,Software - Application,Hong Kong,4938104
