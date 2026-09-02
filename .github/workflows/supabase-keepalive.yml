@@ -9,11 +9,9 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase (write)
+      - name: Ping Supabase
         run: |
-          curl -sf "\nHTTP_STATUS:%{http_code}\n" \
-            -X PATCH "${{ secrets.SUPABASE_URL }}/rest/v1/keepalive?id=eq.1" \
+          curl -s -w "\nHTTP_STATUS:%{http_code}\n" \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/journal_entries?select=id&limit=1" \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Content-Type: application/json" \
-            -d '{"last_ping": "now()"}'
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
