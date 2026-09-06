@@ -1,0 +1,8 @@
+Ticker,Price,Change %,Change from Open %,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+BIAF,15.27,19.48%,37.32%,-0.1299,20085150,532257,600736,0.01594,0.10908,0.024400001,Healthcare,Diagnostics & Research,United States,9173239
+CDTG,1.32,46.72%,44.44%,0.0158,87123019,2766994,3021027,0.06057,0.05776,0.0257,Industrials,Waste Management,China,3987755
+GRI,2.88,25.76%,23.08%,0.0218,7464779,2186115,2186115,0.00375,0.04281,0.0581,Healthcare,Biotechnology,United States,6296011
+GRNQ,18.7,30.77%,33.57%,-0.021,343853,1069894,1812786,0.65804,0.0078100003,0.0014,Industrials,Consulting Services,Malaysia,33899100
+NRSN,0.51,27.19%,27.70%,-0.004,4224384,23870668,37766098,0.25646,0.0089300005,0.0165,Healthcare,Biotechnology,Israel,19290922
+NWGL,1.27,23.30%,23.30%,0.0,5955977,9530154,17236557,0.0,0.031229999,0.0319,Basic Materials,Lumber & Wood Production,Macau,36643516
+ONCO,1.02,38.02%,38.12%,-0.0007,6663281,3949068,4380522,0.00168,0.0733,0.0385,Healthcare,Biotechnology,United States,4468132
