@@ -1,0 +1,4 @@
+Ticker,Price,Change %,Change from Open %,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+MEDS,2.67,64.81%,57.06%,0.0494,6345116,1484051.0,3061919,0.56128,0.01709,0.0864,Healthcare,Medical Distribution,United States,4960309
+MGN,0.25,92.77%,42.67%,0.3511999999999999,70146486,,20000,0.00457,0.00132,0.0256,Industrials,Engineering & Construction,Malaysia,18661
+SNYR,0.13,56.87%,57.63%,-0.0049,35429876,8170053.0,14899883,0.47976002,0.04513,0.0214,Healthcare,Medical Distribution,United States,1226260
