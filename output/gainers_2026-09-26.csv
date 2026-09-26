@@ -1,0 +1,10 @@
+Ticker,Price,Change %,Change from Open %,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+AIB,1.69,19.01%,20.71%,-0.0141,2320852,41322952.0,75979466.0,0.39044997,0.36385,0.01,Technology,Software - Infrastructure,United States,128405296.0
+FAI,1.61,22.90%,21.05%,0.0153,23216784,,,,,,,,,
+IPST,3.71,21.64%,24.50%,-0.023,4440406,664372.0,721578.0,0.031630002,0.14661999,0.0145000005,Financial Services,Capital Markets,United States,2677054.0
+MSGY,8.07,309.64%,278.87%,0.0812,56134191,807132.0,2119625.0,0.35431,0.01731,0.15529999,Industrials,Engineering & Construction,Hong Kong,17105374.0
+PMAX,1.62,-1.82%,25.58%,-0.2182,1852995,1017107.0,1037171.0,0.13978,0.0,0.0202,Financial Services,Capital Markets,Hong Kong,2778839.0
+SHMD,4.37,20.72%,20.72%,0.0,13070081,13553725.0,66637954.0,0.61451,0.119820006,0.0626,Industrials,Specialty Industrial Machinery,Germany,291207840.0
+TDIC,3.16,60.41%,58.79%,0.0102,42787267,2432379.0,3405583.0,0.42574,0.00054000004,0.0034999999,Communication Services,Advertising Agencies,Hong Kong,10786923.0
+VSME,1.0,23.87%,21.91%,0.0161,12181164,2570741.0,2750784.0,0.0032300001,0.01121,0.1543,Communication Services,Advertising Agencies,Singapore,2765070.0
+YDES,5.73,20.13%,20.13%,0.0,656541,15798663.0,70831346.0,0.80149,0.00401,0.0026,Healthcare,Biotechnology,Taiwan,405863616.0
