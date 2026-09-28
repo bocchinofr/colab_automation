@@ -1,0 +1,4 @@
+Ticker,Price,Change %,Change from Open %,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+ARAY,0.36,65.92%,24.05%,0.3375,105689182,113730108,119439307,0.04364,0.64504,0.047399998,Healthcare,Medical Devices,United States,25691394
+ONCO,1.33,29.13%,25.47%,0.0291,4828705,3949068,4380522,0.00151,0.06608,0.0309,Healthcare,Biotechnology,United States,4511937
+WBUY,1.03,23.81%,21.20%,0.0215,18433417,2472062,5202808,0.29365999,0.00632,0.024,Consumer Cyclical,Internet Retail,Singapore,4560826
