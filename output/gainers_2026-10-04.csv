@@ -1,0 +1,10 @@
+Ticker,Price,Change %,Change from Open %,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+CYCU,3.82,42.01%,28.19%,0.1077999999999999,49204591,3084593,25840335,0.04299,0.03108,0.011,Technology,Information Technology Services,United States,98710080
+FLUX,0.64,57.40%,60.20%,-0.0175,167280934,15586177,21621642,0.21447,0.31418,0.0379,Industrials,Electrical Equipment & Parts,United States,13837851
+FNGR,0.25,41.15%,37.78%,0.0245,253409995,47345700,76162686,0.19883,0.01957,0.056799997,Communication Services,Telecom Services,Singapore,18888346
+ICU,4.69,25.07%,24.07%,0.008,519668,4360878,4406841,0.11623,0.07621,0.0278,Healthcare,Biotechnology,United States,20668084
+PMI,5.78,33.80%,33.80%,0.0,892627,1281782,2338634,0.41865003,0.064380005,0.1499,Healthcare,Medical Devices,United States,13517305
+REBN,2.18,26.01%,23.16%,0.0231,360166,6084082,8620122,0.3858,0.12597999,0.0211,Consumer Cyclical,Restaurants,United States,18791866
+SDEV,7.48,104.37%,47.83%,0.3825,153287148,22550189,50615437,0.90075,0.032449998,0.0435,Financial Services,Asset Management,United States,378603456
+XRPN,39.42,68.25%,35.93%,0.2377,9304983,19139433,23710000,0.0,0.89053,0.0029,Financial Services,Shell Companies,United States,1245277696
+ZNB,1.54,45.28%,38.74%,0.0472,28200046,188313,969859,0.00021,0.00487,0.0656,Communication Services,Entertainment,China,1493584
