@@ -1,0 +1,4 @@
+Ticker,Price,Change %,Change from Open %,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+AIXI,3.33,120.53%,113.34%,0.0337,26362155,123698,565211,,,,Technology,Software - Application,China,853468
+FRGT,0.52,113.06%,54.94%,0.3751,63936494,498548,614783,0.00046,0.06678,0.0856,Technology,Software - Application,Mexico,150621
+SDEV,4.45,12.93%,32.42%,-0.1472,24281536,22550189,51751359,0.90075,0.032449998,0.0435,Financial Services,Asset Management,United States,203900368
