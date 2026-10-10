@@ -1,0 +1,9 @@
+Ticker,Price,Change %,Change from Open %,Gap,Volume,Shs Float,Shares Outstanding,Insider Own,Inst Own,Short Float,Sector,Industry,Country,Market Cap
+CUE,27.66,23.87%,24.54%,-0.0054,394674,6846492.0,7264414,0.09437,0.22799999,0.1015,Healthcare,Biotechnology,United States,200933696
+JZ,1.28,53.55%,60.00%,-0.0403,42962292,1403950.0,2377874,0.0,0.00147,0.09729999,Technology,Information Technology Services,China,3082640
+NXGL,0.2,33.53%,28.40%,0.04,10495549,,487383,0.14015001,0.13674,0.0385,Healthcare,Medical Instruments & Supplies,United States,97622
+PDSB,1.38,35.29%,32.69%,0.0196,16061955,44836400.0,72474208,0.19108999,0.10751,0.039300002,Healthcare,Biotechnology,United States,100014408
+QSI,1.53,25.41%,21.43%,0.0327999999999999,40903937,180222447.0,198946412,0.104540005,0.24825001,0.066300005,Healthcare,Medical Devices,United States,334892352
+SMJF,1.53,23.39%,20.47%,0.0242,8558766,2705116.0,14937500,0.26778,0.03964,0.0069999998,Consumer Cyclical,Textile Manufacturing,Singapore,42388648
+WFF,12.29,499.51%,490.87%,0.0146,146064663,38479395.0,41919934,0.08208,4.0000003e-05,0.0022,Industrials,Specialty Industrial Machinery,Malaysia,515196000
+ZYBT,1.73,50.45%,45.38%,0.0349,30600747,6261823.0,47391376,0.16163999,0.00914,0.0025,Healthcare,Drug Manufacturers - Specialty & Generic,China,81987080
